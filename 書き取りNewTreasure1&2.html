@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dictation Practice</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --border: #30363d;
+  --accent: #58a6ff;
+  --accent2: #3fb950;
+  --accent3: #f78166;
+  --nt1: #58a6ff;
+  --nt2: #d2a8ff;
+  --text: #e6edf3;
+  --muted: #7d8590;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 28px 16px;
+}
+
+.screen { display: none; max-width: 740px; margin: 0 auto; }
+.screen.active { display: block; }
+
+h1 {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(1.15rem, 3vw, 1.65rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.subtitle { color: var(--muted); font-size: 0.84rem; margin-bottom: 26px; }
+
+/* HOME */
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 6px;
+}
+@media(max-width:480px){ .home-grid { grid-template-columns: 1fr; } }
+
+.book-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 36px 22px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  user-select: none;
+}
+.book-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.45); }
+.book-card.nt1:hover { border-color: var(--nt1); }
+.book-card.nt2:hover { border-color: var(--nt2); }
+.book-icon { font-size: 2.8rem; margin-bottom: 14px; }
+.book-title { font-family: 'Space Mono', monospace; font-size: 1.25rem; font-weight: 700; margin-bottom: 8px; }
+.book-card.nt1 .book-title { color: var(--nt1); }
+.book-card.nt2 .book-title { color: var(--nt2); }
+.book-desc { color: var(--muted); font-size: 0.81rem; line-height: 1.65; }
+
+/* BACK BUTTON */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: 1px solid var(--border); border-radius: 7px;
+  color: var(--muted); padding: 6px 14px; font-size: 0.78rem;
+  cursor: pointer; font-family: 'Sora', sans-serif; margin-bottom: 18px;
+  transition: color .12s, border-color .12s;
+}
+.back-btn:hover { color: var(--text); border-color: var(--muted); }
+
+/* LESSON GRID */
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 9px;
+  margin-bottom: 20px;
+}
+.lesson-btn {
+  background: var(--surface); border: 1.5px solid var(--border);
+  color: var(--muted); border-radius: 10px; padding: 11px 6px;
+  cursor: pointer; font-family: 'Space Mono', monospace;
+  font-size: 0.74rem; text-align: center; white-space: pre; line-height: 1.5;
+  transition: all .13s;
+}
+.lesson-btn:hover { border-color: var(--accent); color: var(--text); }
+.lesson-btn.sel-nt1 { background: var(--nt1); border-color: var(--nt1); color: #000; font-weight: 700; }
+.lesson-btn.sel-nt2 { background: var(--nt2); border-color: var(--nt2); color: #000; font-weight: 700; }
+
+.start-btn {
+  display: block; width: 100%; max-width: 290px; margin: 0 auto;
+  padding: 15px; border: none; border-radius: 12px; color: #000;
+  font-family: 'Space Mono', monospace; font-size: .95rem; font-weight: 700;
+  cursor: pointer; letter-spacing: .05em; transition: opacity .15s, transform .1s;
+}
+.start-btn.nt1 { background: var(--nt1); }
+.start-btn.nt2 { background: var(--nt2); }
+.start-btn:disabled { opacity: .3; cursor: not-allowed; transform: none !important; }
+.start-btn:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
+
+/* PROGRESS */
+.progress-bar-wrap { background: var(--surface2); border-radius: 4px; height: 5px; margin-bottom: 24px; overflow: hidden; }
+.progress-bar { height: 100%; border-radius: 4px; width: 0%; transition: width .4s ease; }
+.progress-bar.nt1 { background: var(--nt1); }
+.progress-bar.nt2 { background: var(--nt2); }
+
+/* SENTENCE CARDS */
+.sentence-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 22px 20px; margin-bottom: 14px;
+}
+.sentence-num { font-family: 'Space Mono', monospace; font-size: .67rem; letter-spacing: .1em; margin-bottom: 10px; }
+.sentence-num.nt1 { color: var(--nt1); }
+.sentence-num.nt2 { color: var(--nt2); }
+
+/* play row: button + speed controls side by side */
+.play-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.speed-lbl { font-size: .7rem; color: var(--muted); }
+.spd {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 5px;
+  color: var(--muted); padding: 3px 9px; font-size: .7rem; font-family: 'Space Mono', monospace;
+  cursor: pointer; transition: all .12s;
+}
+.spd.on-nt1 { border-color: var(--nt1); color: var(--nt1); }
+.spd.on-nt2 { border-color: var(--nt2); color: var(--nt2); }
+.speed-controls { display: flex; gap: 5px; align-items: center; }
+
+.play-btn {
+  display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
+  border-radius: 8px; padding: 7px 14px; cursor: pointer;
+  font-family: 'Sora', sans-serif; font-size: .82rem; font-weight: 600;
+  transition: all .13s; white-space: nowrap;
+}
+.play-btn.nt1 { background: var(--surface2); border: 1.5px solid var(--nt1); color: var(--nt1); }
+.play-btn.nt1:hover, .play-btn.nt1.on { background: var(--nt1); color: #000; }
+.play-btn.nt2 { background: var(--surface2); border: 1.5px solid var(--nt2); color: var(--nt2); }
+.play-btn.nt2:hover, .play-btn.nt2.on { background: var(--nt2); color: #000; }
+
+.ans-box {
+  display: none; background: #1c2a1e; border: 2px solid var(--accent2);
+  border-radius: 12px; padding: 18px 22px; margin-top: 4px;
+}
+.ans-box.show { display: block; animation: fi .3s ease; }
+.ans-tag { font-family:'Space Mono',monospace; font-size:.63rem; color:var(--accent2); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; }
+.ans-txt { font-size: 1.65rem; line-height: 1.6; font-weight: 600; letter-spacing: 0.01em; }
+
+/* ACTIONS */
+.act-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.reveal-btn {
+  flex: 1; min-width: 145px; padding: 13px;
+  background: transparent; border: 1.5px solid var(--accent3); border-radius: 10px;
+  color: var(--accent3); font-family:'Space Mono',monospace; font-size:.81rem;
+  cursor: pointer; transition: all .13s;
+}
+.reveal-btn:hover { background: var(--accent3); color: #000; }
+.reveal-btn.done { opacity: .4; pointer-events: none; }
+
+.nxt-btn {
+  flex: 1; min-width: 145px; padding: 13px; border: none; border-radius: 10px;
+  color: #000; font-family:'Space Mono',monospace; font-size:.81rem; font-weight:700;
+  cursor: pointer; transition: opacity .13s; display: none;
+}
+.nxt-btn.nt1 { background: var(--nt1); }
+.nxt-btn.nt2 { background: var(--nt2); }
+.nxt-btn:hover { opacity: .85; }
+
+.fin-btn {
+  width: 100%; padding: 15px; border: none; border-radius: 12px; color: #000;
+  font-family:'Space Mono',monospace; font-size:.88rem; font-weight:700;
+  cursor: pointer; transition: opacity .13s; margin-top: 9px; display: none;
+}
+.fin-btn.nt1 { background: var(--nt1); }
+.fin-btn.nt2 { background: var(--nt2); }
+.fin-btn:hover { opacity: .85; }
+
+/* DONE */
+#done-screen { text-align: center; padding-top: 52px; }
+.done-icon { font-size: 3rem; margin-bottom: 12px; }
+.done-ttl { font-family:'Space Mono',monospace; font-size:1.35rem; color:var(--accent2); margin-bottom:8px; }
+.done-sub { color:var(--muted); margin-bottom:28px; font-size:.88rem; }
+.done-acts { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.d-btn { padding:12px 26px; border-radius:10px; font-family:'Space Mono',monospace; font-size:.83rem; cursor:pointer; transition:all .13s; }
+.d-btn.out { background:transparent; border:1.5px solid var(--accent); color:var(--accent); }
+.d-btn.out:hover { background:var(--accent); color:#000; }
+.d-btn.fil { background:var(--accent2); border:none; color:#000; font-weight:700; }
+.d-btn.fil:hover { opacity:.85; }
+
+@keyframes fi { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home-screen" class="screen active">
+  <h1 style="color:var(--accent)">✏️ Dictation Practice</h1>
+  <p class="subtitle">テキストを選んでください</p>
+  <div class="home-grid">
+    <div class="book-card nt1" onclick="goSelect('nt1')">
+      <div class="book-icon">📘</div>
+      <div class="book-title">NT 1</div>
+      <div class="book-desc">Lesson 1-1 〜 12-4<br>基礎英語・入門レベル</div>
+    </div>
+    <div class="book-card nt2" onclick="goSelect('nt2')">
+      <div class="book-icon">📗</div>
+      <div class="book-title">NT 2</div>
+      <div class="book-desc">Lesson 1-1 〜 12-3<br>標準英語・中級レベル</div>
+    </div>
+  </div>
+</div>
+
+<!-- SELECT -->
+<div id="select-screen" class="screen">
+  <button class="back-btn" onclick="goHome()">← ホームへ</button>
+  <h1 id="sel-title"></h1>
+  <p class="subtitle">レッスンを選んで ▶ スタートを押してください</p>
+  <div class="lesson-grid" id="lesson-grid"></div>
+  <button class="start-btn" id="start-btn" disabled onclick="startQuiz()">▶ スタート</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz-screen" class="screen">
+  <button class="back-btn" onclick="goSelect(curBook)">← レッスン選択へ</button>
+  <h1 id="quiz-title"></h1>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="prog"></div></div>
+  <div id="cards"></div>
+  <div class="act-row">
+    <button class="reveal-btn" id="rev-btn" onclick="revealAll()">🔍 解答を表示</button>
+    <button class="nxt-btn" id="nxt-btn" onclick="nextRound()">次のセット ▶</button>
+  </div>
+  <button class="fin-btn" id="fin-btn" onclick="showDone()">終了する</button>
+</div>
+
+<!-- DONE -->
+<div id="done-screen" class="screen">
+  <div class="done-icon">🎉</div>
+  <div class="done-ttl">お疲れさまでした！</div>
+  <p class="done-sub">書き取り練習が完了しました。</p>
+  <div class="done-acts">
+    <button class="d-btn out" onclick="goSelect(curBook)">← 同じテキストで続ける</button>
+    <button class="d-btn fil" onclick="goHome()">🏠 ホームへ</button>
+  </div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────────────
+// DATA
+// ──────────────────────────────────────────────────────
+const DATA = {
+  nt1: {
+    label: "NT 1",
+    lessons: {
+      "1-1":["I am Mary.","My name is Mary Smith.","I'm from Canada.","You are Tom.","I am not Mary.","You are not from Canada.","Are you from Australia? — Yes, I am. / No, I'm not."],
+      "1-2":["This is Lisa.","This is my textbook.","That is your locker.","This isn't Mary's notebook.","That is not my bag.","Is this Tom's desk? — Yes, it is. / No, it isn't.","Is that your bike? — No, it isn't. It's my sister's bike."],
+      "2-1":["This is Amy. She is my classmate.","That is Mr. Jones. He is my teacher.","Mr. Tanaka is my math teacher. He is not my science teacher.","This is Ms. Jones. She isn't my English teacher.","Is he your friend? — Yes, he is. / No, he isn't.","Is she Ken's sister? — Yes, she is. / No, she isn't. She is his mother.","Is he Mr. Brown? — No, he isn't. He is Mr. Smith."],
+      "2-2":["What is this? — It is a radish.","What's that? — It's an eggplant.","Tom is tall.","Tom is a tall boy."],
+      "2-3":["This is a big school.","This school is big.","That is an old temple.","That temple is old.","Who is that girl? — She is Karen.","Who's that man? — He's my uncle.","Is your house new or old? — It's new.","Is this a fruit or a vegetable? — It's a vegetable.","Is that lady a doctor or a nurse? — She is a doctor."],
+      "3-1":["I like tennis.","I practice tennis after school.","You play soccer well.","I don't speak Japanese at school.","Do you study English every day? — Yes, I do. / No, I don't."],
+      "3-2":["What do you have in your hand? — I have a tennis ball.","What do you do after school? — I practice tennis with Lisa.","I like books.","I need some pens.","Do you have any pens? — No, I don't have any.","How many pens do you need? — I need two.","I have a new book. This is the book.","I play the piano in the evening."],
+      "3-3":["Karen and I are classmates. We are good friends.","You are good baseball players.","John and Bob play baseball. They are teammates.","These are my brother's T-shirts. They are new.","Those coats are old.","That boy is John. Do you know him?","John and Bob play baseball with us after school."],
+      "4-1":["Ken likes books.","He goes to the library after school.","Lisa studies English every day.","She watches an English TV program in the morning.","She learns fifty English words every week.","Mr. Smith has two cats."],
+      "4-2":["My brother doesn't listen to music.","Ken doesn't play video games.","Does your mother cook Chinese food? — Yes, she does. / No, she doesn't.","Does she have many recipe books? — Yes, she does. / No, she doesn't.","I always drink milk for breakfast.","My father usually goes to work by car.","We sometimes go to Japanese restaurants.","Janet never eats natto.","My mother is always busy in the morning."],
+      "4-3":["Where do you live? — I live in Yokohama.","Where does this bus go? — It goes to Yokohama Station.","Where is the teachers' room? — It's on the second floor.","Where are your classmates? — They are over there.","What time does your school start? — It starts at eight.","When is your school festival? — It's in September.","When does the summer vacation end? — It ends on August 31."],
+      "5-1":["This pencil case is mine.","Is that ruler yours? — Yes, it is.","These staplers are not ours.","This hat is Mary's.","That coat is not my sister's. It's my mother's.","These T-shirts are my brothers'.","Whose umbrella is this? — It's mine.","Whose are those umbrellas? — They are Ken's."],
+      "5-2":["How many brothers do you have? — I have one.","How old is your brother? — He is 11 years old.","How tall is your mother? — She is 162 centimeters tall.","How high is Mt. Fuji? — It's 3,776 meters high.","How long is the Tone River? — It is about 322 kilometers long.","How deep is this lake? — It is about 15 meters deep.","How much is the ticket? — It is 30 dollars."],
+      "5-3":["Who plays baseball well? — Ken does.","Who is the captain of the baseball team? — Ken is.","Which is your cup, this one or that one? — That one is mine.","Which do you want, iced tea or hot tea? — I want hot tea.","What subject do you like? — I like P.E.","Which subject do you like, English or math? — I like math."],
+      "6-1":["Open the window.","Wash your hands, Ken.","Ken, use this towel.","Please put the plates on the table.","Have a seat, please.","Let's go to the park. — Yes, let's.","Let's play tennis again. — No, let's not. Let's play badminton next.","Don't touch the picture.","Please don't run in the museum."],
+      "6-2":["I can play the piano.","Bob can write songs.","Lisa and Tom can sing very well.","We can make a nice band.","I can't run fast.","Jun can't swim very well.","We cannot go to the pool today."],
+      "6-3":["Can you ski? — Yes, I can. / No, I can't.","Can Tom skate? — Yes, he can. / No, he can't.","Can Eri and Mary come with us? — Yes, they can. / No, they can't.","What can you see from there? — I can see a post office on the right.","Be a good boy, Rob.","Everybody, don't be noisy.","Don't be late for the club meeting."],
+      "7-1":["I am playing a video game now.","My brother is sleeping in his room.","My parents are watching TV in the living room.","Mary is making a cake for her mother.","Mary's parents are running in the park.","Mary's dog is lying on the sofa."],
+      "7-2":["I am not listening to music. I'm watching videos online.","Use this tablet. Jane is not using it now.","The students are not studying. They are taking a break.","Are you doing your homework now? — Yes, I am. / No, I'm not.","It smells good! Is Dad cooking? — Yes, he is. / No, he isn't.","Are Rob and Ken playing outside? — No, they aren't. They are working in the garden.","What is Ken looking for? — He is looking for his bag.","What are you doing here? — I am waiting for Ken.","Where is Mary going? — She is going to the teachers' room.","Who is talking loudly in the library? — Sam is."],
+      "7-3":["I drink milk every day.","I am drinking hot tea.","My father takes a bath before dinner.","My father is taking a shower now.","My cat usually sleeps on my bed.","My cat is sleeping by the table.","Sam loves tennis.","He knows the rules of tennis very well.","He has many tennis rackets.","He belongs to the tennis club."],
+      "8-1":["I cleaned my room last night.","My friend called me two days ago.","Lisa and I studied for our English exam yesterday.","She dropped her house key on her way home."],
+      "8-2":["I didn't use my smartphone last night.","My smartphone did not work yesterday.","Did you call Jane last Monday? — Yes, I did. / No, I didn't.","Did Jane call you back? — Yes, she did. / No, she didn't.","When did Mike visit Jane? — He visited her last week.","Where did Jane travel last weekend? — She traveled to Kyoto.","Who cleaned the living room? — Mike did."],
+      "8-3":["I went to London last month.","We left the hotel for the airport at five.","We saw a famous actor on the plane.","Did you buy a comic book? — No, I didn't. I bought a dictionary.","I didn't drink any coffee yesterday. I drank a lot of tea.","What did Mr. White eat this morning? — He ate an English breakfast.","What time did you get up this morning? — I got up at seven.","When did you come home? — I came home at 8 o'clock.","Who made this cake yesterday? — My mother did."],
+      "9-1":["I was tired last night.","My brother was in Hokkaido yesterday.","My parents were busy last week.","I wasn't hungry this morning.","My dogs weren't in the living room. They were in the garden.","Was Bob in the gym at 4 p.m.? — Yes, he was. / No, he wasn't.","Where were you at that time? — I was in the music room.","Who was angry at you? — Jim was."],
+      "9-2":["I was playing catch with my dad at 1 p.m. yesterday.","My sisters were having lunch then.","I wasn't studying at 9 o'clock last night.","We weren't listening to the teacher.","Were you talking with Bob at 10 p.m.? — Yes, I was. / No, I wasn't.","Were your sisters watching the drama then? — Yes, they were. / No, they weren't.","What was your mom doing at that time? — She was reading the newspaper in the living room.","Who was using the tablet in the living room? — My dad was."],
+      "9-3":["What is the date today? — It's October 23.","What day is it today? — It's Monday.","What time is it? — It's seven thirty.","How is the weather today? — It's cloudy.","It rained early this morning.","It is cold and dark outside now.","How far is it from your house to the station? — It's 1.5 kilometers. It's about twenty minutes' walk."],
+      "10-1":["I am going to visit my friend tomorrow.","We are going to have dinner together.","It is going to be rainy this afternoon.","Are you going to stay home tonight? — Yes, I am. / No, I'm not.","I am not going to climb Mt. Takao tomorrow.","What is Lisa going to do in the festival? — She is going to play the drums in a band.","Who is going to sing in the band? — Mike is."],
+      "10-2":["How do you go to school? — I always walk to school.","How did you carry such a big suitcase? — Dad carried it for me.","How long is Mr. Smith going to stay in Japan? — He is going to stay for a week.","How often does Mr. Smith come to Japan? — He comes to Japan twice a year.","Why is Mr. Smith angry? — Because John came late to class.","Why did John come late? — Because he talked with his friends for a long time."],
+      "10-3":["It will be rainy this afternoon.","I will take an umbrella with me.","It is raining. We won't go cycling today.","You can use my pen.","Can I borrow your dictionary? — Sure."],
+      "10-4":["You may come in.","May I have your name, please? — Yes. I'm Yamada Yumi.","It may snow tomorrow morning.","I must buy a ring for Lisa.","You must take off your hat in this restaurant.","Rob's story must be true.","You must not be late for the exam.","The students mustn't use cell phones during the exam."],
+      "11-1":["There is a zoo in my town.","There are two white tigers in the zoo.","There was a shopping mall near the zoo three years ago.","There were a lot of tourists in the town."],
+      "11-2":["There aren't any traffic lights on this road.","There is no library in our school.","There were no traffic lights on this island ten years ago.","Is there a supermarket near your house? — Yes, there is. / No, there isn't.","Are there any coffee shops on this island? — Yes, there are. / No, there aren't.","There are a lot of beautiful places in Japan.","Is there a lot of rain in Okinawa?","There is little snow in Okinawa.","Is there much snow in Hokkaido?"],
+      "11-3":["We want three cups of coffee and five glasses of orange juice.","I need a pen and a sheet of paper.","How many rooms are there in this hotel? — There are twenty rooms.","How many students were there at the entrance? — There were eight students.","How much sugar is there in the pot? — Only a little."],
+      "12-1":["I am as tall as my mother.","My old bicycle was as expensive as my new one.","Baseball is as popular in my country as in your country.","Yoshiki plays soccer as well as Robert.","Robert gets up as early as his mother.","In Brazil baseball is not as popular as soccer.","Our soccer team doesn't have as many players as yours.","Ken doesn't practice baseball as hard as John does."],
+      "12-2":["Mr. Smith is taller than my father.","John's new PC is bigger than mine.","This question was more difficult for me than that one.","Mike runs faster than John.","Please speak more slowly."],
+      "12-3":["Mt. Fuji is the highest mountain in Japan.","Tokyo is the largest of all cities in Japan.","Paris is the most popular city in the world for tourists.","Ken takes the first bus and arrives earliest in the class.","Yoko listened to the teacher most carefully of the five.","Mike plays basketball better than Bill does.","The score in the game was the worst in history.","Mike enjoyed the game the most in our team.","Mike is the best basketball player of our teammates."],
+      "12-4":["Which is older, the library or the gym? — The library is.","Who is younger, your brother or Tom's brother? — My brother is.","Which is the most popular club in your school? — The tennis club is.","Who is the tallest student in your class? — Tom is.","Who swims fastest of the four? — Ann does.","Which do you like better, history or math? — I like history better.","Which subject do you like the best? — I like P.E. the best.","What sport do you like the best? — I like basketball the best."],
+    }
+  },
+  nt2: {
+    label: "NT 2",
+    lessons: {
+      "1-1":["Janet's father is from Spain, and her mother is from America.","Janet can sing very well, but she's very shy.","Does she speak Spanish or English?","Get up now, and you'll be in time for school.","Be quick, or you'll miss the bus."],
+      "1-2":["When my sister was born, I was five years old.","I was very happy when I met my new sister.","While my sister was watching TV, I finished my homework.","I looked after my brothers while my parents were not at home.","After I finished the test, I played with my friends in the schoolyard.","I bought some flowers before I went to Mary's birthday party."],
+      "1-3":["Look up the sky. How beautiful the rainbow is!","I waved to Emi, but she ignored me. How rude she was!","Look at the puppy. How fast it runs!","What a difficult test that was! I must study harder.","What an interesting idea you have! Explain it to the class.","What unfair rules they are! I'm going to leave the club.","My brother always helps me with my homework. — How kind he is! / What a kind brother he is!"],
+      "2-1":["If you mix red and blue, you get purple.","You can change the color if you don't like it.","Let's meet at the bus stop if it rains.","The bus was late because the roads were busy.","Because the bus didn't come on time, I was late for school.","Why did you buy a new bike? — Because I want to go to school by bike.","Though it's sunny, it's very cold.","I stopped by a convenience store, although I was in a hurry."],
+      "2-2":["I know that Nancy is the daughter of the famous actor.","I hear that Nancy moved to the US.","Do you think that she'll be in a Hollywood movie?","I hope that you will pass the examination.","I know that your examination went well.","I think that he will go to the concert.","I thought that he would go to the concert."],
+      "2-3":["Shall we go to the movies together tomorrow? — Yes, let's. / No, let's not.","Shall I get the movie tickets? — Yes, please. / No, thank you.","Will you cook dinner today? — Sure. / I'm afraid I can't. I'm going out.","Will you come and have dinner with us? — Yes, I'd love to. / No, thank you.","You have to be home by six.","I had to come home early. I had a lot of homework.","David doesn't have to take the exam today.","Do you have a fever? You should see a doctor."],
+      "3-1":["Time flies.","My dog sleeps well.","My dog is cute.","Mary likes animals.","David became a soccer player.","David looked tired after the soccer game.","The boy became popular all around the world.","In six months he grew tall.","He feels great today."],
+      "3-2":["Maria's father gave her a new smartphone.","Please pass me the smartphone on the table.","Could you show me the photo?","Can you send me the photo by e-mail?","Our teacher told us an interesting story yesterday.","Did you make Janet lunch yesterday?","My father bought me a new computer."],
+      "3-3":["My name is Elizabeth. Please call me Beth.","The soccer match made me nervous. It was an important match.","Please leave me alone.","We must keep our uniforms clean.","We painted the bench white.","Beth found the sports program boring, so she turned off the TV.","What did you name your team? — We named it The Reds.","Beth made the team chocolate cookies.","We made Beth captain of our team."],
+      "4-1":["Kate likes to draw pictures of animals.","She began to paint when she was a little girl.","I want to borrow a book about art history.","What do you want to be in the future? — I want to be an artist.","To get up early is good for your health.","To talk with my friends makes me happy.","The important thing is to get enough sleep.","To see is to believe."],
+      "4-2":["Robert was in the music room yesterday to practice the piano.","He practices hard to be a good pianist.","He is working hard to save money.","He is going to visit New York to see a musical.","Why do you study English? — To communicate with people all over the world."],
+      "4-3":["There are many good places to see in Japan.","I need a guidebook to help me.","I didn't have enough time to prepare for the trip.","I want something to eat.","I want something cold to drink.","I have nothing special to do today.","Mary needs someone to make dinner for her."],
+      "5-1":["Swimming is fun.","Getting daily exercise is a good habit.","My father's favorite pastime is playing golf.","My mother's job is teaching tennis.","Chris enjoys studying math.","The teacher finished talking and we started the class.","Patrick stopped writing and put his pen on the desk.","After the test, he left the classroom without saying a word.","Don't worry about making mistakes."],
+      "5-2":["We began eating lunch at twelve o'clock.","My father enjoyed watching rugby games on TV after lunch.","I want to eat fried noodles today.","Tom doesn't remember meeting Mary in the cafeteria before.","Please remember to meet me in the cafeteria at noon tomorrow.","Mike is good at folding paper cranes.","Alison was tired of staying home every day.","I am looking forward to seeing you soon.","Would you mind opening the window?"],
+      "6-1":["Coffee is drunk all over the world.","Paper cups are used in many coffee shops.","Few paper cups were recycled last year.","These beautiful photos of shooting stars were taken by Chris.","Pluto was discovered by an American astronomer.","English is not spoken in this area.","Are Japanese comic books read in New York? — Yes, they are. / No, they aren't.","These e-books can be downloaded for free."],
+      "6-2":["What was stolen from Mary's locker? — Her purse was.","Where was Mary's purse found? — It was found in the restroom.","Who was told about the problem first? — The shop clerk was.","The hall was filled with people.","The singer is known to people all over the world.","We were surprised at the beautiful voice of the singer.","Mary and I were pleased with the concert.","We were caught in the rain on our way home."],
+      "6-3":["The gold medal was given to Ann by the school. Ann was given the gold medal by the school.","A Christmas gift was sent to Ted by his uncle. Ted was sent a Christmas gift by his uncle.","These cookies were made for us by Beth.","My mother was named Christine by my grandmother.","At school, my mother was called Chris by her friends."],
+      "7-1":["I have just eaten my lunch. So I'm full.","My mother has already washed the dishes.","My brother has lost his smartphone.","I have not written my essay yet.","My brother has not found his smartphone yet.","Have you found your smartphone yet? — Yes, I have. / No, I haven't."],
+      "7-2":["I have seen that movie before.","My parents have visited France twice.","My dad has talked with that famous dancer.","My brother has never traveled by plane in his life.","Have you ever traveled on a ship? — Yes, I have. / No, I haven't.","How often have you been to Hawaii? — I have been there four times.","How many times have you traveled abroad? — Only once."],
+      "7-3":["David has lived in Tokyo for two years.","He and I have known each other since last year.","We have been in the same class for six months.","David hasn't seen his friends in the US for a long time.","Have you been busy since you came to Tokyo? — Yes, I have. / No, I haven't.","How long have you lived in this city? — I have lived here for two years.","How long has David been famous in Japan? — He has been famous since he won the dance competition."],
+      "7-4":["I have been making a poster for the school festival since this morning.","Ken has been surfing the Internet for an hour.","Have you been studying during the break? — Yes, I have. / No, I haven't.","How long have you been waiting for your teacher? — For about forty minutes."],
+      "8-1":["My family is large.","My family are all tall.","I bought two pumpkins, a bottle of milk and two pounds of butter.","My mother gave me some good advice when I made dinner.","The secret of my sister's success is a lot of hard work.","My brother David left Tokyo for Los Angeles this morning."],
+      "8-2":["I lost my umbrella yesterday, so I have to buy one.","Which is your highlighter? — The yellow one.","I bought two shirts and threw away the old ones.","I don't like this sweater. Could you show me another?","I have two cousins. One is in Osaka and the other is in Fukuoka.","I have five dogs. One is male and the others are female.","The members of my club celebrated my birthday. All of them gave me a present.","You should thank each of them for the present.","I have a brother. Both of us were born in October."],
+      "8-3":["Ted introduced himself to the class.","All of the students enjoyed themselves at the welcome party.","I put on a new T-shirt and looked at myself in the mirror.","Help yourself to anything on the table.","The president himself welcomed the guest at the entrance.","The students planned the festival themselves.","We will talk with the doctor himself.","Ted is honesty itself."],
+      "9-1":["I need a new phone because I lost my old one.","When I took my dog for a walk yesterday, nothing strange happened.","Have you ever been to the restaurant on 47th Street?","We are looking for a good restaurant to recommend to my friends.","James has the ability to cook Japanese and French dishes."],
+      "9-2":["We got up early to see the rising sun on New Year's Day.","Wash these lettuce leaves in running water, please.","Which would you like for breakfast, a boiled egg or scrambled eggs?","The police officer found the stolen bike near the station.","Can you see the two girls there? The girl sitting on the left is Lisa.","Who was the tall boy running in the schoolyard?","I love the meals served in our school.","Can everybody see the figure drawn on the blackboard?"],
+      "10-1":["Mike is the boy who lives next door.","Do you know the boys who are playing tennis over there?","The boy who is playing tennis with my brother is Mike.","We usually play shogi in the community center which is close to our school.","A dictionary is a book which explains the meaning of words.","The dog which is chasing after a ball is Jack.","Nancy helped the students that couldn't solve the problem.","I need more information that will help me with my report.","This is the book that is famous for its beautiful cover."],
+      "10-2":["Is that the boy that you met at the bookstore?","Tell me about the book which you like the best.","The writer that I like is only eighteen years old.","When will the book which I ordered arrive?","I replied to an e-mail from a boy I met in Rome.","I've got an e-mail I have to check as soon as possible.","The e-mail you sent me yesterday was really interesting."],
+      "10-3":["This is the best movie that I have ever seen.","This is the first novel that she read in English.","All the books that I am reading were bought by my father recently.","The hero in the story can't remember anything that happened to him.","In the book, I like the boy and the dog that are traveling together.","Write about the people and things that interest you."],
+      "11-1":["It is difficult to get up early every morning.","It is important to prepare for an earthquake.","It will be a lot of fun to ride the roller coaster tomorrow.","It is difficult for me to explain my thoughts in English.","It isn't necessary for you to write the book report now.","I want you to clean the living room while I'm out.","My mother told me to share the cake with my brother.","I had a toothache. My mother advised me to see the dentist."],
+      "11-2":["Have you decided what to do during the summer vacation?","I'm not sure who to ask about the hotels in London.","We discussed where to go on our vacation.","Juliet is wondering when to buy the plane tickets.","I don't know how to pronounce this word.","She is thinking about which museums to visit in England.","I'm lost. Could you tell me how to get to the hotel?","I asked Mr. Jones what to do in London."],
+      "11-3":["Betty was too shy to talk to the teacher.","She was too nervous to ask a question.","The teacher spoke too fast for her to understand.","The homework was too difficult for her to finish in a day.","This tea is so hot that I can't drink it.","The traffic was so busy that I couldn't be in time for the class.","My little brother is old enough to walk to our grandparents' house.","I left home early enough to be in time for school.","This bag isn't big enough for me to pack all the clothes I need for travel."],
+      "11-4":["My mother makes me eat fresh yogurt every morning.","My brother's joke made everyone laugh.","Our father sometimes lets us stay up late.","Please let me know when you need any help.","My sister had the server bring another glass of water."],
+      "12-1":["I don't know when the party will start.","I cannot imagine what Karen wants for her birthday.","I have to tell the guests where they should hang their coats.","Can you tell me why Sam refused my invitation?","Do you know who made this birthday cake?","I wonder how many guests will come to the party.","Takashi didn't know where Nancy was going last night.","He asked me when she would come home.","I wanted to know how I could contact you while you were out."],
+      "12-2":["This is a great restaurant, isn't it?","Jim ate a whole pizza, didn't he?","We can share this steak, can't we?","New York isn't the capital city of the US, is it?","Bob doesn't like tomatoes, does he?","You have met my cousin, haven't you?","Let's go to the beach after lunch, shall we?","Pass me a cold drink, will you?","There are a lot of people on this beach today, aren't there?"],
+      "12-3":["If it rains tomorrow, I will go to school by bus.","If I had wings, I would fly to school.","If I were not busy, I would help you.","If John were on the team, we could win the tournament.","If I had my smartphone with me, I could send text messages to John.","What would you like to do if you were ten years older?","The musical was amazing! I wish I could sing like the star!","Mary's brother behaves as if he were a movie star."],
+    }
+  }
+};
+
+// ──────────────────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────────────────
+let curBook = 'nt1';
+let curLesson = null;
+let curSents = [];
+let cardSpd = [1.0, 1.0, 1.0]; // カードごとの速度
+let currentBtn = null; // 現在再生中のボタン
+
+// ──────────────────────────────────────────────────────
+// HELPERS
+// ──────────────────────────────────────────────────────
+const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); };
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const rand3 = arr => [...arr].sort(()=>Math.random()-.5).slice(0,Math.min(3,arr.length));
+const C = id => document.getElementById(id);
+
+// ──────────────────────────────────────────────────────
+// NAV
+// ──────────────────────────────────────────────────────
+function goHome() { synth().cancel(); show('home-screen'); }
+
+function goSelect(book) {
+  synth().cancel();
+  curBook = book;
+  curLesson = null;
+  // title
+  C('sel-title').textContent = `📚 ${DATA[book].label} — レッスン選択`;
+  C('sel-title').style.color = `var(--${book})`;
+  // start btn
+  C('start-btn').className = `start-btn ${book}`;
+  C('start-btn').disabled = true;
+  // grid
+  const grid = C('lesson-grid');
+  grid.innerHTML = '';
+  Object.keys(DATA[book].lessons).forEach(key => {
+    const b = document.createElement('button');
+    b.className = 'lesson-btn';
+    b.textContent = `Lesson\n${key}`;
+    b.onclick = () => {
+      grid.querySelectorAll('.lesson-btn').forEach(x=>x.className='lesson-btn');
+      b.classList.add(`sel-${book}`);
+      curLesson = key;
+      C('start-btn').disabled = false;
+    };
+    grid.appendChild(b);
+  });
+  show('select-screen');
+}
+
+// ──────────────────────────────────────────────────────
+// QUIZ
+// ──────────────────────────────────────────────────────
+function startQuiz() {
+  C('quiz-title').textContent = `✏️ ${DATA[curBook].label} — Lesson ${curLesson}`;
+  C('quiz-title').style.color = `var(--${curBook})`;
+  C('prog').className = `progress-bar ${curBook}`;
+  C('nxt-btn').className = `nxt-btn ${curBook}`;
+  C('fin-btn').className = `fin-btn ${curBook}`;
+  loadRound();
+  show('quiz-screen');
+}
+
+function loadRound() {
+  curSents = rand3(DATA[curBook].lessons[curLesson]);
+  cardSpd = [1.0, 1.0, 1.0];
+  currentBtn = null;
+  renderCards();
+  C('prog').style.width = '0%';
+  C('rev-btn').className = 'reveal-btn';
+  C('rev-btn').textContent = '🔍 解答を表示';
+  C('nxt-btn').style.display = 'none';
+  C('fin-btn').style.display = 'none';
+}
+
+function renderCards() {
+  const box = C('cards');
+  box.innerHTML = '';
+  curSents.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'sentence-card';
+    d.innerHTML = `
+      <div class="sentence-num ${curBook}">SENTENCE ${i+1} / 3</div>
+      <div class="play-row">
+        <button class="play-btn ${curBook}" id="pb${i}" onclick="play(${i})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          再生
+        </button>
+        <div class="speed-controls">
+          <span class="speed-lbl">速度:</span>
+          <button class="spd ${cardSpd[i]===0.7?'on-'+curBook:''}" onclick="setSpd(0.7,this,${i})">0.7x</button>
+          <button class="spd ${cardSpd[i]===1.0?'on-'+curBook:''}" onclick="setSpd(1.0,this,${i})">1.0x</button>
+          <button class="spd ${cardSpd[i]===1.3?'on-'+curBook:''}" onclick="setSpd(1.3,this,${i})">1.3x</button>
+        </div>
+      </div>
+      <div class="ans-box" id="ab${i}">
+        <div class="ans-tag">✓ Answer</div>
+        <div class="ans-txt">${esc(s)}</div>
+      </div>`;
+    box.appendChild(d);
+  });
+}
+
+function setSpd(v, btn, idx) {
+  cardSpd[idx] = v;
+  btn.closest('.speed-controls').querySelectorAll('.spd').forEach(b => {
+    b.className = 'spd';
+    if (parseFloat(b.textContent) === v) b.classList.add(`on-${curBook}`);
+  });
+}
+
+function synth() { return window.speechSynthesis || {cancel:()=>{},speak:()=>{}}; }
+
+function resetPlayBtn(btn) {
+  btn.classList.remove('on');
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> もう一度`;
+}
+
+function play(i) {
+  synth().cancel();
+  // 前のボタンをリセット
+  if (currentBtn) resetPlayBtn(currentBtn);
+  const btn = C(`pb${i}`);
+  currentBtn = btn;
+  btn.classList.add('on');
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> 再生中...`;
+  const u = new SpeechSynthesisUtterance(curSents[i]);
+  u.lang = 'en-US'; u.rate = cardSpd[i];
+  const done = () => {
+    if (currentBtn === btn) {
+      resetPlayBtn(btn);
+      currentBtn = null;
+    }
+  };
+  u.onend = done;
+  u.onerror = done;
+  synth().speak(u);
+}
+
+function revealAll() {
+  curSents.forEach((_,i)=>C(`ab${i}`).classList.add('show'));
+  C('rev-btn').classList.add('done');
+  C('rev-btn').textContent = '✓ 解答表示済み';
+  C('nxt-btn').style.display = 'flex';
+  C('fin-btn').style.display = 'block';
+  C('prog').style.width = '100%';
+}
+
+function nextRound() { synth().cancel(); currentBtn = null; loadRound(); }
+
+function showDone() { synth().cancel(); currentBtn = null; show('done-screen'); }
+
+// Enter key → start quiz (when on select screen and lesson chosen)
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const sel = document.getElementById('select-screen');
+    const quiz = document.getElementById('quiz-screen');
+    if (sel.classList.contains('active')) {
+      const sb = C('start-btn');
+      if (!sb.disabled) startQuiz();
+    } else if (quiz.classList.contains('active')) {
+      // Enter on quiz screen: reveal if not yet, else next round
+      const rb = C('rev-btn');
+      if (!rb.classList.contains('done')) revealAll();
+      else nextRound();
+    }
+  }
+});
+</script>
+</body>
+</html>

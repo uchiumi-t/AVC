@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ドラゴンイングリッシュ</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=Lora:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #faf7f2;
+    --warm-white: #fff9f2;
+    --ink: #1a1410;
+    --ink-light: #4a3f35;
+    --ink-muted: #9c8c7c;
+    --accent: #c0392b;
+    --accent-dark: #922b21;
+    --accent-light: #fadbd8;
+    --gold: #d4ac0d;
+    --border: #e8ddd0;
+    --surface: #ffffff;
+  }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+  }
+
+  /* ── SELECTION SCREEN ── */
+  #screen-select {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  .app-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .app-title {
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .app-title span {
+    color: var(--accent);
+  }
+
+  .app-sub {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--ink-muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* toolbar */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .toolbar-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-light);
+    letter-spacing: 0.08em;
+    margin-right: 4px;
+  }
+
+  .btn-tool {
+    padding: 6px 16px;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--ink-light);
+    transition: all 0.15s;
+  }
+  .btn-tool:hover { background: var(--border); }
+
+  .btn-tool.danger {
+    border-color: #e8b4b0;
+    color: var(--accent);
+  }
+  .btn-tool.danger:hover { background: var(--accent-light); }
+
+  .select-count {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--ink-muted);
+    font-weight: 700;
+  }
+  .select-count em {
+    font-style: normal;
+    color: var(--accent);
+    font-size: 15px;
+  }
+
+  /* grid */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+    margin-bottom: 32px;
+    max-height: 56vh;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .card-grid::-webkit-scrollbar { width: 4px; }
+  .card-grid::-webkit-scrollbar-track { background: transparent; }
+  .card-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .item-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    line-height: 1.45;
+    user-select: none;
+  }
+
+  .item-label:hover { border-color: #c0a898; background: #fdf8f5; }
+
+  .item-label.checked {
+    border-color: var(--accent);
+    background: #fff5f4;
+  }
+
+  .item-label input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 17px; height: 17px;
+    min-width: 17px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    margin-top: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: white;
+    position: relative;
+  }
+
+  .item-label input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .item-label input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 1px; left: 4px;
+    width: 5px; height: 9px;
+    border: 2px solid white;
+    border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+
+  .item-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 22px;
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  .item-text {
+    font-size: 12px;
+    color: var(--ink-light);
+    flex: 1;
+  }
+
+  /* start button */
+  .start-wrap {
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+  }
+
+  .btn-start {
+    padding: 16px 56px;
+    font-size: 17px;
+    font-family: inherit;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(192,57,43,0.35);
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+  .btn-start:hover {
+    background: var(--accent-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(192,57,43,0.4);
+  }
+  .btn-start:active { transform: translateY(0); }
+  .btn-start:disabled {
+    background: #ccc; box-shadow: none; cursor: not-allowed; transform: none;
+  }
+
+  /* ── STUDY SCREEN ── */
+  #screen-study {
+    display: none;
+    min-height: 100vh;
+    padding: 32px 20px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #screen-study.active {
+    display: flex;
+  }
+
+  .study-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .study-title {
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+  }
+
+  .study-progress {
+    font-size: 13px;
+    color: var(--ink-muted);
+    font-weight: 700;
+  }
+
+  .study-progress em {
+    font-style: normal;
+    color: var(--accent);
+    font-size: 16px;
+  }
+
+  .btn-back {
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 5px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--ink-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-back:hover { background: var(--border); }
+
+  /* question card */
+  .q-card {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 44px 48px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .q-label {
+    position: absolute;
+    top: 18px; left: 24px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  #japanese-text {
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.7;
+    text-align: center;
+  }
+
+  /* answer card */
+  .a-card {
+    width: 100%;
+    background: #fff5f4;
+    border: 2px solid var(--accent-light);
+    border-radius: 20px;
+    padding: 36px 48px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 16px rgba(192,57,43,0.06);
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.25s;
+    position: relative;
+  }
+
+  .a-card.hidden-ans { opacity: 0; pointer-events: none; }
+
+  .a-label {
+    position: absolute;
+    top: 14px; left: 24px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+
+  #english-text {
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(20px, 3.5vw, 30px);
+    font-weight: 600;
+    color: var(--accent-dark);
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  /* controls */
+  .controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .btn-main {
+    padding: 14px 40px;
+    font-size: 15px;
+    font-family: inherit;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 3px 14px rgba(192,57,43,0.3);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .btn-main:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  .btn-main:active { transform: translateY(0); }
+
+  .btn-speak {
+    padding: 14px 28px;
+    font-size: 15px;
+    font-family: inherit;
+    font-weight: 700;
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent-light);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: none;
+  }
+  .btn-speak.visible { display: inline-block; }
+  .btn-speak:hover { background: var(--accent-light); }
+
+  /* hints */
+  .key-hints {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 0.06em;
+  }
+
+  .key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-bottom: 2px solid #d0c4b4;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-family: inherit;
+    background: white;
+    color: var(--ink-light);
+  }
+
+  /* animation */
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .anim { animation: fadeSlide 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<!-- ===== SELECTION SCREEN ===== -->
+<div id="screen-select">
+  <div class="app-header">
+    <div class="app-title">ドラゴン<span>イングリッシュ</span></div>
+    <div class="app-sub">暗記用フラッシュカード — 問題セットを選んでスタート</div>
+  </div>
+
+  <div class="toolbar">
+    <span class="toolbar-label">問題を選択</span>
+    <button class="btn-tool" id="btn-all">すべて選択</button>
+    <button class="btn-tool danger" id="btn-none">選択を解除</button>
+    <span class="select-count" id="select-count"><em>0</em> 問 選択中</span>
+  </div>
+
+  <div class="card-grid" id="card-grid"></div>
+
+  <div class="start-wrap">
+    <button class="btn-start" id="btn-start" disabled>選択した問題でスタート →</button>
+  </div>
+</div>
+
+<!-- ===== STUDY SCREEN ===== -->
+<div id="screen-study">
+  <div class="study-header">
+    <div class="study-title">ドラゴンイングリッシュ</div>
+    <div class="study-progress">問題 <em id="prog-cur">1</em> / <span id="prog-total">—</span></div>
+    <button class="btn-back" id="btn-back">← 選択画面へ</button>
+  </div>
+
+  <div class="q-card">
+    <span class="q-label">JAPANESE</span>
+    <div id="japanese-text">—</div>
+  </div>
+
+  <div class="a-card hidden-ans" id="a-card">
+    <span class="a-label">ENGLISH</span>
+    <div id="english-text"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-speak" id="speak-button">🔊 もう一度聞く</button>
+    <button class="btn-main" id="next-button">答えを表示</button>
+  </div>
+
+  <div class="key-hints">
+    <div class="hint"><span class="key">Space</span> 答えを表示 / 次へ</div>
+    <div class="hint"><span class="key">Enter</span> 答えを表示</div>
+    <div class="hint"><span class="key">Esc</span> 読み上げ停止</div>
+  </div>
+</div>
+
+<script>
+const flashcards = [
+{ 
+    japanese: "1.ウイスキーのボトルを2本も空けて車を運転するのは危険だ。", 
+    english: "It would be dangerous to drink two bottles of whiskey and drive a car." 
+},
+{ 
+    japanese: "2.交通量の多い通りを、信号が青に変わらないうちに横断するのはとても危険です。", 
+    english: "It is very dangerous to cross a busy street before the light turns green." 
+},
+{ 
+    japanese: "3.早朝、鳥のさえずりを聴きながら散歩するのは本当に気持ちがいい。", 
+    english: "It is really pleasant to take a walk early in the morning, listening to birds sing." 
+},
+{ 
+    japanese: "4.日本の高校生の大半が、大学入試に備えるため塾に行く。", 
+    english: "Most Japanese high school students go to a cram school to prepare for college entrance exams." 
+},
+{ 
+    japanese: "5.日本人は、エレベーターや信号待ちだと、わずか30秒でいらいらし始める。", 
+    english: "When waiting for the elevator to come or the traffic light to change, most Japanese people become irritated in only thirty seconds." 
+},
+{ 
+    japanese: "6.列車で隣に座ったおばあさんに、どこまで行くのかと尋ねられた。", 
+    english: "An elderly woman sitting next to me on the train asked me where I was going." 
+},
+{ 
+    japanese: "7.公共の交通機関では不便だから、レンタカーを借りてその街をあちこち見て回るのはどうだろう、とトムは言った。", 
+    english: "Tom told us that we should rent a car to get around the city because the public transportation was inconvenient." 
+},
+{ 
+    japanese: "8.いつ結婚するか、子どもを産むか産まないかは、各人の自由な判断によるべきだ。", 
+    english: "Everyone should be free to decide when to get married and whether to have children." 
+},
+{ 
+    japanese: "9.大地震がいつどこで起こるかは予測不可能だ。", 
+    english: "It is impossible to predict where and when there will be a major earthquake." 
+},
+{ 
+    japanese: "10.トムは万事うまくいくと言い張ったが、私は心配で仕方なかった。", 
+    english: "Tom insisted that everything would be all right, but I couldn't help feeling worried." 
+},
+{ 
+    japanese: "11.僕の発言が彼女を傷つけるなんて思いもしなかった。", 
+    english: "It never occurred to me that my remark might hurt her feelings." 
+},
+{ 
+    japanese: "12.「トム、ごはんですよ。」「わかった。すぐ行くよ」", 
+    english: "\"Tom, dinner is ready.\" \"Ok, Mom. I'm coming.\"" 
+},
+{ 
+    japanese: "13.成田空港に着いたら電話します。", 
+    english: "I'll call you when I get to Narita Airport." 
+},
+{ 
+    japanese: "14.ここから東京ディズニーランドまで電車で行くなら、3回も乗り換えが必要になります。", 
+    english: "If you take the train to Tokyo Disneyland from here, you have to change three times." 
+},
+{ 
+    japanese: "15.大学を卒業したら海外で仕事を探すことに決めている。", 
+    english: "I've decided to look for a job abroad when I graduate from college." 
+},
+{ 
+    japanese: "16.このドライヤー、動かないわ。壊れたみたい。", 
+    english: "This dryer doesn't work. Something seems to be wrong with it." 
+},
+{ 
+    japanese: "17.アメリカでのホームステイで一番うれしかったことは、ホストファミリーの両親が私を自分の娘のように扱ってくれたことです。", 
+    english: "The best thing about my stay with an American family was that the parents treated me just like their daughter." 
+},
+{ 
+    japanese: "18.１０代の頃、父の仕事の関係でカナダに３年間住んだことがある。", 
+    english: "I lived in Canada for three years when I was in my teens because my father was transferred there." 
+},
+{ 
+    japanese: "19.インターネットの普及と共に、ここ数年、パソコンの売り上げが急速に伸びている。", 
+    english: "The Internet is widely used, so sales of personal computers have been rapidly increasing over the last few years." 
+},
+{ 
+    japanese: "20.トムが水泳の名人だと自慢するのをたびたび聞いたことがあるが、実際に泳いでいるところを見たことが無い。", 
+    english: "I've often heard Tom boast that he is very good at swimming, but I've never actually seen him swim." 
+},
+{ 
+    japanese: "21.コンビニでアルバイトを始めてから１週間にしかならないが、もうすっかり仕事に慣れた。", 
+    english: "It has been only a week since I began a part-time job at a convenience store, but I'm already used to it." 
+},
+{ 
+    japanese: "22.今朝電車に乗った時空いた席が見つからなかった。", 
+    english: "When I got on the train this morning, I couldn't find an empty seat." 
+},
+{ 
+    japanese: "23.今はめがねをかけていないので、あの標示に何と書いてあるのかわかりません。", 
+    english: "I'm not wearing glasses now, so I can't make out what the sign says." 
+},
+{ 
+    japanese: "24.私は、故郷に帰れば24時間もしないうちに、自然と地元の方言を話している。", 
+    english: "Less than twenty-four hours after I return to my hometown, without realizing it, I start to talk in the local dialect." 
+},
+{ 
+    japanese: "25.人間は５～６歳になる頃には、思ったことを表現できる能力を持つようになる。", 
+    english: "Humans learn to express what they think by the age of five or six." 
+},
+{ 
+    japanese: "26.先日描いてもらった地図のおかげで、迷わずにここまで来ることができました。", 
+    english: "Thanks to the map you drew me the other day, I managed to get here without getting lost." 
+},
+{ 
+    japanese: "27.この夏に2週間の休みをとり、妻とヨーロッパ旅行に行きました。", 
+    english: "Last summer I took two weeks off, and went on a trip to Europe with my wife." 
+},
+{ 
+    japanese: "28.ボブはずいぶんと変わっていたので、このまえクラス会で会った時に彼だとわからなかった。", 
+    english: "Bob had changed a lot, so when I saw him at a class reunion, I didn't recognize him." 
+},
+{ 
+    japanese: "29.20年ぶりに訪れた故郷はすっかり変わってしまい、昔の面影をとどめていなかった。", 
+    english: "When I visited my hometown for the first time in twenty years, I found that it was no longer what it used to be." 
+},
+{ 
+    japanese: "30.昨日は数学の予習に追われて4時まで起きていたので、とても眠い。", 
+    english: "I stayed up till four last night preparing for the math lesson, so I feel very sleepy." 
+},
+{ 
+    japanese: "31.図書館から昨日借りてきた小説を読み終えたので、今はすることがない。", 
+    english: "I've finished reading the novel I borrowed from the library yesterday, so now I have nothing to do." 
+},
+{ 
+    japanese: "32.この薬を飲んで寝ていれば、たぶん2~3日で良くなっていたのに。", 
+    english: "If you had taken this medicine and stayed in bed, you would probably have got well in two or three days." 
+},
+{ 
+    japanese: "33.先生は、このまま出発すると途中で雷雨に見舞われる危険があるので、しばらくここで待った方がいいと言っています。", 
+    english: "The teacher says that we should wait here for a while because if we left now, we might get caught in a thunderstorm on the way." 
+},
+{ 
+    japanese: "34.不老不死は人間の夢である。しかし、もしこれが実現したら地球は人であふれてしまう。", 
+    english: "People wish they could live forever and never become older. However, if this wish came true, there would be too many people on the earth." 
+},
+{ 
+    japanese: "35.アンはうれしそうな顔をしているね。何かいいことがあったに違いない。", 
+    english: "Ann looks happy. Something good must have happened to her." 
+},
+{ 
+    japanese: "36.ヨーロッパの古都に行ったことのある人ならば、町並みの美しさに感動したに違いない。", 
+    english: "If you have been to old European cities, you must have been impressed by the beautiful streets." 
+},
+{ 
+    japanese: "37.もし石油や石炭などの化石燃料がなかったら、20世紀の歴史はまったく異なったものになっていたに違いない。", 
+    english: "Without fossil fuels such as oil and coal, the history of the 20th century would have been completely different." 
+},
+{ 
+    japanese: "38.図書館に来る学生の中には、まるで喫茶店にいるかのように振る舞う者がいる。", 
+    english: "Some students coming to the library act as if they are in a coffee shop." 
+},
+{ 
+    japanese: "39.子供の頃、もう少し家が広ければと思ったものでした。", 
+    english: "When I was a child, I often wished my house were a little larger." 
+},
+{ 
+    japanese: "40.洪水や地震などの被災者を手助けするボランティアとして活動したい。", 
+    english: "I'd like to work as a volunteer helping victims of natural disasters, such as floods or earthquakes." 
+},
+{ 
+    japanese: "41.トムは素晴らしいドラムを持っていますが、誰にも使わせません。", 
+    english: "Tom has nice drums, and he never lets anyone else play them." 
+},
+{ 
+    japanese: "42.最初トムは冗談を言っていると思ったが、後で本気だとわかった。", 
+    english: "At first I thought Tom was joking, but later I realized he was serious." 
+},
+{ 
+    japanese: "43.この前の日曜日、生まれて初めてイタリア料理に挑戦してみましたが、とってもおいしいものができました。", 
+    english: "Last Sunday I tried making some Italian food for the first time, and it was delicious." 
+},
+{ 
+    japanese: "44.夏は暑くて何をする気にもなれないから嫌いだと言う人がいます。しかし、海で泳ぐことができるので、私はその夏の暑さが好きです。", 
+    english: "Some people say that they don't like summer because it is so hot that they don't feel like doing anything. However, I like the heat of summer because I can swim in the sea." 
+},
+{ 
+    japanese: "45.ジェームズが8年前日本に来たのは、お寺めぐりがしたかっただけでなく、日本人の彼女がいたからだ。", 
+    english: "James came to Japan eight years ago not only because he wanted to visit temples, but also because he had a Japanese girlfriend." 
+},
+{ 
+    japanese: "46.私はヒトクローンに反対します。なぜなら独裁者が自らの複製を作り出すことになるかもしれないからです。", 
+    english: "I am against human cloning. That is because it could cause duplication of dictators." 
+},
+{ 
+    japanese: "47.グラフを見ると、日本における出生率は1985年以降減少している。理由の1つは子育てにお金がかかるからだ。", 
+    english: "The graph shows that in Japan the birth rate has been decreasing since 1985. This decrease is partly because it costs a lot of money to raise children." 
+},
+{ 
+    japanese: "48.私はアンに遅刻したことを謝ったが、許してくれなかった。", 
+    english: "I apologized to Ann for being late, but she didn't forgive me." 
+},
+{ 
+    japanese: "49.数学の授業中に携帯電話が鳴り出して先生にひどく叱られた。電源を切っておかなかったことをとても後悔した。", 
+    english: "During the math class, my cell phone began to ring, and the teacher severely scolded me. I regretted that I hadn't turned it off." 
+},
+{ 
+    japanese: "50.毎日、家事がとても忙しく、映画を観に行く暇がない。", 
+    english: "I'm so busy doing the housework every day that I have no time to see a movie." 
+},
+{ 
+    japanese: "51.この木の机は重いので私1人では2階まで運べない。", 
+    english: "This wooden desk is too heavy for me to carry upstairs alone." 
+},
+{ 
+    japanese: "52.ヨーロッパ旅行中、どこの国に行っても多くの日本人旅行者に出会うのでうんざりしました。", 
+    english: "While traveling in Europe, I was disappointed that wherever I went, there were many Japanese tourists." 
+},
+{ 
+    japanese: "53.私がプレゼントしたイヤリングをして母が会社に行くのを見て、とてもうれしかった。", 
+    english: "I was very happy when I saw my mother going to work wearing the earrings I had bought her." 
+},
+{ 
+    japanese: "54.学校は勉強だけを教えているところだと思うのは、学校の役割を理解していない証拠です。", 
+    english: "If you expect that schools only teach academic subjects, then this proves that you don't understand what schools are for." 
+},
+{ 
+    japanese: "55.たいていの日本人は、大部分の時間を生きるために働いて過ごす。", 
+    english: "Most Japanese people spend most of their time working to live." 
+},
+{ 
+    japanese: "56.日本人は、他人を傷つけないように自分の気持ちはできるだけ間接的に表現するのがふつうだ。", 
+    english: "Japanese people usually express their feelings as indirectly as possible so that they won't offend others." 
+},
+{ 
+    japanese: "57.大学の優劣は、図書館の質や規模だけではなく、教師と学生の能力に左右される。", 
+    english: "Whether a college is good or bad depends not only on how many books its library has and how good they are. It also depends on how intelligent its teachers and students are." 
+},
+{ 
+    japanese: "58.大気中のCO₂の増加は、地球温暖化と密接な関連がある。", 
+    english: "The increase in the amount of CO₂ in the atmosphere is closely connected with global warming." 
+},
+{ 
+    japanese: "59.現代文明が進めば進むほど、夜型の生活を強いられて睡眠不足になる。", 
+    english: "The more modern civilization advances, the longer we are forced to stay up at night, and the less sleep we get." 
+},
+{ 
+    japanese: "60.医師と教師が似ているところは、どちらも物ではなく人を扱うところである。", 
+    english: "Doctors and teachers are alike in that both of them deal not with things but with people." 
+},
+{ 
+    japanese: "61.プロ野球はテレビで見るより球場で見た方が100倍面白い。", 
+    english: "Professional baseball is far more exciting at a stadium than on TV." 
+},
+{ 
+    japanese: "62.このバイクは、イギリスでは日本のおよそ2倍の値段です。", 
+    english: "This motorbike is about twice as expensive in the UK. as in Japan." 
+},
+{ 
+    japanese: "63.本を読む量が減ったからといって、今の若者の知的欲求が少なくなったということにはならない。", 
+    english: "Just because young people today read less than they used to, it doesn't always follow that they are less eager to learn." 
+},
+{ 
+    japanese: "64.率直に言って、私が昨日受けた入学試験は思っていたよりもはるかに難しかった。", 
+    english: "Frankly speaking, the entrance exams I took yesterday were far more difficult than I had expected." 
+},
+{ 
+    japanese: "65.パソコンを持っている人は多いが、十分に活用する方法を知っている人は極めて少ない。", 
+    english: "A lot of people have personal computers, but very few of them know how to use them effectively." 
+},
+{ 
+    japanese: "66.物価が高すぎると不平を言う主婦が多い。", 
+    english: "A lot of housewives complain that prices are too high." 
+},
+{ 
+    japanese: "67.世界には食糧が有り余っている国もあれば、何万人もの子供が餓死している国もある。", 
+    english: "In some countries, people have too much food, while in others tens of thousands of children are starving." 
+},
+{ 
+    japanese: "68.寝る前に必ずエアコンを消しなさい。さもないと風邪をひくかもしれないよ。", 
+    english: "Don't forget to turn off the air conditioner before you go to bed, or you'll catch a cold." 
+},
+{ 
+    japanese: "69.風邪は万病の元と言います。風邪をひかないように注意しなさい。", 
+    english: "There is a saying that a cold can cause a variety of diseases. Take care not to catch a cold." 
+},
+{ 
+    japanese: "70.インターネットでは、世界中の人々と年齢や性別や国籍の違いを超えて意見の交換ができる。", 
+    english: "On the Internet, you can exchange thoughts and ideas with people all over the world, regardless of their age, sex, or nationality." 
+},
+{ 
+    japanese: "71.いくら運動しても、カロリー計算をしていないと減量は無理だよ。", 
+    english: "However much exercise you get, you won't lose weight unless you count your calories." 
+},
+{ 
+    japanese: "72.意味を知っているつもりの単語でも、辞書で引いてみると新たな発見があるものだ。", 
+    english: "Although you believe you know a word, you may learn something new if you look it up in the dictionary." 
+},
+{ 
+    japanese: "73.日本人観光客の中には、非常識にも多額の現金をズボンの後ろのポケットに入れて持ち歩く者がいる。", 
+    english: "Some Japanese tourists lack common sense and carry a lot of cash in their backpockets." 
+},
+{ 
+    japanese: "74.健康を維持する秘訣は、バランスのとれた食事をし定期的に運動することです。", 
+    english: "In order to stay healthy, you should have a balanced diet and get regular exercise." 
+},
+{ 
+    japanese: "75.発展途上国でしばらく暮らしてみることは、日本を違った角度から見直すよい機会になる。", 
+    english: "If you live in a developing country for a while, you have an opportunity to look at Japan from a different point of view." 
+},
+{ 
+    japanese: "76.外国に行って初めて、日本の大都市のネオンの多さに気づく。", 
+    english: "It is not until you go abroad that you realize how many neon lights there are in big Japanese cities." 
+},
+{ 
+    japanese: "77.英語を話せさえすれば国際人になれると勘違いしている日本人が多いのは残念だ。", 
+    english: "It is a pity that many Japanese people mistakenly believe that they have only to speak English to be internationally-minded." 
+},
+{ 
+    japanese: "78.意味が通じる限り、相手の英語の発音のよしあしを気にしないアメリカ人が多いのは驚きです。", 
+    english: "It is surprising that many Americans don't care how you pronounce English as long as they can understand what you are trying to say." 
+},
+{ 
+    japanese: "79.環境を守るためにできることといったら、ゴミを減らして、できるだけ環境に優しい製品を使うことぐらいだ。", 
+    english: "The best things you can do to protect nature are to reduce garbage and to use environmentally friendly products." 
+},
+{ 
+    japanese: "80.日本の若者の10人のうち7人は、まったく無宗教だと言われる。", 
+    english: "It is said that seven out of ten young Japanese people don't believe in religion." 
+},
+{ 
+    japanese: "81.あいさつの仕方は国によりさまざまだが、日本では、握手よりお辞儀の方がふつうだ。", 
+    english: "Ways of greeting vary from country to country. In Japan bowing is more common than shaking hands." 
+},
+{ 
+    japanese: "82.浜松は、美しい景色と海産物で有名な浜名湖の東に位置しています。", 
+    english: "Hamamatsu is located east of Lake Hamana, which is famous for its beautiful scenery and delicious fish." 
+},
+{ 
+    japanese: "83.年配の女性の中には、1人で何もすることができず妻にしがみついて離れない夫を軽蔑する人も少なくない。", 
+    english: "Quite a few elderly women look down on their husbands, who cannot do anything by themselves and ask too much of them." 
+},
+{ 
+    japanese: "84.その映画館までは徒歩でおよそ20分ですが、地下鉄なら5分で行くことができます。", 
+    english: "The movie theater is about twenty minutes' walk from here, but it takes only five minutes to get there by subway." 
+},
+{ 
+    japanese: "85.この自転車を修理してもらうのに1万円かかりました。", 
+    english: "It cost ten thousand yen to have this bike repaired." 
+},
+{ 
+    japanese: "86.うちは4人家族で、家はこのマンションの5階にあります。", 
+    english: "There are four people in my family. Our apartment is on the fifth floor of this building." 
+},
+{ 
+    japanese: "87.若者が活字なら何でも鵜呑みにしてしまうという傾向は、今に始まったことではない。", 
+    english: "The tendency for young people to believe everything that is printed is nothing new." 
+},
+{ 
+    japanese: "88.パリに留学していた頃、ある有名な画家に高級レストランでごちそうしてもらった経験がある。", 
+    english: "When I was studying in Paris, a famous painter bought me a meal at a first-class restaurant." 
+},
+{ 
+    japanese: "89.多くのものを犠牲にして、トムはついに宇宙飛行士になるという夢を実現した。", 
+    english: "Tom finally realized his dream of becoming an astronaut, but at the expense of many other things." 
+},
+{ 
+    japanese: "90.都会の生活でたまったストレスや疲れをとるには、自然の中でのんびりするのが一番です。", 
+    english: "If city life gives you stress and fatigue, it is best to relax in the mountains or on beaches in order to relieve them." 
+},
+{ 
+    japanese: "91.日本では、女性は出産・育児の後は復職や昇進において不利になる。", 
+    english: "In Japan, women have difficulty getting promoted or returning to their jobs after giving birth and raising their children." 
+},
+{ 
+    japanese: "92.アメリカでは、自分で運転できる年齢に達するまで、子供はどこに行くにも親に車で送ってもらう。", 
+    english: "In the US, parents drive their children everywhere until they are old enough to get a driver's license." 
+},
+{ 
+    japanese: "93.「すみませんが、郵便局までどう行ったらいいですか?」「2筋目を左です。右にあります」", 
+    english: "\"Excuse me. Could you tell me how to get to the post office?\" \"Go straight for two blocks, then turn left. You'll find it on your right.\"" 
+},
+{ 
+    japanese: "94.「今度の先生をどう思う?」「どこか魅力的なところがあるよね」", 
+    english: "\"What do you think of our new teacher?\" \"There is something about her that attracts me.\"" 
+},
+{ 
+    japanese: "95.混雑した電車で、2人分の席を占領して平気な顔をしている人を見ると本当に腹が立つ。", 
+    english: "People who don't feel guilty about occupying two seats on a crowded train really make me angry." 
+},
+{ 
+    japanese: "96.人は誰でも生まれながらにして何らかの才能を持っているが、問題はそれを見つけられるかどうかだ。", 
+    english: "Everyone is born with a talent. The question is whether they can find it or not." 
+},
+{ 
+    japanese: "97.昼ごはんを食べに会社を出たら、高校時代の友達にばったり出会った。", 
+    english: "When I left the office for lunch, I ran into an old friend from high school." 
+},
+{ 
+    japanese: "98.この音楽は何度も繰り返して聴く価値がある。君もぜひ聴いてみたらいいよ。", 
+    english: "This music is worth listening to over and over again. I recommend it." 
+},
+{ 
+    japanese: "99.歯は健康にとって大切な役割を果たしています。健康でいたければ、毎食後の歯磨きを励行しなければなりません。", 
+    english: "Teeth play an important part in your health. If you want to stay healthy, you should brush your teeth after every meal." 
+},
+{ 
+    japanese: "100.やる気さえあれば何事においても成功できる、ということを心に留めておきなさい。", 
+    english: "Bear in mind that if you have enthusiasm, you can succeed in anything." 
+}
+];
+
+// ── BUILD SELECTION GRID ──
+const grid = document.getElementById('card-grid');
+const countEl = document.getElementById('select-count');
+const startBtn = document.getElementById('btn-start');
+
+flashcards.forEach((card, i) => {
+  const label = document.createElement('label');
+  label.className = 'item-label';
+  label.innerHTML = `
+    <input type="checkbox" data-index="${i}">
+    <span class="item-num">${i+1}</span>
+    <span class="item-text">${card.japanese.replace(/^\d+\.\s*/, '')}</span>
+  `;
+  grid.appendChild(label);
+  const cb = label.querySelector('input');
+  cb.addEventListener('change', () => {
+    label.classList.toggle('checked', cb.checked);
+    updateCount();
+  });
+});
+
+function updateCount() {
+  const n = document.querySelectorAll('#card-grid input:checked').length;
+  countEl.innerHTML = `<em>${n}</em> 問 選択中`;
+  startBtn.disabled = n === 0;
+}
+
+document.getElementById('btn-all').addEventListener('click', () => {
+  document.querySelectorAll('#card-grid input').forEach(cb => {
+    cb.checked = true;
+    cb.closest('.item-label').classList.add('checked');
+  });
+  updateCount();
+});
+
+document.getElementById('btn-none').addEventListener('click', () => {
+  document.querySelectorAll('#card-grid input').forEach(cb => {
+    cb.checked = false;
+    cb.closest('.item-label').classList.remove('checked');
+  });
+  updateCount();
+});
+
+// ── STUDY LOGIC ──
+const screenSelect = document.getElementById('screen-select');
+const screenStudy  = document.getElementById('screen-study');
+const japaneseEl   = document.getElementById('japanese-text');
+const englishEl    = document.getElementById('english-text');
+const aCard        = document.getElementById('a-card');
+const nextBtn      = document.getElementById('next-button');
+const speakBtn     = document.getElementById('speak-button');
+const progCur      = document.getElementById('prog-cur');
+const progTotal    = document.getElementById('prog-total');
+
+let deck = [];
+let deckIndex = 0;
+let currentCard = null;
+let isAnswerShown = false;
+
+const synth = window.speechSynthesis;
+let englishVoice = null;
+
+function loadVoice() {
+  const voices = synth.getVoices();
+  englishVoice = voices.find(v => v.lang === 'en-US') ||
+                 voices.find(v => v.lang === 'en-GB') ||
+                 voices.find(v => v.lang.startsWith('en'));
+}
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoice;
+loadVoice();
+
+function speak(text) {
+  if (!synth || !text) return;
+  if (synth.speaking) synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  if (englishVoice) u.voice = englishVoice;
+  synth.speak(u);
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+startBtn.addEventListener('click', () => {
+  const selected = [];
+  document.querySelectorAll('#card-grid input:checked').forEach(cb => {
+    selected.push(flashcards[+cb.dataset.index]);
+  });
+  deck = [...selected];
+  shuffle(deck);
+  deckIndex = 0;
+  progTotal.textContent = deck.length;
+
+  screenSelect.style.display = 'none';
+  screenStudy.classList.add('active');
+  showCard();
+});
+
+document.getElementById('btn-back').addEventListener('click', () => {
+  synth.cancel();
+  screenStudy.classList.remove('active');
+  screenSelect.style.display = '';
+});
+
+function showCard() {
+  currentCard = deck[deckIndex];
+  progCur.textContent = deckIndex + 1;
+
+  japaneseEl.classList.remove('anim');
+  void japaneseEl.offsetWidth;
+  japaneseEl.classList.add('anim');
+  japaneseEl.textContent = currentCard.japanese;
+
+  englishEl.textContent = '';
+  aCard.classList.add('hidden-ans');
+  speakBtn.classList.remove('visible');
+  isAnswerShown = false;
+  nextBtn.textContent = '答えを表示';
+  if (synth.speaking) synth.cancel();
+}
+
+function showAnswer() {
+  englishEl.classList.remove('anim');
+  void englishEl.offsetWidth;
+  englishEl.classList.add('anim');
+  englishEl.textContent = currentCard.english;
+  aCard.classList.remove('hidden-ans');
+  speakBtn.classList.add('visible');
+  isAnswerShown = true;
+  nextBtn.textContent = deckIndex < deck.length - 1 ? '次の問題 →' : '最初からやり直す';
+  speak(currentCard.english);
+}
+
+function next() {
+  if (!isAnswerShown) { showAnswer(); return; }
+  if (deckIndex < deck.length - 1) {
+    deckIndex++;
+  } else {
+    shuffle(deck);
+    deckIndex = 0;
+  }
+  showCard();
+}
+
+nextBtn.addEventListener('click', next);
+speakBtn.addEventListener('click', () => { if (isAnswerShown) speak(currentCard.english); });
+
+document.addEventListener('keydown', e => {
+  if (screenStudy.classList.contains('active')) {
+    if (e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (!isAnswerShown) showAnswer(); }
+    else if (e.key === 'Escape') synth.cancel();
+  }
+});
+</script>
+</body>
+</html>

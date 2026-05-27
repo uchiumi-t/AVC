@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vision Quest 総合英語 Ultimate 基本例文集255</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=Lora:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #faf7f2;
+    --warm-white: #fff9f2;
+    --ink: #1a1410;
+    --ink-light: #4a3f35;
+    --ink-muted: #9c8c7c;
+    --accent: #c0392b;
+    --accent-dark: #922b21;
+    --accent-light: #fadbd8;
+    --gold: #d4ac0d;
+    --border: #e8ddd0;
+    --surface: #ffffff;
+  }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+  }
+
+  /* ── SCREEN BASE ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── SCREEN 1: 文法項目選択 ── */
+  #screen-grammar {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  .app-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .app-title {
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .app-title span { color: var(--accent); }
+  .app-sub {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--ink-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 32px;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .step-circle {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+    border: 2px solid var(--border);
+    background: white;
+    color: var(--ink-muted);
+    transition: all 0.2s;
+  }
+  .step.active .step-circle {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .step.done .step-circle {
+    background: #e8f5e9;
+    border-color: #81c784;
+    color: #388e3c;
+  }
+  .step-label {
+    font-size: 10px;
+    color: var(--ink-muted);
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .step.active .step-label { color: var(--accent); }
+  .step-line {
+    width: 40px; height: 2px;
+    background: var(--border);
+    margin-bottom: 18px;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    color: var(--ink-light);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .grammar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .grammar-btn {
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .grammar-btn:hover {
+    border-color: var(--accent);
+    background: #fff5f4;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(192,57,43,0.1);
+  }
+  .grammar-btn-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 3px;
+  }
+  .grammar-btn-range {
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+  }
+  .grammar-btn-count {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 700;
+    float: right;
+    margin-top: -14px;
+  }
+
+  /* ── SCREEN 2: 文番号選択 ── */
+  #screen-select {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  .back-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .btn-back-small {
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 5px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--ink-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-back-small:hover { background: var(--border); }
+
+  .current-grammar-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.06em;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .toolbar-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-light);
+    letter-spacing: 0.08em;
+    margin-right: 4px;
+  }
+  .btn-tool {
+    padding: 6px 16px;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--ink-light);
+    transition: all 0.15s;
+  }
+  .btn-tool:hover { background: var(--border); }
+  .btn-tool.danger { border-color: #e8b4b0; color: var(--accent); }
+  .btn-tool.danger:hover { background: var(--accent-light); }
+
+  .select-count {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--ink-muted);
+    font-weight: 700;
+  }
+  .select-count em {
+    font-style: normal;
+    color: var(--accent);
+    font-size: 15px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+    margin-bottom: 32px;
+    max-height: 52vh;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .card-grid::-webkit-scrollbar { width: 4px; }
+  .card-grid::-webkit-scrollbar-track { background: transparent; }
+  .card-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .item-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    line-height: 1.45;
+    user-select: none;
+  }
+  .item-label:hover { border-color: #c0a898; background: #fdf8f5; }
+  .item-label.checked { border-color: var(--accent); background: #fff5f4; }
+
+  .item-label input[type="checkbox"] {
+    appearance: none; -webkit-appearance: none;
+    width: 17px; height: 17px; min-width: 17px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    margin-top: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: white;
+    position: relative;
+  }
+  .item-label input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .item-label input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 1px; left: 4px;
+    width: 5px; height: 9px;
+    border: 2px solid white;
+    border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+
+  .item-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 22px;
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+  }
+  .item-text {
+    font-size: 12px;
+    color: var(--ink-light);
+    flex: 1;
+  }
+
+  .start-wrap {
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+  }
+  .btn-start {
+    padding: 16px 56px;
+    font-size: 17px;
+    font-family: inherit;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(192,57,43,0.35);
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+  .btn-start:hover {
+    background: var(--accent-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(192,57,43,0.4);
+  }
+  .btn-start:active { transform: translateY(0); }
+  .btn-start:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; transform: none; }
+
+  /* ── SCREEN 3: STUDY ── */
+  #screen-study {
+    min-height: 100vh;
+    padding: 32px 20px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+  }
+  #screen-study.active { display: flex; }
+
+  .study-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .study-title {
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+  }
+  .study-grammar-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .study-progress {
+    font-size: 13px;
+    color: var(--ink-muted);
+    font-weight: 700;
+  }
+  .study-progress em { font-style: normal; color: var(--accent); font-size: 16px; }
+
+  .btn-back {
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 5px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--ink-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-back:hover { background: var(--border); }
+
+  .q-card {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 44px 48px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .q-label {
+    position: absolute;
+    top: 18px; left: 24px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .q-num {
+    position: absolute;
+    top: 16px; right: 24px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+  #japanese-text {
+    font-size: clamp(16px, 3vw, 24px);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.7;
+    text-align: center;
+  }
+
+  .a-card {
+    width: 100%;
+    background: #fff5f4;
+    border: 2px solid var(--accent-light);
+    border-radius: 20px;
+    padding: 36px 48px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 16px rgba(192,57,43,0.06);
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.25s;
+    position: relative;
+  }
+  .a-card.hidden-ans { opacity: 0; pointer-events: none; }
+  .a-label {
+    position: absolute;
+    top: 14px; left: 24px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+  #english-text {
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(18px, 3.5vw, 28px);
+    font-weight: 600;
+    color: var(--accent-dark);
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .btn-main {
+    padding: 14px 40px;
+    font-size: 15px;
+    font-family: inherit;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 3px 14px rgba(192,57,43,0.3);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .btn-main:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  .btn-main:active { transform: translateY(0); }
+
+  .btn-speak {
+    padding: 14px 28px;
+    font-size: 15px;
+    font-family: inherit;
+    font-weight: 700;
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent-light);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: none;
+  }
+  .btn-speak.visible { display: inline-block; }
+  .btn-speak:hover { background: var(--accent-light); }
+
+  .key-hints {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+  }
+  .hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 0.06em;
+  }
+  .key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-bottom: 2px solid #d0c4b4;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-family: inherit;
+    background: white;
+    color: var(--ink-light);
+  }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .anim { animation: fadeSlide 0.3s ease both; }
+
+  @media (max-width: 480px) {
+    .q-card, .a-card { padding: 36px 24px; }
+    .grammar-grid { grid-template-columns: 1fr 1fr; }
+    .step-line { width: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== SCREEN 1: 文法項目選択 ===== -->
+<div id="screen-grammar" class="screen active">
+  <div class="app-header">
+    <div class="app-title">Vision Quest　総合英語 <span>Ultimate</span></div>
+    <div class="app-title" style="font-size: clamp(16px, 3vw, 24px); margin-top: 4px;">基本例文集　２５５</div>
+    <div class="app-sub">まず文法項目を選んでください</div>
+  </div>
+
+  <div class="step-indicator">
+    <div class="step active" id="step1">
+      <div class="step-circle">1</div>
+      <div class="step-label">文法項目</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step2">
+      <div class="step-circle">2</div>
+      <div class="step-label">文を選択</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step3">
+      <div class="step-circle">3</div>
+      <div class="step-label">暗記スタート</div>
+    </div>
+  </div>
+
+  <div class="section-title">文法項目を選んでください</div>
+  <div class="grammar-grid" id="grammar-grid"></div>
+</div>
+
+<!-- ===== SCREEN 2: 文番号選択 ===== -->
+<div id="screen-select" class="screen">
+  <div class="back-row">
+    <button class="btn-back-small" id="btn-back-to-grammar">← 文法項目へ</button>
+    <span class="current-grammar-badge" id="current-grammar-badge">—</span>
+  </div>
+
+  <div class="step-indicator">
+    <div class="step done">
+      <div class="step-circle">✓</div>
+      <div class="step-label">文法項目</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step active">
+      <div class="step-circle">2</div>
+      <div class="step-label">文を選択</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-circle">3</div>
+      <div class="step-label">暗記スタート</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <span class="toolbar-label">問題を選択</span>
+    <button class="btn-tool" id="btn-all">すべて選択</button>
+    <button class="btn-tool danger" id="btn-none">選択を解除</button>
+    <span class="select-count" id="select-count"><em>0</em> 問 選択中</span>
+  </div>
+
+  <div class="card-grid" id="card-grid"></div>
+
+  <div class="start-wrap">
+    <button class="btn-start" id="btn-start" disabled>選択した問題でスタート →</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN 3: STUDY ===== -->
+<div id="screen-study">
+  <div class="study-header">
+    <div>
+      <div class="study-title">Vision Quest　基本例文集２５５</div>
+      <div class="study-grammar-badge" id="study-grammar-badge">—</div>
+    </div>
+    <div class="study-progress">問題 <em id="prog-cur">1</em> / <span id="prog-total">—</span></div>
+    <button class="btn-back" id="btn-back">← 選択画面へ</button>
+  </div>
+
+  <div class="q-card">
+    <span class="q-label">JAPANESE</span>
+    <span class="q-num" id="q-num">No.—</span>
+    <div id="japanese-text">—</div>
+  </div>
+
+  <div class="a-card hidden-ans" id="a-card">
+    <span class="a-label">ENGLISH</span>
+    <div id="english-text"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-speak" id="speak-button">🔊 もう一度聞く</button>
+    <button class="btn-main" id="next-button">答えを表示</button>
+  </div>
+
+  <div class="key-hints">
+    <div class="hint"><span class="key">Space</span> 答えを表示 / 次へ</div>
+    <div class="hint"><span class="key">Enter</span> 答えを表示</div>
+    <div class="hint"><span class="key">Esc</span> 読み上げ停止</div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const categories = [
+  { name: "文型・文の種類", start: 1, end: 12 },
+  { name: "時制", start: 13, end: 19 },
+  { name: "完了形", start: 20, end: 24 },
+  { name: "助動詞", start: 25, end: 42 },
+  { name: "受動態", start: 43, end: 53 },
+  { name: "不定詞", start: 54, end: 71 },
+  { name: "動名詞", start: 72, end: 82 },
+  { name: "分詞", start: 83, end: 98 },
+  { name: "関係詞", start: 99, end: 125 },
+  { name: "比較", start: 126, end: 152 },
+  { name: "仮定法", start: 153, end: 179 },
+  { name: "否定", start: 180, end: 188 },
+  { name: "強調・倒置・挿入・省略・同格", start: 189, end: 197 },
+  { name: "無生物主語・名詞構文", start: 198, end: 206 },
+  { name: "接続詞", start: 207, end: 217 },
+  { name: "疑問詞", start: 218, end: 227 },
+  { name: "名詞・冠詞・代名詞・形容詞・副詞", start: 228, end: 255 },
+];
+
+const flashcards = [
+  { no: 1,  japanese: "「誕生日はいつですか。」「4月25日です。」", english: '"When is your birthday?"  "It\'s April 25th."' },
+  { no: 2,  japanese: "「あなたは何を買いましたか。」「私はＴシャツを買いました。」", english: '"What did you buy?"  "I bought a T-shirt."' },
+  { no: 3,  japanese: "「誰が主役を演じるのですか。」「マイクです。」", english: '"Who plays the hero?"  "Mike does."' },
+  { no: 4,  japanese: "この家はなんて美しいのだろう。", english: "How beautiful this house is!" },
+  { no: 5,  japanese: "これはなんて美しい家だろう。", english: "What a beautiful house this is!" },
+  { no: 6,  japanese: "この町の人は音楽が好きです。", english: "People in this town like music." },
+  { no: 7,  japanese: "私の姉は大学生だ。", english: "My sister is a college student." },
+  { no: 8,  japanese: "メグは幸せそうです。", english: "Meg looks happy." },
+  { no: 9,  japanese: "彼はサリーに指輪を買ってあげた。", english: "He bought Sally a ring." },
+  { no: 10, japanese: "彼女は壁を茶色に塗った。", english: "She painted the wall brown." },
+  { no: 11, japanese: "我々はその問題について議論した。", english: "We discussed the matter." },
+  { no: 12, japanese: "私はあなたに賛成します。", english: "I agree with you." },
+  { no: 13, japanese: "太陽は東から昇る。", english: "The sun rises in the east." },
+  { no: 14, japanese: "私は来月17歳になる。", english: "I will be seventeen next month." },
+  { no: 15, japanese: "私は明日，買い物に行く予定です。", english: "I'm going to go shopping tomorrow." },
+  { no: 16, japanese: "もし明日雨が降れば，私たちは家にいます。", english: "If it rains tomorrow, we will stay home." },
+  { no: 17, japanese: "私の弟はいつもテレビを見てばかりいる。", english: "My brother is always watching TV." },
+  { no: 18, japanese: "私は明日，ロサンゼルスに向けて出発する。", english: "I'm leaving for Los Angeles tomorrow." },
+  { no: 19, japanese: "その飛行機は12時30分にニューヨークに向けて出発する。", english: "The plane leaves for New York at 12:30." },
+  { no: 20, japanese: "私はちょうどその知らせを聞いたところだ。", english: "I have just heard the news." },
+  { no: 21, japanese: "彼女はパリに３年間住んでいる。", english: "She has lived in Paris for three years." },
+  { no: 22, japanese: "私たちが到着した時，パーティーはすでに始まっていた。", english: "The party had already started when we arrived." },
+  { no: 23, japanese: "フレッドはカナダに帰ったと聞きました。", english: "I heard that Fred had returned to Canada." },
+  { no: 24, japanese: "彼らは来年で結婚して20年になる。", english: "They will have been married for 20 years next year." },
+  { no: 25, japanese: "今夜，星を見ることができるでしょう。", english: "You'll be able to see the stars tonight." },
+  { no: 26, japanese: "そのうわさが本当であるはずがない。", english: "The rumor can't [couldn't] be true." },
+  { no: 27, japanese: "彼は家にいるかもしれない。", english: "He may [might] be at home." },
+  { no: 28, japanese: "靴を脱ぐ必要はありません。", english: "You don't have to take off your shoes." },
+  { no: 29, japanese: "医者に診てもらいなさい。", english: "You had better see a doctor." },
+  { no: 30, japanese: "私の妹はどうしても野菜を食べようとしない。", english: "My little sister won't eat vegetables." },
+  { no: 31, japanese: "私たちはよく映画を見に行ったものだ。", english: "We would often go to the movies." },
+  { no: 32, japanese: "私は（以前は）友達と歩いて登校したものだ。", english: "I used to walk to school with my friends." },
+  { no: 33, japanese: "町にはかつて劇場があった。", english: "There used to be a theater in the town." },
+  { no: 34, japanese: "私は家に鍵を置き忘れたのかもしれない。", english: "I may [might] have left the key at home." },
+  { no: 35, japanese: "その事故はもっとひどいことになった可能性がある。", english: "The accident could have been much worse." },
+  { no: 36, japanese: "私は彼の忠告を聞くべきだったのに（聞かなかった）。", english: "I should [ought to] have taken his advice." },
+  { no: 37, japanese: "私は外出するよりもむしろ家にいたい。", english: "I would rather stay home than go out." },
+  { no: 38, japanese: "彼はおそらく勝つだろう。", english: "He may [might] well win." },
+  { no: 39, japanese: "雨の中を行ったほうがいい。やまないだろうから。", english: "We may [might] as well go in the rain. It will never stop." },
+  { no: 40, japanese: "あなたはただ静かに座っていればいい。", english: "You only have to sit quietly." },
+  { no: 41, japanese: "彼女には同情せずにはいられない。", english: "I cannot help feeling sorry for her." },
+  { no: 42, japanese: "あなたに同意せざるを得ません。", english: "I cannot help but agree with you." },
+  { no: 43, japanese: "オーストリアではドイツ語が話されている。", english: "German is spoken in Austria." },
+  { no: 44, japanese: "あなたはパーティーに招待されましたか。", english: "Were you invited to the party?" },
+  { no: 45, japanese: "パーティーはどこで開かれましたか。", english: "Where was the party held?" },
+  { no: 46, japanese: "私の家から花火は見えない。", english: "The fireworks can't be seen from my house." },
+  { no: 47, japanese: "その時，そのロボットは製作中だった。", english: "The robot was being made at that time." },
+  { no: 48, japanese: "家に帰った時には，テレビは修理されていた。", english: "The TV had been repaired when I came home." },
+  { no: 49, japanese: "私がそこに着くまでに，チケットは売り切れているだろう。", english: "The tickets will have been sold out by the time I get there." },
+  { no: 50, japanese: "メアリーは金メダルを授与された。", english: "Mary was given a gold medal." },
+  { no: 51, japanese: "その金メダルがメアリーに授与された。", english: "The gold medal was given to Mary." },
+  { no: 52, japanese: "彼はとても金持ちだと言われている。", english: "It is said (that) he is very rich. [ He is said to be very rich. ]" },
+  { no: 53, japanese: "今朝，私は外国人に話しかけられた。", english: "I was spoken to by a foreigner this morning." },
+  { no: 54, japanese: "十分な睡眠をとることが大切だ。", english: "It's important to get enough sleep." },
+  { no: 55, japanese: "彼女の夢は歌手になることだ。", english: "Her dream is to be a singer." },
+  { no: 56, japanese: "私はインターネットでホテルを予約することが簡単だとわかった。", english: "I found it easy to book a hotel online." },
+  { no: 57, japanese: "今日，私にはするべきことがたくさんある。", english: "I have a lot of things to do today." },
+  { no: 58, japanese: "ノートと何か書くものを持ってきてください。", english: "Bring a notebook and something to write with." },
+  { no: 59, japanese: "子どもたちがここにとどまるのは危険だ。", english: "It's dangerous for the children to stay here." },
+  { no: 60, japanese: "私を助けてくれるなんてあなたは親切だった。", english: "It was kind of you to help me." },
+  { no: 61, japanese: "両親は私が留学するのを許さないだろう。", english: "My parents won't allow me to study abroad." },
+  { no: 62, japanese: "彼女は私に遅れないようにと言った。", english: "She told me not to be late." },
+  { no: 63, japanese: "母は私に部屋の掃除をさせた。", english: "My mother made me clean my room." },
+  { no: 64, japanese: "私はドアマンに荷物を運んでもらった。", english: "I had the doorman carry my baggage." },
+  { no: 65, japanese: "私はその男が車から降りるのを見た。", english: "I saw the man get out of the car." },
+  { no: 66, japanese: "私は何をすべきかわからない。", english: "I don't know what to do." },
+  { no: 67, japanese: "その問題を解くのは簡単だ。", english: "The problem is easy to solve." },
+  { no: 68, japanese: "私はあまりにも疲れていて歩けない。", english: "I'm too tired to walk." },
+  { no: 69, japanese: "彼はそのパズルを解くほど賢い。", english: "He is smart enough to solve the puzzle." },
+  { no: 70, japanese: "私は彼の話を信じるほど愚かではない。", english: "I'm not so foolish as to believe his story." },
+  { no: 71, japanese: "あなたは本当のことを言うだけでよい。", english: "All you have to do is (to) tell the truth." },
+  { no: 72, japanese: "バスケットボールをすることは楽しい。", english: "Playing basketball is fun." },
+  { no: 73, japanese: "私は音楽を聴くことが好きです。", english: "I like listening to music." },
+  { no: 74, japanese: "今日は来てくれてありがとう。", english: "Thank you for coming today." },
+  { no: 75, japanese: "母は私がミニスカートをはくのが好きではない。", english: "My mother doesn't like me [my] wearing short skirts." },
+  { no: 76, japanese: "もっと早く手紙を書かなくてすみません。", english: "I'm sorry for not writing sooner." },
+  { no: 77, japanese: "彼女は看護師であることを誇りに思っている。", english: "She is proud of being a nurse." },
+  { no: 78, japanese: "彼女は看護師だったことを誇りに思っている。", english: "She is proud of having been a nurse." },
+  { no: 79, japanese: "その映画は見る価値がある。", english: "That movie is worth seeing." },
+  { no: 80, japanese: "このはさみは髪を切るためのものです。", english: "These scissors are for cutting hair." },
+  { no: 81, japanese: "健康が富に勝るのは言うまでもないことだ。", english: "It goes without saying that health is above wealth." },
+  { no: 82, japanese: "私は早起きに慣れている。", english: "I'm used to getting up early." },
+  { no: 83, japanese: "消防士たちは燃えている家に入った。", english: "Firefighters entered the burning house." },
+  { no: 84, japanese: "彼らにはクリスと名付けられた息子がいる。", english: "They have a son named Chris." },
+  { no: 85, japanese: "その列車の中には興奮したファンがたくさんいた。", english: "There were a lot of excited fans in the train." },
+  { no: 86, japanese: "私はその本が新聞で広告されているのを見かけた。", english: "I saw the book advertised in the paper." },
+  { no: 87, japanese: "彼女はバッグを盗まれた。", english: "She had [got] her bag stolen." },
+  { no: 88, japanese: "英語で自分の言いたいことを伝えられますか。", english: "Can you make yourself understood in English?" },
+  { no: 89, japanese: "わかりやすい英語で書かれているので，この本は読みやすい。", english: "Written in plain English, this book is easy to read." },
+  { no: 90, japanese: "何をしてよいかわからないまま，私はただそこに立っていた。", english: "I just stood there, not knowing what to do." },
+  { no: 91, japanese: "サッカーをしている時に，彼は脚にけがをした。", english: "Playing soccer, he hurt his leg." },
+  { no: 92, japanese: "その列車は8時に名古屋を出発し，10時に東京に着く。", english: "The train leaves Nagoya at eight, arriving in Tokyo at ten." },
+  { no: 93, japanese: "休暇シーズンなので，列車はいっぱいだった。", english: "It being the holiday season, the train was full." },
+  { no: 94, japanese: "車のエンジンをかけたまま，彼は彼女が戻ってくるのを待った。", english: "He waited for her to come back with the engine running." },
+  { no: 95, japanese: "その女性は脚を組んで座っていた。", english: "The woman was sitting with her legs crossed." },
+  { no: 96, japanese: "学園祭まで２日しか残されていない。", english: "There are only two days left until the school festival." },
+  { no: 97, japanese: "彼は試験の準備をするのに忙しい。", english: "He is busy preparing for the exam." },
+  { no: 98, japanese: "私は電話で話をして１時間を過ごした。", english: "I spent an hour chatting on the phone." },
+  { no: 99,  japanese: "彼女は10代に人気がある小説を読んでいた。", english: "She was reading a novel which was popular with teenagers." },
+  { no: 100, japanese: "私が韓国で出会った人々は親切だった。", english: "The people (whom [who]) I met in Korea were nice." },
+  { no: 101, japanese: "屋根が赤色の家はおじの家です。", english: "The house whose roof is red is my uncle's." },
+  { no: 102, japanese: "これが私が君に話したCDです。", english: "This is the CD (which) I told you about." },
+  { no: 103, japanese: "これが私が君に話したCDです。（前置詞＋関係代名詞）", english: "This is the CD about which I told you." },
+  { no: 104, japanese: "私は彼女が言ったことが聞こえなかった。", english: "I didn't hear what she said." },
+  { no: 105, japanese: "彼女には息子が２人いて，（２人とも）俳優になった。", english: "She has two sons, who became actors." },
+  { no: 106, japanese: "彼女が突然退部し，そのことは私たちを驚かせた。", english: "She suddenly left the club, which surprised us." },
+  { no: 107, japanese: "私たちが泊まったホテルはすばらしかった。", english: "The hotel where we stayed was wonderful." },
+  { no: 108, japanese: "あなたが遅れた理由を言いなさい。", english: "Tell me (the reason) why you were late." },
+  { no: 109, japanese: "そのようにして事故は起こった。", english: "That's how the accident happened." },
+  { no: 110, japanese: "助けを必要としている人であれば誰でも助けたい。", english: "We want to help whoever needs help." },
+  { no: 111, japanese: "あなたが欲しいものは何でもあげますよ。", english: "I'll give you whatever you want." },
+  { no: 112, japanese: "あなたが誰であっても歓迎します。", english: "You're welcome, whoever you are." },
+  { no: 113, japanese: "どこでもあなたの好きなところに座ってください。", english: "Please take a seat wherever you like." },
+  { no: 114, japanese: "どこへ行こうとも，いつも彼はボディーガードを２人連れている。", english: "Wherever he goes, he always has two bodyguards." },
+  { no: 115, japanese: "どんなに状況が困難でも，彼は決してあきらめない。", english: "He never gives up, however difficult the situation is." },
+  { no: 116, japanese: "彼は，私がいつかアカデミー賞をとると思う，すばらしい役者だ。", english: "He is a good actor who I think will win an Academy Award someday." },
+  { no: 117, japanese: "彼は持っていたお金をすべて奪われた。", english: "He was robbed of what money he had." },
+  { no: 118, japanese: "その本は表紙が破れているが，貴重なものだ。", english: "The book, the cover of which is torn, is valuable." },
+  { no: 119, japanese: "彼は以前の彼とは違う。", english: "He is not what he used to be." },
+  { no: 120, japanese: "友情と心の関係は，食べ物と体の関係と同じだ。", english: "Friendship is to the soul what food is to the body." },
+  { no: 121, japanese: "あなたを幸せにするような本を読みなさい。", english: "Read such books as will make you happy." },
+  { no: 122, japanese: "なんてこと。彼女は私が着ているのと同じセーターを着ている。", english: "Oh, no. She's wearing the same sweater as I am." },
+  { no: 123, japanese: "彼女にはよくあることだが，打ち合わせで何もしゃべらなかった。", english: "As is often the case with her, she was silent in the meeting." },
+  { no: 124, japanese: "あなたが必要としている以上のお金を持ち歩いてはいけません。", english: "Don't carry more money than you need." },
+  { no: 125, japanese: "例外のない規則はない。", english: "There is no rule but has exceptions." },
+  { no: 126, japanese: "彼女は彼女の姉[妹]と同じくらいテニスが上手だ。", english: "She plays tennis as well as her sister (does)." },
+  { no: 127, japanese: "ジョンはあなたほど背が高くない。", english: "John isn't as tall as you (are)." },
+  { no: 128, japanese: "私は兄［弟］と同じくらいの数の本を持っている。", english: "I have as many books as my brother (does)." },
+  { no: 129, japanese: "ブラジルはアルゼンチンの３倍の大きさだ。", english: "Brazil is three times as large as Argentina." },
+  { no: 130, japanese: "母は父よりも慎重に運転する。", english: "My mother drives more carefully than my father (does)." },
+  { no: 131, japanese: "このドレスはあのドレスほど値段が高くはない。", english: "This dress is less expensive than that one." },
+  { no: 132, japanese: "彼女は妹よりも２歳年上だ。", english: "She is two years older than her sister." },
+  { no: 133, japanese: "その俳優は日本でよりもアメリカでのほうが有名だ。", english: "That actor is more famous in the U.S.A. than in Japan." },
+  { no: 134, japanese: "彼女は実際よりも若く見える。", english: "She looks younger than she really is." },
+  { no: 135, japanese: "彼は３人の少年の中でいちばん速く走れる。", english: "He can run (the) fastest of the three boys." },
+  { no: 136, japanese: "カナダは世界で２番目に大きな国だ。", english: "Canada is the second largest country in the world." },
+  { no: 137, japanese: "彼は世界で最も有名な芸術家の１人だ。", english: "He is one of the most famous artists in the world." },
+  { no: 138, japanese: "世界にはロシアよりも大きな国はない。", english: "No (other) country in the world is larger than Russia." },
+  { no: 139, japanese: "ロシアは世界のほかのどの国よりも大きい。", english: "Russia is larger than any other country in the world." },
+  { no: 140, japanese: "光ほど速く伝わるものはない。", english: "Nothing can travel as fast as light." },
+  { no: 141, japanese: "私は２つの新しいモデルのうち，安いほうを選んだ。", english: "I chose the cheaper of the two new models." },
+  { no: 142, japanese: "私は旅行の計画を立てている時がいちばん幸せだ。", english: "I'm happiest when I'm planning a trip." },
+  { no: 143, japanese: "そのバンドは相変わらず人気がある。", english: "The band is as popular as ever." },
+  { no: 144, japanese: "この本はほとんど新品同様だ。", english: "This book is as good as new." },
+  { no: 145, japanese: "彼は歌手というよりはむしろ俳優だ。", english: "He is not so much a singer as an actor." },
+  { no: 146, japanese: "だんだん暑くなってきている。", english: "It's getting hotter and hotter." },
+  { no: 147, japanese: "高く上れば上るほど，ますます景色が美しくなる。", english: "The higher you go, the more beautiful the view becomes." },
+  { no: 148, japanese: "次の試験があるのでいっそう勉強する必要がある。", english: "I need to study all the harder for the next exam." },
+  { no: 149, japanese: "マイクは欠点があるが，それでも私は彼が好きだ。", english: "I like Mike none the less for his faults." },
+  { no: 150, japanese: "ネズミが鳥でないのと同じように，コウモリは鳥ではない。", english: "A bat is no more a bird than a rat is (a bird)." },
+  { no: 151, japanese: "私は中古車を買う余裕はないし，まして新車は買えない。", english: "I can't afford to buy a used car, much [still] less a new one." },
+  { no: 152, japanese: "私たちはこの機会を最大限に利用しなければならない。", english: "We must make the most of this chance." },
+  { no: 153, japanese: "もし明日，雨が降れば，私は家にいます。", english: "If it rains tomorrow, I will stay home." },
+  { no: 154, japanese: "もし海の近くに住んでいれば，毎日泳ぎに行けるのに。", english: "If I lived near the sea, I could go swimming every day." },
+  { no: 155, japanese: "暇があれば，君と一緒に行けるのに。", english: "If I were free, I could go with you." },
+  { no: 156, japanese: "彼の電話番号を知っていれば，彼に電話するのに。", english: "If I knew his phone number, I would call him." },
+  { no: 157, japanese: "暇があったなら，君と一緒に行けたのに。", english: "If I had been free, I could have gone with you." },
+  { no: 158, japanese: "彼の電話番号を知っていたなら，彼に電話したのに。", english: "If I had known his phone number, I would have called him." },
+  { no: 159, japanese: "そのチームに入っていたなら，今ごろ彼はスターになっているだろうに。", english: "If he had joined the team, he would be a star now." },
+  { no: 160, japanese: "仮にあなたが本を書くとしたら，何についての本ですか。", english: "If you were to write a book, what would it be about?" },
+  { no: 161, japanese: "万一，気が変われば，彼は私たちに知らせるだろう。", english: "If he should change his mind, he would let us know." },
+  { no: 162, japanese: "彼の電話番号を知っていればなあ。", english: "I wish I knew his phone number." },
+  { no: 163, japanese: "もっと勉強していたらなあ。", english: "I wish I had studied more." },
+  { no: 164, japanese: "彼はまるで私を幼い子どものように扱う。", english: "He treats me as if I were a little child." },
+  { no: 165, japanese: "私はまるで恐ろしい悪夢でも見たかのような気分だ。", english: "I feel as if I had had a horrible nightmare." },
+  { no: 166, japanese: "もしお金持ちなら，その車が買えるのに。", english: "Were I rich, I could buy the car." },
+  { no: 167, japanese: "もしお金持ちだったなら，その車を買ったのに。", english: "Had I been rich, I would have bought the car." },
+  { no: 168, japanese: "万一，気が変われば，私に知らせてください。", english: "Should you change your mind, please let me know." },
+  { no: 169, japanese: "あなたの助けがなければ，私はこの仕事ができないだろう。", english: "Without your help, I would not be able to do this job." },
+  { no: 170, japanese: "私たちはジムのことをとてもよく知っている。そうでなければ彼を信用したりしないだろう。", english: "We know Jim very well; otherwise we would not trust him." },
+  { no: 171, japanese: "もしあなたの立場だったなら，私も同じことをしただろう。", english: "In your place, I would have done the same thing." },
+  { no: 172, japanese: "正直な男性ならばそんなことはしないだろう。", english: "An honest man wouldn't do such a thing." },
+  { no: 173, japanese: "彼女が話すのを聞くと，東京出身だと思ってしまうだろう。", english: "To hear her speak, you would think she was from Tokyo." },
+  { no: 174, japanese: "様子を見てみるのがよいと思います。", english: "I suggest that we wait and see." },
+  { no: 175, japanese: "彼はそこに行く必要がある。", english: "It's necessary that he go there." },
+  { no: 176, japanese: "あなたの助けがなければ，私はこの仕事ができないだろう。（If it were not for）", english: "If it were not for your help, I would not be able to do this job." },
+  { no: 177, japanese: "私がお金持ちでありさえすればなあ。", english: "If only I were rich!" },
+  { no: 178, japanese: "もう寝る時間だよ。", english: "It's time you went to bed." },
+  { no: 179, japanese: "あなたにここにいてほしいのですが。", english: "I'd rather you stayed here." },
+  { no: 180, japanese: "通りには車が１台もありません。", english: "There are no cars on the street." },
+  { no: 181, japanese: "私は近所の人をほとんど知らない。", english: "I hardly know my neighbors." },
+  { no: 182, japanese: "罪を犯すことのない人はいない。", english: "There is no person who does not commit a sin." },
+  { no: 183, japanese: "私は両親が同意しないと思う。", english: "I don't think (that) my parents will agree." },
+  { no: 184, japanese: "「パーティーに来ることができますか。」「できないと思います。」", english: '"Can you come to the party?"  "I\'m afraid not."' },
+  { no: 185, japanese: "あなたの夢はまもなく実現するでしょう。", english: "It won't be long before your dream comes true." },
+  { no: 186, japanese: "彼は40歳になって初めて海外に行った。", english: "He didn't go abroad until he was 40." },
+  { no: 187, japanese: "彼女はもはやここでは働いていない。", english: "She no longer works here." },
+  { no: 188, japanese: "多くのことがまだなされていない。", english: "Many things remain to be done." },
+  { no: 189, japanese: "先月，ニューヨークを訪れたのは私の兄です。", english: "It was my brother that visited New York last month." },
+  { no: 190, japanese: "「お腹がすいたなあ。」「私もです。」", english: '"I\'m hungry."  "So am I."' },
+  { no: 191, japanese: "「私はこれ以上歩きたくない。」「私もです。」", english: '"I don\'t want to walk any further."  "Neither [Nor] do I."' },
+  { no: 192, japanese: "私の友人のジョンはウェブデザイナーだ。", english: "My friend John is a web designer." },
+  { no: 193, japanese: "私たちはイングランドのマンチェスターという都市を訪れた。", english: "We visited the city of Manchester in England." },
+  { no: 194, japanese: "もう一度挑戦しなければならないという事実に彼は直面した。", english: "He faced the fact that he would have to try again." },
+  { no: 195, japanese: "私は病気になって初めて健康のありがたみが実感できるようになった。", english: "It was not until I fell ill that I came to realize the blessing of health." },
+  { no: 196, japanese: "座るとすぐに携帯電話が鳴った。", english: "Hardly [Scarcely] had I sat down when my cell phone rang." },
+  { no: 197, japanese: "言うことと実行することは別だ。", english: "Saying is one thing, and doing is another." },
+  { no: 198, japanese: "この写真を見ると私は笑ってしまう。", english: "This picture makes me laugh." },
+  { no: 199, japanese: "この写真を見ると私は自分の子ども時代を思い出す。", english: "This picture reminds me of my childhood." },
+  { no: 200, japanese: "このソフトのおかげで簡単にウェブサイトを作成することができる。", english: "This software enables you to create websites easily." },
+  { no: 201, japanese: "その雨で私たちはビーチに行けなかった。", english: "The rain prevented us from going to the beach." },
+  { no: 202, japanese: "この道を行けば宮殿に着くでしょう。", english: "This road will lead you to the Palace." },
+  { no: 203, japanese: "飛行機で行けばかなり時間の節約になるでしょう。", english: "Going by plane will save you a lot of time." },
+  { no: 204, japanese: "新聞に，寒い冬になりそうだと書いてある。", english: "The newspaper says that we will have a cold winter." },
+  { no: 205, japanese: "彼の死の知らせに私は衝撃を受けた。", english: "I was shocked at the news of his death." },
+  { no: 206, japanese: "列車の到着が遅れましたことをおわびいたします。", english: "We apologize for the late arrival of the train." },
+  { no: 207, japanese: "植物は水だけではなく太陽も必要だ。", english: "Plants need not only water but also the sun." },
+  { no: 208, japanese: "問題はあまり時間がないということだ。", english: "The problem is (that) we don't have much time." },
+  { no: 209, japanese: "試合が行われるかどうかは天気次第だ。", english: "Whether the game will be held depends on the weather." },
+  { no: 210, japanese: "いったん心に決めると，彼はそれを変えない。", english: "Once he makes up his mind, he doesn't change it." },
+  { no: 211, japanese: "私の知る限りでは，彼はいい人です。", english: "As far as I know, he is a good guy." },
+  { no: 212, japanese: "もうテストが終わったので，２，３日休息をとるつもりです。", english: "Now that the test is over, I'll rest a few days." },
+  { no: 213, japanese: "両親が協力的だったという点で私は幸運だった。", english: "I was lucky in that my parents were supportive." },
+  { no: 214, japanese: "その本はとてもおもしろかったので，1日で読んだ。", english: "The book was so interesting that I read it in a day." },
+  { no: 215, japanese: "それはとてもおもしろい本だったので，1日で読んだ。", english: "It was such an interesting book that I read it in a day." },
+  { no: 216, japanese: "始発列車に乗るために，私は朝早く起きなければならない。", english: "I have to get up early so that I can catch the first train." },
+  { no: 217, japanese: "雨が降るといけないから傘を持って行きなさい。", english: "Take an umbrella in case it rains." },
+  { no: 218, japanese: "「このコートは誰のものですか。」「私のです。」", english: '"Whose is this coat?"  "It\'s mine."' },
+  { no: 219, japanese: "「これは誰のコートですか。」「私のです。」", english: '"Whose coat is this?"  "It\'s mine."' },
+  { no: 220, japanese: "「おかげんはいかがですか。」「もうよくなりました。」", english: '"How do you feel?"  "I feel better now."' },
+  { no: 221, japanese: "誰が窓を割ったのか，彼に尋ねてみます。", english: "I'll ask him who broke the window." },
+  { no: 222, japanese: "「彼女は何歳だと思いますか。」「20代だと思います。」", english: '"How old do you think she is?"  "I think she\'s in her twenties."' },
+  { no: 223, japanese: "「何のために大学へ行っているのですか。」「法律を勉強するためです。」", english: '"What do you go to college for?"  "To study law."' },
+  { no: 224, japanese: "「リチャードってどんな人ですか。」「とても親切ですよ。」", english: '"What\'s Richard like?"  "He is very nice."' },
+  { no: 225, japanese: "「このアイデアをどう思いますか。」「すばらしいアイデアだと思います。」", english: '"What do you think of [about] this idea?"  "I think it\'s a great idea."' },
+  { no: 226, japanese: "「ジェフはどうなったのだろうか。」「誰も知りません。」", english: '"What has become of Jeff?"  "Nobody knows."' },
+  { no: 227, japanese: "「雨が降ったらどうしよう。」「代わりにボウリングに行こう。」", english: '"What if it rains?"  "We\'ll go bowling instead."' },
+  { no: 228, japanese: "この問題は非常に重要だ。", english: "This matter is of great importance." },
+  { no: 229, japanese: "彼女は簡単に試験に合格した。", english: "She passed the exam with ease." },
+  { no: 230, japanese: "若者はしばしば無鉄砲だ。", english: "The young are often reckless." },
+  { no: 231, japanese: "こんなに美しい景色は今までに見たことがない。", english: "I have never seen such a beautiful sight." },
+  { no: 232, japanese: "そんなに美しい景色は今までに見たことがない。", english: "I have never seen so beautiful a sight." },
+  { no: 233, japanese: "未来を予測することはできない。", english: "You cannot predict the future." },
+  { no: 234, japanese: "もっと環境に意識を向けるべきだ。", english: "We should be more environmentally aware." },
+  { no: 235, japanese: "あの国では英語とフランス語が話されています。", english: "They speak English and French in that country." },
+  { no: 236, japanese: "「今日は寒いですね。」「ええ，そうですね。」", english: '"It\'s cold today, isn\'t it?"  "Yeah, it is."' },
+  { no: 237, japanese: "困っている人々を助けなければいけません。", english: "You must help those who are in trouble." },
+  { no: 238, japanese: "彼女は猫を３匹飼っています。１匹は黒で，残りは全部白です。", english: "She has three cats. One is black, and the others are white." },
+  { no: 239, japanese: "私たちは猫を３匹飼っていますが，それぞれ違った色です。", english: "We have three cats and each is a different color." },
+  { no: 240, japanese: "「紅茶がよろしいですか，コーヒーがよろしいですか。」「どちらでもいいです。」", english: '"Would you like tea or coffee?"  "Either is fine."' },
+  { no: 241, japanese: "どちらの答えも正しくない。", english: "Neither answer is correct." },
+  { no: 242, japanese: "空港に行くのに１時間かかります。", english: "It takes (you) an hour to get to the airport." },
+  { no: 243, japanese: "父は朝食に米を食べることにしている。", english: "My father makes it a rule to eat rice for breakfast." },
+  { no: 244, japanese: "私の祖父は女性が家事をするのは当然のことと思っている。", english: "My grandfather takes it for granted that women do housework." },
+  { no: 245, japanese: "私はその事故とは何の関係もない。", english: "I have nothing to do with the accident." },
+  { no: 246, japanese: "彼は台湾ではちょっとしたスターである。", english: "He is something of a star in Taiwan." },
+  { no: 247, japanese: "カメラの調子がどこかおかしい。", english: "There is something wrong with the camera." },
+  { no: 248, japanese: "私たちは乗客でいっぱいの列車に乗った。", english: "We got on a train full of passengers." },
+  { no: 249, japanese: "彼はドアを開けたままにした。", english: "He left the door open." },
+  { no: 250, japanese: "東京ではあまり雪が降らない。", english: "We don't have much snow in Tokyo." },
+  { no: 251, japanese: "どの席にも番号が付いている。", english: "Every seat has a number." },
+  { no: 252, japanese: "ローズはジャックと結婚しそうだ。", english: "Rose is likely to marry Jack. [ It is likely that Rose will marry Jack. ]" },
+  { no: 253, japanese: "私は彼女の勝利を確信している。", english: "I'm sure of her winning." },
+  { no: 254, japanese: "私は彼女が勝つと確信している。", english: "I'm sure that she will win." },
+  { no: 255, japanese: "私はほとんど一瞬で眠りに落ちた。", english: "I fell asleep almost immediately." },
+];
+
+// ── SCREEN MANAGEMENT ──
+const screenGrammar = document.getElementById('screen-grammar');
+const screenSelect  = document.getElementById('screen-select');
+const screenStudy   = document.getElementById('screen-study');
+
+function showScreen(name) {
+  screenGrammar.classList.remove('active');
+  screenSelect.classList.remove('active');
+  screenStudy.classList.remove('active');
+  if (name === 'grammar') screenGrammar.classList.add('active');
+  else if (name === 'select') screenSelect.classList.add('active');
+  else if (name === 'study') { screenStudy.style.display = 'flex'; screenStudy.classList.add('active'); }
+}
+
+// ── BUILD GRAMMAR GRID ──
+const grammarGrid = document.getElementById('grammar-grid');
+let currentCategory = null;
+
+categories.forEach(cat => {
+  const count = cat.end - cat.start + 1;
+  const btn = document.createElement('button');
+  btn.className = 'grammar-btn';
+  btn.innerHTML = `
+    <span class="grammar-btn-count">${count}文</span>
+    <span class="grammar-btn-name">${cat.name}</span>
+    <span class="grammar-btn-range">No.${cat.start}〜${cat.end}</span>
+  `;
+  btn.addEventListener('click', () => {
+    currentCategory = cat;
+    openSelectScreen(cat);
+  });
+  grammarGrid.appendChild(btn);
+});
+
+// ── SELECT SCREEN ──
+const cardGrid   = document.getElementById('card-grid');
+const countEl    = document.getElementById('select-count');
+const startBtn   = document.getElementById('btn-start');
+const badgeEl    = document.getElementById('current-grammar-badge');
+
+function openSelectScreen(cat) {
+  badgeEl.textContent = cat.name + '　No.' + cat.start + '〜' + cat.end;
+  document.getElementById('study-grammar-badge').textContent = cat.name;
+
+  // rebuild grid
+  cardGrid.innerHTML = '';
+  const items = flashcards.filter(c => c.no >= cat.start && c.no <= cat.end);
+  items.forEach(card => {
+    const label = document.createElement('label');
+    label.className = 'item-label';
+    label.innerHTML = `
+      <input type="checkbox" data-no="${card.no}">
+      <span class="item-num">No.${card.no}</span>
+      <span class="item-text">${card.japanese}</span>
+    `;
+    cardGrid.appendChild(label);
+    const cb = label.querySelector('input');
+    cb.addEventListener('change', () => {
+      label.classList.toggle('checked', cb.checked);
+      updateCount();
+    });
+  });
+  updateCount();
+  showScreen('select');
+}
+
+function updateCount() {
+  const n = cardGrid.querySelectorAll('input:checked').length;
+  countEl.innerHTML = `<em>${n}</em> 問 選択中`;
+  startBtn.disabled = n === 0;
+}
+
+document.getElementById('btn-all').addEventListener('click', () => {
+  cardGrid.querySelectorAll('input').forEach(cb => {
+    cb.checked = true;
+    cb.closest('.item-label').classList.add('checked');
+  });
+  updateCount();
+});
+document.getElementById('btn-none').addEventListener('click', () => {
+  cardGrid.querySelectorAll('input').forEach(cb => {
+    cb.checked = false;
+    cb.closest('.item-label').classList.remove('checked');
+  });
+  updateCount();
+});
+
+document.getElementById('btn-back-to-grammar').addEventListener('click', () => {
+  showScreen('grammar');
+});
+
+// ── STUDY LOGIC ──
+const japaneseEl = document.getElementById('japanese-text');
+const englishEl  = document.getElementById('english-text');
+const aCard      = document.getElementById('a-card');
+const nextBtn    = document.getElementById('next-button');
+const speakBtn   = document.getElementById('speak-button');
+const progCur    = document.getElementById('prog-cur');
+const progTotal  = document.getElementById('prog-total');
+const qNumEl     = document.getElementById('q-num');
+
+let deck = [];
+let deckIndex = 0;
+let currentCard = null;
+let isAnswerShown = false;
+
+const synth = window.speechSynthesis;
+let englishVoice = null;
+function loadVoice() {
+  const voices = synth.getVoices();
+  englishVoice = voices.find(v => v.lang === 'en-US') ||
+                 voices.find(v => v.lang === 'en-GB') ||
+                 voices.find(v => v.lang.startsWith('en'));
+}
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoice;
+loadVoice();
+
+function speak(text) {
+  if (!synth || !text) return;
+  if (synth.speaking) synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.9;
+  if (englishVoice) u.voice = englishVoice;
+  synth.speak(u);
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+startBtn.addEventListener('click', () => {
+  const selected = [];
+  cardGrid.querySelectorAll('input:checked').forEach(cb => {
+    const card = flashcards.find(c => c.no === +cb.dataset.no);
+    if (card) selected.push(card);
+  });
+  deck = [...selected];
+  shuffle(deck);
+  deckIndex = 0;
+  progTotal.textContent = deck.length;
+  showScreen('study');
+  showCard();
+});
+
+document.getElementById('btn-back').addEventListener('click', () => {
+  synth.cancel();
+  screenStudy.style.display = 'none';
+  showScreen('select');
+});
+
+function showCard() {
+  currentCard = deck[deckIndex];
+  progCur.textContent = deckIndex + 1;
+  qNumEl.textContent = 'No.' + currentCard.no;
+
+  japaneseEl.classList.remove('anim');
+  void japaneseEl.offsetWidth;
+  japaneseEl.classList.add('anim');
+  japaneseEl.textContent = currentCard.japanese;
+
+  englishEl.textContent = '';
+  aCard.classList.add('hidden-ans');
+  speakBtn.classList.remove('visible');
+  isAnswerShown = false;
+  nextBtn.textContent = '答えを表示';
+  if (synth.speaking) synth.cancel();
+}
+
+function showAnswer() {
+  englishEl.classList.remove('anim');
+  void englishEl.offsetWidth;
+  englishEl.classList.add('anim');
+  englishEl.textContent = currentCard.english;
+  aCard.classList.remove('hidden-ans');
+  speakBtn.classList.add('visible');
+  isAnswerShown = true;
+  nextBtn.textContent = deckIndex < deck.length - 1 ? '次の問題 →' : '最初からやり直す';
+  speak(currentCard.english);
+}
+
+function next() {
+  if (!isAnswerShown) { showAnswer(); return; }
+  if (deckIndex < deck.length - 1) {
+    deckIndex++;
+  } else {
+    shuffle(deck);
+    deckIndex = 0;
+  }
+  showCard();
+}
+
+nextBtn.addEventListener('click', next);
+speakBtn.addEventListener('click', () => { if (isAnswerShown) speak(currentCard.english); });
+
+document.addEventListener('keydown', e => {
+  if (screenStudy.classList.contains('active')) {
+    if (e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (!isAnswerShown) showAnswer(); }
+    else if (e.key === 'Escape') synth.cancel();
+  }
+});
+</script>
+</body>
+</html>

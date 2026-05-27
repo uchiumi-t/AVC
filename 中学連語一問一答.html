@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英語フレーズ 一問一答</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;1,400&family=Zen+Kaku+Gothic+New:wght@300;400;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0e1014;
+  --surface: #161920;
+  --border: #252932;
+  --gold: #e8b84b;
+  --gold-dim: #7a5e1a;
+  --gold-glow: rgba(232,184,75,0.12);
+  --text: #eaedf5;
+  --text-sub: #8890a6;
+  --text-hint: #404660;
+  --green: #4ecb8d;
+  --grade-colors: #5b9cf6, #4ecb8d, #f0a500, #e05c5c;
+}
+
+html, body {
+  height: 100%; background: var(--bg);
+  color: var(--text); font-family: 'Zen Kaku Gothic New', sans-serif;
+  overflow: hidden;
+}
+
+/* ══════════════ HOME ══════════════ */
+#screen-home {
+  height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 24px;
+}
+
+.home-eyebrow {
+  font-size: 11px; letter-spacing: 0.3em; color: var(--text-hint);
+  text-transform: uppercase; margin-bottom: 16px;
+}
+.home-title {
+  font-size: clamp(28px, 4vw, 48px); font-weight: 900;
+  color: var(--gold); letter-spacing: 0.04em; margin-bottom: 8px;
+  text-align: center;
+}
+.home-sub {
+  font-size: 14px; color: var(--text-sub); margin-bottom: 52px;
+  letter-spacing: 0.1em; text-align: center;
+}
+
+.grade-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 16px; width: 100%; max-width: 640px;
+}
+
+.grade-btn {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 28px 24px; cursor: pointer;
+  font-family: inherit; text-align: left;
+  transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+  position: relative; overflow: hidden;
+}
+.grade-btn::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  border-radius: 16px 16px 0 0;
+}
+.grade-btn:nth-child(1)::before { background: #5b9cf6; }
+.grade-btn:nth-child(2)::before { background: #4ecb8d; }
+.grade-btn:nth-child(3)::before { background: #f0a500; }
+.grade-btn:nth-child(4)::before { background: #e05c5c; }
+
+.grade-btn:hover { transform: translateY(-3px); }
+.grade-btn:nth-child(1):hover { border-color: #5b9cf6; box-shadow: 0 8px 28px rgba(91,156,246,0.15); }
+.grade-btn:nth-child(2):hover { border-color: #4ecb8d; box-shadow: 0 8px 28px rgba(78,203,141,0.15); }
+.grade-btn:nth-child(3):hover { border-color: #f0a500; box-shadow: 0 8px 28px rgba(240,165,0,0.15); }
+.grade-btn:nth-child(4):hover { border-color: #e05c5c; box-shadow: 0 8px 28px rgba(224,92,92,0.15); }
+
+.grade-label {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  font-weight: 700; margin-bottom: 8px;
+}
+.grade-btn:nth-child(1) .grade-label { color: #5b9cf6; }
+.grade-btn:nth-child(2) .grade-label { color: #4ecb8d; }
+.grade-btn:nth-child(3) .grade-label { color: #f0a500; }
+.grade-btn:nth-child(4) .grade-label { color: #e05c5c; }
+
+.grade-title {
+  font-size: 18px; font-weight: 900; color: var(--text); margin-bottom: 6px;
+}
+.grade-count {
+  font-size: 12px; color: var(--text-sub);
+}
+
+/* ══════════════ QUIZ SCREEN ══════════════ */
+#screen-quiz {
+  display: none; height: 100vh;
+  flex-direction: column;
+}
+
+/* Top bar */
+.quiz-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px 14px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.topbar-left { display: flex; align-items: center; gap: 16px; }
+
+.back-btn {
+  font-size: 11px; font-family: inherit; font-weight: 700;
+  letter-spacing: 0.1em; padding: 5px 14px;
+  border: 1.5px solid var(--border); border-radius: 20px;
+  background: transparent; color: var(--text-sub); cursor: pointer;
+  transition: all 0.15s;
+}
+.back-btn:hover { border-color: var(--text-sub); color: var(--text); }
+
+.grade-badge {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
+  padding: 4px 12px; border-radius: 20px; text-transform: uppercase;
+}
+
+.progress-text {
+  font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text-sub);
+}
+.progress-text em { font-style: normal; color: var(--gold); font-size: 16px; }
+
+/* Progress bar */
+.progress-bar-wrap {
+  height: 3px; background: var(--border); flex-shrink: 0;
+}
+.progress-bar-fill {
+  height: 100%; background: var(--gold);
+  transition: width 0.4s ease; width: 0%;
+}
+
+/* Main card area */
+.quiz-main {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 32px 48px; gap: 0;
+  min-height: 0;
+}
+
+/* Instruction line */
+.txt-instruction {
+  font-size: 13px; color: var(--text-hint); letter-spacing: 0.06em;
+  margin-bottom: 28px; text-align: center;
+  font-weight: 400; line-height: 1.6;
+}
+
+/* Japanese sentence */
+.txt-japanese {
+  font-size: clamp(22px, 3.2vw, 40px); font-weight: 700;
+  color: var(--text-sub); text-align: center; line-height: 1.65;
+  margin-bottom: 24px; max-width: 900px;
+  animation: fadeUp 0.35s ease both;
+}
+
+/* English sentence with blanks */
+.txt-english {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(20px, 2.8vw, 36px);
+  color: var(--text); text-align: center; line-height: 1.7;
+  max-width: 900px;
+  animation: fadeUp 0.35s 0.05s ease both;
+}
+
+/* Filled-in answer word inside the sentence */
+.filled-word {
+  display: inline-block;
+  color: var(--gold);
+  font-style: italic;
+  font-weight: 600;
+  border-bottom: 2px solid var(--gold-dim);
+  padding: 0 2px;
+  animation: wordReveal 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes wordReveal {
+  from { opacity: 0; transform: translateY(6px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Answer reveal (answer label below) */
+.answer-wrap {
+  margin-top: 32px; text-align: center;
+  animation: answerIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.answer-label {
+  font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--text-hint); margin-bottom: 6px; font-weight: 700;
+}
+.answer-text {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(18px, 2.4vw, 30px); font-weight: 600;
+  color: var(--gold-dim);
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes answerIn {
+  from { opacity: 0; transform: scale(0.88) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Bottom bar */
+.quiz-bottombar {
+  border-top: 1px solid var(--border); flex-shrink: 0;
+  padding: 14px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.key-hints {
+  display: flex; gap: 20px; align-items: center;
+}
+.hint {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; color: var(--text-hint); letter-spacing: 0.06em;
+}
+.key {
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid #2a2f3d; border-bottom: 2px solid #1e2230;
+  border-radius: 5px; padding: 2px 8px; min-width: 28px;
+  font-size: 10px; font-family: 'DM Mono', monospace;
+  background: #131620; color: #404660;
+}
+
+.answer-status {
+  font-size: 12px; color: var(--text-hint); letter-spacing: 0.06em;
+  font-weight: 700; min-width: 80px; text-align: right;
+}
+.answer-status.shown { color: var(--gold); }
+
+/* ══════════════ GRADE COLORS ══════════════ */
+.g1 { color: #5b9cf6; background: rgba(91,156,246,0.1); border-color: rgba(91,156,246,0.3); }
+.g2 { color: #4ecb8d; background: rgba(78,203,141,0.1); border-color: rgba(78,203,141,0.3); }
+.g3 { color: #f0a500; background: rgba(240,165,0,0.1);  border-color: rgba(240,165,0,0.3); }
+.g4 { color: #e05c5c; background: rgba(224,92,92,0.1);  border-color: rgba(224,92,92,0.3); }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ══════ HOME ══════ -->
+<div id="screen-home">
+  <div class="home-eyebrow">Classroom Flashcards</div>
+  <div class="home-title">英語フレーズ 一問一答</div>
+  <div class="home-sub">グレードを選んでスタート</div>
+
+  <div class="grade-grid">
+    <button class="grade-btn" onclick="startGrade(1)">
+      <div class="grade-label">Grade 1</div>
+      <div class="grade-title">基礎フレーズ</div>
+      <div class="grade-count" id="count-1">— 問</div>
+    </button>
+    <button class="grade-btn" onclick="startGrade(2)">
+      <div class="grade-label">Grade 2</div>
+      <div class="grade-title">初級フレーズ</div>
+      <div class="grade-count" id="count-2">— 問</div>
+    </button>
+    <button class="grade-btn" onclick="startGrade(3)">
+      <div class="grade-label">Grade 3</div>
+      <div class="grade-title">中級フレーズ</div>
+      <div class="grade-count" id="count-3">— 問</div>
+    </button>
+    <button class="grade-btn" onclick="startGrade(4)">
+      <div class="grade-label">Grade 4</div>
+      <div class="grade-title">上級フレーズ</div>
+      <div class="grade-count" id="count-4">— 問</div>
+    </button>
+  </div>
+</div>
+
+<!-- ══════ QUIZ ══════ -->
+<div id="screen-quiz">
+  <div class="quiz-topbar">
+    <div class="topbar-left">
+      <button class="back-btn" onclick="goHome()">← ホーム</button>
+      <span class="grade-badge" id="grade-badge">Grade 1</span>
+    </div>
+    <div class="progress-text">
+      No.<em id="prog-num">1</em> &nbsp;|&nbsp; <em id="prog-cur">1</em> / <span id="prog-total">25</span>
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="prog-bar"></div>
+  </div>
+
+  <div class="quiz-main" id="quiz-main">
+    <div class="txt-instruction" id="txt-instruction"></div>
+    <div class="txt-japanese"   id="txt-japanese"></div>
+    <div class="txt-english"    id="txt-english"></div>
+    <div class="answer-wrap hidden" id="answer-wrap">
+      <div class="answer-label">Answer</div>
+      <div class="answer-text" id="answer-text"></div>
+    </div>
+  </div>
+
+  <div class="quiz-bottombar">
+    <div class="key-hints">
+      <div class="hint"><span class="key">←</span> 前の問題</div>
+      <div class="hint"><span class="key">→</span> 次の問題</div>
+      <div class="hint"><span class="key">Enter</span> 解答を表示</div>
+      <div class="hint"><span class="key">↓</span> 音声を再生</div>
+    </div>
+    <div class="answer-status" id="answer-status"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+const raw = [
+[1,1,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の姉はたくさんのペンを持っています。","My sister has (     ) (     ) (     ) pens.","a lot of"],
+[1,2,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ケンは放課後サッカーをします。","Ken plays soccer (     ) (     ).","after school"],
+[1,3,"次の日本語の意味に合うように空欄に適する語を答えなさい。","オレンジをください。―わかりました。","An orange, please. ― (     ) (     ).","All right"],
+[1,4,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は毎週土曜日に家でテレビを見ます。","I watch TV (     ) (     ) on Saturdays.","at home"],
+[1,5,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはどうやってそこに行きますか。―バスで行きます。","How do you go there? ―I go (     ) (     ).","by bus"],
+[1,6,"次の日本語の意味に合うように空欄に適する語を答えなさい。","由美は毎日ピアノを弾きます。","Yumi plays the piano (     ) (     ).","every day"],
+[1,7,"次の日本語の意味に合うように空欄に適する語を答えなさい。","すみません。今、何時ですか。","(     ) (     ).  What time is it now?","Excuse me"],
+[1,8,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の母は毎朝6時に起きます。","My mother (     ) (     ) at six every morning.","gets up"],
+[1,9,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の父はたいてい11時に寝ます。","My father usually (     ) (     ) (     ) at eleven.","goes to bed"],
+[1,10,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ジャックはよくトムと一緒に学校に行きます。","Jack often (     ) (     ) (     ) with Tom.","goes to school"],
+[1,11,"次の日本語の意味に合うように空欄に適する語を答えなさい。","このCDをください。―はい、どうぞ。","This CD, please. ― (     ) (     ) (     ).","Here you are"],
+[1,12,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はテニスが好きです。　あなたはどうですか。","I like tennis.  (     ) (     ) you?","How about"],
+[1,13,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは何本の鉛筆をもっていますか。","(     ) (     ) pencils do you have?","How many"],
+[1,14,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は6時に起きて英語を勉強します。　―なるほど。","I get up at six and study English. ― (     ) (     ).","I see"],
+[1,15,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は中学生です。","I'm a (     ) (     ) (     ) student.","junior high school"],
+[1,16,"次の日本語の意味に合うように空欄に適する語を答えなさい。","トムは今、CDを聞いています。","Tom is (     ) (     ) the CD now.","listening to"],
+[1,17,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あの大きな木をごらんなさい。樹齢100年ですよ。","(     ) (     ) that big tree.  It is one hundred years old.","Look at"],
+[1,18,"次の日本語の意味に合うように空欄に適する語を答えなさい。","はじめまして。　―こちらこそ〔はじめまして〕。","(     ) (     ) (     ) (     ).  ― (     ) (     ) (     ) (     ), too.","Nice to meet you"],
+[1,19,"次の日本語の意味に合うように空欄に適する語を答えなさい。","向こうで野球をしましょう。","Let's play baseball (     ) (     ).","over there"],
+[1,20,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ここにすわって彼の言うことを聞きなさい。","(     ) (     ) here and listen to him.","Sit down"],
+[1,21,"次の日本語の意味に合うように空欄に適する語を答えなさい。","全員起立。","(     ) (     ), everyone.","Stand up"],
+[1,22,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ジムは野球が上手です。　―そのとおりです。","Jim is a good baseball player. ― (     ) (     ).","That's right"],
+[1,23,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は日本食が大好きです。","I like Japanese food (     ) (     ).","very much"],
+[1,24,"次の日本語の意味に合うように空欄に適する語を答えなさい。","東京へようこそ。","(     ) (     ) Tokyo.","Welcome to"],
+[1,25,"次の日本語の意味に合うように空欄に適する語を答えなさい。","どうもありがとう。　―どういたしまして。","Thank you very much. ― (     ) (     ).","You're welcome"],
+[2,26,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私にお茶を一杯ください。","Please give me (     ) (     ) (     ) tea.","a cup of"],
+[2,27,"次の日本語の意味に合うように空欄に適する語を答えなさい。","数年後、彼はりっぱな先生になりました。","After  (     ) (     ) years, he became a good teacher.","a few"],
+[2,28,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あれは魚の一種です。","That is  (     ) (     ) (     ) fish.","a kind of"],
+[2,29,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は英語を少し話します。","I speak  (     ) (     ) English. = I speak English (     ) (     ).","a little"],
+[2,30,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ケンは野球についてよく知っています。","Ken knows  (     ) (     ) about baseball.","a lot"],
+[2,31,"次の日本語の意味に合うように空欄に適する語を答えなさい。","トムはほかのどの生徒よりもサッカーが上手です。","Tom plays soccer better than  (     ) (     ) student.","any other"],
+[2,32,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は世界中を旅行したい。","I want to travel  (     ) (     ) (     ).","around the world"],
+[2,33,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はトムと同じくらい速く走れます。","I can run (     ) fast (     ) Tom.","as … as"],
+[2,34,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは彼に助けを求めました。","We (     ) him (     ) help.","asked for"],
+[2,35,"次の日本語の意味に合うように空欄に適する語を答えなさい。","最初、私は彼のいうことがわかりませんでした。"," (     ) (     ) I didn't understand him.","At first"],
+[2,36,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女はついに歌手になりました。"," (     ) (     ) she became a singer.","At last"],
+[2,37,"次の日本語の意味に合うように空欄に適する語を答えなさい。","そのとき私はテニスをしていました。","I was playing tennis (     ) (     ) (     ).","at that time"],
+[2,38,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の考えはあなたのとは違います。","My idea (     ) (     ) (     ) yours.","is different from"],
+[2,39,"次の日本語の意味に合うように空欄に適する語を答えなさい。","オーストラリアはコアラで有名です。","Australia (     ) (     ) (     ) koalas.","is famous for"],
+[2,40,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は久美と仲がいいです。","I (     ) (     ) (     ) Kumi.","am friends with"],
+[2,41,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は来週京都を訪れるつもりです。","I'(     ) (     ) (     ) visit Kyoto next week.","m going to"],
+[2,42,"次の日本語の意味に合うように空欄に適する語を答えなさい。","トムはスポーツが得意です。","Tom (     ) (     ) (     ) sports.","is good at"],
+[2,43,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ケンは今朝学校に遅刻しました。","Ken (     ) (     ) (     ) school this morning.","was late for"],
+[2,44,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ジェーンは今日病気で寝ています。","Jane (     ) (     ) (     ) (     ) today.","is sick in bed"],
+[2,45,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は野球もサッカーも両方とも好きです。","I like (     ) baseball (     ) soccer.","both … and"],
+[2,46,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女はひとりで日本を旅行しています。","She is traveling in Japan (     ) (     ).","by herself"],
+[2,47,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ところで、あなたは今日の午後ひまですか。"," (     ) (     ) (     ), are you free this afternoon?","By the way"],
+[2,48,"次の日本語の意味に合うように空欄に適する語を答えなさい。","何にいたしましょうか。―帽子が欲しいのですが。"," ( C-    ) (     ) (     ) (     )?  ―I want a cap.","Can I help you"],
+[2,49,"次の日本語の意味に合うように空欄に適する語を答えなさい。","何か私にできることはありますか。―このいすを運んでいただけますか。"," (M-     ) (     ) (     ) (     )? ―Could you carry this chair?","May I help you"],
+[2,50,"次の日本語の意味に合うように空欄に適する語を答えなさい。","次の駅で電車を乗り換えなさい。"," (     ) (     ) at the next station.","Change trains"],
+[2,51,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは自分の部屋を掃除しなければなりません。","You must (     ) (     ) your room.","clean up"],
+[2,52,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の父は昨日ニューヨークから帰ってきました。","My father (     ) (     ) from New York yesterday.","came back"],
+[2,53,"次の日本語の意味に合うように空欄に適する語を答えなさい。","この言葉は中国語から来ています。","This word (     ) (     ) Chinese.","comes from"],
+[2,54,"次の日本語の意味に合うように空欄に適する語を答えなさい。","由紀は大阪の出身です。","Yuki (c-    ) (     ) Osaka.","comes from"],
+[2,55,"次の日本語の意味に合うように空欄に適する語を答えなさい。","父はたいてい7時に帰宅します。","My father usually (     ) (     ) at seven.","comes home"],
+[2,56,"次の日本語の意味に合うように空欄に適する語を答えなさい。","どうぞ、お入りください。"," (     ) (     ), please.","Come in"],
+[2,57,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたの夢は実現するでしょう。","Your dream will (     ) (     ).","come true"],
+[2,58,"次の日本語の意味に合うように空欄に適する語を答えなさい。","（私は）全力を尽くします。","I'll (     ) (     ) (     ).","do my best"],
+[2,59,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は、今日は母の手伝いをしなくてよい。","I (     ) (     ) (     ) help my mother today.","don't have to"],
+[2,60,"次の日本語の意味に合うように空欄に適する語を答えなさい。","心配しないで。私は大丈夫です。"," (     ) (     ).   I'm all right.","Don't worry"],
+[2,61,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちはお互いを助け合わなければなりません。","We must help (     ) (     ).","each other"],
+[2,62,"次の日本語の意味に合うように空欄に適する語を答えなさい。","トムは彼の国から遠く離れて暮らしています。","Tom lives (     ) (     ) from his country.","far away"],
+[2,63,"次の日本語の意味に合うように空欄に適する語を答えなさい。","どうやって見つけ出したのですか。","How did you (     ) (     )?","find out"],
+[2,64,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は古い都市、例えば京都や奈良が好きです。","I like old cities, (     ) (     ), Kyoto and Nara.","for example"],
+[2,65,"次の日本語の意味に合うように空欄に適する語を答えなさい。","久美は8時から10時まで勉強します。","Kumi studies (     ) eight (     ) ten.","from … to"],
+[2,66,"次の日本語の意味に合うように空欄に適する語を答えなさい。","まもなく暗くなるでしょう。","It will  (     ) (     ) soon.","get dark"],
+[2,67,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはふつう何時に帰宅しますか。","What time do you usually (     ) (     )?","get home"],
+[2,68,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は駅の前でバスに乗りました。","I (     ) (     ) a bus in front of the station.","got on"],
+[2,69,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はちょうど9時に駅に着きました。","I (g-     ) (     ) the station just at nine.","got to"],
+[2,70,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はその計画をあきらめませんでした。","He did not (     ) (     ) the plan.","give up"],
+[2,71,"次の日本語の意味に合うように空欄に適する語を答えなさい。","川へ泳ぎに行きましょう。","Let's (     ) (     ) in the river.","go swimming"],
+[2,72,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私と一緒にトムに会いにいきませんか。","Will you (     ) (     ) (     ) Tom with me?","go and see"],
+[2,73,"次の日本語の意味に合うように空欄に適する語を答えなさい。","その若者は私たちに礼を言って立ち去りました。","The young man thanked us and (     ) (     ).","went away"],
+[2,74,"次の日本語の意味に合うように空欄に適する語を答えなさい。","トムは来月アメリカに帰ります。","Tom will (     ) (     ) (     ) America next month.","go back to"],
+[2,75,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は鞄を買いに姉と買い物に行きました。","I (     ) (     ) with my sister to buy a bag.","went shopping"],
+[2,76,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は風邪をひいているので、今日は家にいるつもりです。","I'll stay at home today because I (     ) (     ) (     ).","have a cold"],
+[2,77,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは北海道で楽しく過ごしました。","We (     ) (     ) (     ) (     ) in Hokkaido.","had a good time"],
+[2,78,"次の日本語の意味に合うように空欄に適する語を答えなさい。","どうしましょう。　―いい考えがあります。","What shall we do?  ― I (     ) (     ) good (     ).","have a idea"],
+[2,79,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は、今日は部屋を掃除しなければなりません。","I (     ) (     ) clean my room today.","have to"],
+[2,80,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女はときどき私の宿題を手伝ってくれます。","She sometimes  (     ) me  (     ) my homework.","helps with"],
+[2,81,"次の日本語の意味に合うように空欄に適する語を答えなさい。","さあ着きました。ここが私の家です。","(     ) (     ) (     ). Here is my house.","Here we are"],
+[2,82,"次の日本語の意味に合うように空欄に適する語を答えなさい。","（電話を）切らないでそのままお待ちください。","(     ) (     ), please.","Hold on"],
+[2,83,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私のホストファミリーは私にとても親切でした。","My (     ) (     ) was very kind to me.","host family"],
+[2,84,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはここにどのくらい滞在するつもりですか。","(     ) (     ) are you going to stay here?","How long"],
+[2,85,"次の日本語の意味に合うように空欄に適する語を答えなさい。","このペンはいくらですか。　―1000円です。","(     ) (     ) is this pen? ― It's 1,000 yen.","How much"],
+[2,86,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたのおばあさんは何歳ですか。　―70歳です。","(     ) (     ) is your grandmother? ― She's 70 years old.","How old"],
+[2,87,"次の日本語の意味に合うように空欄に適する語を答えなさい。","庭園には何百本もの花がありました。","There were (     ) (     ) flowers in the garden.","hundreds of"],
+[2,88,"次の日本語の意味に合うように空欄に適する語を答えなさい。","１台の車が私の家の前に止まりました。","A car stopped (     ) (     ) (     ) my house.","in front of"],
+[2,89,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは将来何になりたいですか。","What do you want to be (     ) (     ) (     )?","in the future"],
+[2,90,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちはそのバスに間に合いました。","We were (     ) (     ) for the bus.","in time"],
+[2,91,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ちょっとお待ちください。","(     ) (     ) (     ), please.","Just a minute"],
+[2,92,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはどんな種類のスポーツが好きですか。","What (     ) (     ) sports do you like?","kind of"],
+[2,93,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あの動物はなんですか。　―ええと。それはコアラです。","What is that animal? － (     ) (     ). It's a koala.","Let's see"],
+[2,94,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは何を探しているのですか。　―私は傘を探しています。","What are you (     ) (     )? － I'm (     ) (     ) my umbrella.","looking for"],
+[2,95,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はあなたにお会いするのを楽しみにしています。","I am (     ) (     ) (     ) seeing you.","looking forward to"],
+[2,96,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は箱の中をのぞきこみました。","He (     ) (     ) the box.","looked into"],
+[2,97,"次の日本語の意味に合うように空欄に適する語を答えなさい。","それは猫のように見えます。","It  (     ) (     ) a cat.","looks like"],
+[2,98,"次の日本語の意味に合うように空欄に適する語を答えなさい。","数学はますます難しくなりました。","Math became (     ) (     ) (     ) difficult.","more and more"],
+[2,99,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは、毎年元日に「雑煮（ぞうに）」を食べます。","We eat Zoni on (     ) (     ) (     ) every year.","New Year's Day"],
+[2,100,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の家は郵便局の隣にあります。","My house is (     ) (     ) the post office.","next to"],
+[2,101,"次の日本語の意味に合うように空欄に適する語を答えなさい。","お茶を一杯いかがですか。　―いいえ、結構です。","How about a cup of tea? － (     ), (     ) (     ).","No, thank you"],
+[2,102,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の犬はあなたの犬ほど大きくない。","My dog is (     ) (     ) big (     ) yours.","not as … as"],
+[2,103,"次の日本語の意味に合うように空欄に適する語を答えなさい。","その音楽会に行きませんか。　―はい、もちろん。","Shall we go to the concert? － Yes, (     ) (     ).","of course"],
+[2,104,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ある日、私は通りで私の旧友に会いました。","(     ) (     ) I saw my old friend on the street.","One day"],
+[2,105,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ケンは私の友達の一人です。","Ken is (     ) (     ) my friends.","one of"],
+[2,106,"次の日本語の意味に合うように空欄に適する語を答えなさい。","久美が家から出てきました。","Kumi came (     ) (     ) her house.","out of"],
+[2,107,"次の日本語の意味に合うように空欄に適する語を答えなさい。","今すぐそれをしなさい。","Do it (     ) (     ).","right now"],
+[2,108,"次の日本語の意味に合うように空欄に適する語を答えなさい。","男の子たちがその犬を追いかけています。","The boys are (     ) (     ) the dog.","running after"],
+[2,109,"次の日本語の意味に合うように空欄に適する語を答えなさい。","その猫は私を見ると逃げました。","The cat (     ) (     ) when it saw me.","ran away"],
+[2,110,"次の日本語の意味に合うように空欄に適する語を答えなさい。","わたしはいつかオーストラリアへ行きたい。","I want to go to Australia (     ) (     ).","some day"],
+[2,111,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私に話しかけないで。","Don't (s-     ) (     ) me.","speak to"],
+[2,112,"次の日本語の意味に合うように空欄に適する語を答えなさい。","（電話で）ジェーンさんとお話ししたいのですが。","May I (s-     ) (     ) Jane?","speak to"],
+[2,113,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は夏の間、祖父母のところに滞在しました。","I (     ) (     ) my grandparents during summer.","stayed with"],
+[2,114,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ネットサーフィンをするのはとても楽しい。","(     ) (     ) (     ) is a lot of fun.","Surfing the Internet"],
+[2,115,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私が犬の世話をします。","I (     ) (     ) (     ) our dog.","take care of"],
+[2,116,"次の日本語の意味に合うように空欄に適する語を答えなさい。","お体をお大事に。","(     ) (     ) (     ) yourself.","Take care of"],
+[2,117,"次の日本語の意味に合うように空欄に適する語を答えなさい。","それじゃあ、またね。（別れの挨拶）","(T-     ) (     ) (     ).","Take it easy"],
+[2,118,"次の日本語の意味に合うように空欄に適する語を答えなさい。","気楽にやりましょう。","Let's (     ) (     ) (     ).","take it easy"],
+[2,119,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは自分たちの夢について話しました。","We (     ) (     ) our dreams.","talked about"],
+[2,120,"次の日本語の意味に合うように空欄に適する語を答えなさい。","お手紙をありがとう。","(     ) (     ) (     ) your letter.","Thank you for"],
+[2,121,"次の日本語の意味に合うように空欄に適する語を答えなさい。","電話を（してくれて）ありがとう。","(     ) (     ) (     ) (     ).","Thank you for calling"],
+[2,122,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はこの夏にアメリカを訪れます。　―それはすごいですね。","I'll visit America this summer. － (     ) (     ).","That's great"],
+[2,123,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはこの計画についてどう思いますか。","What do you (     ) (     ) this plan?","think of"],
+[2,124,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はバスの停留所で彼を待っていました。","I was (     ) (     ) him at the bus stop.","waiting for"],
+[2,125,"次の日本語の意味に合うように空欄に適する語を答えなさい。","トムは新しいコンピュータを買いたがっています。","Tom (     ) (     ) buy a new computer.","wants to"],
+[2,126,"次の日本語の意味に合うように空欄に適する語を答えなさい。","もしもし、こちらはケンです。ジムをおねがいします。　―僕だよ、ケン。やあ、元気？","Hello, this is Ken. Can I speak to Jim? － Speaking, Ken. (     ) (     )?","What's up"],
+[2,127,"次の日本語の意味に合うように空欄に適する語を答えなさい。","野球の試合を見に行きませんか。","(     ) (     ) (     ) go and see the baseball game?","Why don't you"],
+[2,128,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はさよならを言わずに立ち去りました。","He went away (     ) (     ) goodbye.","without saying"],
+[2,129,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は１５歳で、私の姉は１８歳です。","I am 15 (     ) (     ) and my sister is 18 (     ) (     ).","years old"],
+[2,130,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は魚はあまり好きではないんですよ。","(     ) (     ), I don't like fish very much.","You know"],
+[3,131,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは２、３時間そこにいました。","We stayed there for (     ) (     ) (     ) hours.","a couple of"],
+[3,132,"次の日本語の意味に合うように空欄に適する語を答えなさい。","昔々この山は海底にありました。","(     ) (     ) (     ) (     ), this mountain was under the sea.","A long time ago"],
+[3,133,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ケーキを１ついかがですか。","Would you like (     ) (     ) (     ) cake?","a piece of"],
+[3,134,"次の日本語の意味に合うように空欄に適する語を答えなさい。","しばらくしてその男の子は泣きやみました。","The boy stopped crying (     ) (     ) (     ).","after a while"],
+[3,135,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は結局、私たちと映画を見に行くことに決めました。","He decided to go to the movies with us (     ) (     ).","after all"],
+[3,136,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女は私の意見に賛成しませんでした。","She didn't (     ) (     ) me.","agree with"],
+[3,137,"次の日本語の意味に合うように空欄に適する語を答えなさい。","そのお年寄りの男の人はまったくのひとり暮らしです。","The old man lives (     ) (     ).","all alone"],
+[3,138,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あたり一面に美しい花が咲いていました。","There were beautiful flowers (    ) (    ).","all around"],
+[3,139,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼らは一日中熱心に働きました。","They worked hard (     ) (     ).","all day"],
+[3,140,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は夜通し音楽を聞いていました。","He listened to music (     ) (     ).","all night"],
+[3,141,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼の本は世界中で読まれています。","His book is read (     ) (     ) (     ) (     ).","all over the world"],
+[3,142,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女はいつもほほえんでいました。","She smiled (     ) (     ) (     ).","all the time"],
+[3,143,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はテニス、野球、バスケットボールなどが好きです。","I like tennis, baseball, basketball, (     ) (     ) (     ).","and so on"],
+[3,144,"次の日本語の意味に合うように空欄に適する語を答えなさい。","マイクはいつ東京に着いたのですか。","When did Mike (     ) (     ) Tokyo?","arrive in"],
+[3,145,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女はできるだけ速く走りました。","She ran (     ) fast (     ) she (     ).","as … as … could"],
+[3,146,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は帰宅するとすぐにテレビを見始めました。","He began to watch TV (     ) (     ) (     ) he came home.","as soon as"],
+[3,147,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女は中国語も話します。","She speaks Chinese (     ) (     ).","as well"],
+[3,148,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は私に数分待ってくれるように頼みました。","He (     ) me to wait a few minutes.","asked"],
+[3,149,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は１０歳のときに突然病気になりました。","He suddenly became sick (     ) (     ) (     ) (     ) 10.","at the age of"],
+[3,150,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の父はスペイン語を話せます。","My father (     ) (     ) (     ) speak Spanish.","is able to"],
+[3,151,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は子どものとき犬がこわかった。","I (     ) (     ) (     ) dogs when I was a child.","was afraid of"],
+[3,152,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはどこでうまれたのですか。","Where (     ) you (     )?","were … born"],
+[3,153,"次の日本語の意味に合うように空欄に適する語を答えなさい。","その山は雪でおおわれています。","The mountain (     ) (     ) (     ) snow.","is covered with"],
+[3,154,"次の日本語の意味に合うように空欄に適する語を答えなさい。","そのスタジアムは人でいっぱいでした。","The stadium (     ) (     ) (     ) people.","was full of"],
+[3,155,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたとお話しできてうれしいです。","I (     ) (     ) (     ) talk with you.","am glad to"],
+[3,156,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは美術に興味がありますか。","(     ) you (     ) (     ) art?","Are … interested in"],
+[3,157,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は日本の文化を誇りに思っています。","I (     ) (     ) (     ) Japanese culture.","am proud of"],
+[3,158,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はその建物の大きさに驚きました。","I (     ) (     ) (     ) the size of the building.","was surprised at"],
+[3,159,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はそこであなたに会っておどろきました。","I (     ) (     ) (     ) see you there.","was surprised to"],
+[3,160,"次の日本語の意味に合うように空欄に適する語を答えなさい。","大雪のために私たちの学校は休みでした。","Our school was closed (     ) (     ) the heavy snow.","because of"],
+[3,161,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは神を信じますか。","Do you (     ) (     ) God?","believe in"],
+[3,162,"次の日本語の意味に合うように空欄に適する語を答えなさい。","恵子とみどりの間に立っている男の子はだれですか。","Who is the boy standing (     ) Keiko (     ) Midori?","between … and"],
+[3,163,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あとでこちらから電話してもいいですか。","May I (     ) you (     )?","call back"],
+[3,164,"次の日本語の意味に合うように空欄に適する語を答えなさい。","今日の午後、私はは弟の世話をしなければなりません。","I must (     ) (     ) my little brother this afternoon.","care for"],
+[3,165,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の母はよく風邪をひきます。","My mother often (     ) (     ) (     ).","catches a cold"],
+[3,166,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「元気を出せよ」と彼は言いました。",'"(     ) (     ) !" he said.',"Cheer up"],
+[3,167,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はくる日もくる日も彼女に会いに行きました。","He went to see her (     ) (     ) (     ).","day after day"],
+[3,168,"次の日本語の意味に合うように空欄に適する語を答えなさい。","トムは音楽家になろうと決心しました。","Tom (     ) (     ) be a musician.","decided to"],
+[3,169,"次の日本語の意味に合うように空欄に適する語を答えなさい。","世界中でたくさんの動物が絶滅しつつあります。","Many animals are (     ) (     ) throughout the world.","dying out"],
+[3,170,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたか彼のどちらかがそれをしなければなりません。","(     ) you (     ) he must do it.","Either … or"],
+[3,171,"次の日本語の意味に合うように空欄に適する語を答えなさい。","たとえあなたが反対しても私はそこへ行くつもりです。","I will go there (     ) (     )  you are against it.","even if"],
+[3,172,"次の日本語の意味に合うように空欄に適する語を答えなさい。","お年寄りの女の人が私のまん前で倒れました。","An old woman (     ) (     )  just in front of me.","fell down"],
+[3,173,"次の日本語の意味に合うように空欄に適する語を答えなさい。","劇場はすぐに満員になりました。","The theater soon (     ) (     ).","filled up"],
+[3,174,"次の日本語の意味に合うように空欄に適する語を答えなさい。","第一に、あなたの援助に感謝したいと思います。","(     ) (     ) (     ), I would like to thank you for your help.","First of all"],
+[3,175,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちはそのことについて長い間話しました。","We talked about the matter (     ) (     ) (     ) (     ).","for a long time"],
+[3,176,"次の日本語の意味に合うように空欄に適する語を答えなさい。","それではまた。","Goodbye (     ) (     ).","for now"],
+[3,177,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私ははじめて聞いて以来アフリカの音楽が大好きです。","I have loved African music since I heard it (     ) (     ) (     ) (     ).","for the first time"],
+[3,178,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「さようなら」と彼は言って車に乗りました。",'"Goodbye!" he said and (     ) (     ) his car.',"got in"],
+[3,179,"次の日本語の意味に合うように空欄に適する語を答えなさい。","博物館へ行くにはどこで降りたらいいですか。","Where should I (     ) (     ) to go to the museum?","get off"],
+[3,180,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたのお母さんが早く良くなるといいですね。","I hope your mother (     ) (     ) soon.","gets well"],
+[3,181,"次の日本語の意味に合うように空欄に適する語を答えなさい。","公園へ散歩に行きましょう。","Let's (     ) (     ) (     ) (     ) in the park.","go for a walk"],
+[3,182,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は大学へ行くために出発しました。","He (     ) (     ) to college.","went off"],
+[3,183,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは真夜中まで歩き続けました。","We (     ) (     ) (     ) until midnight.","went on walking"],
+[3,184,"次の日本語の意味に合うように空欄に適する語を答えなさい。","夜は１人で外出すべきではありません。","You should not (     ) (     ) alone at night.","go out"],
+[3,185,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女はトムのところまで行って何かを手渡しました。","She (     ) (     ) (     )  Tom and handed him something.","went up to"],
+[3,186,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は大人になったらアメリカに住みたいです。","I want to live in America when I (     ) (     ).","grow up"],
+[3,187,"次の日本語の意味に合うように空欄に適する語を答えなさい。","君は家にいたほうがいい。","You (     ) (     ) stay at home.","had better"],
+[3,188,"次の日本語の意味に合うように空欄に適する語を答えなさい。","楽しい旅を。","(     ) (     ) (     ) trip!","Have a nice"],
+[3,189,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはおなかが痛いのですか。","Do you (     ) (     ) (     )?","have a stomachache"],
+[3,190,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は１度日光へ行ったことがあります。","I (     ) (     ) (     ) Nikko once.","have been to"],
+[3,191,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼から長い間便りがありません。","I have not (     ) (     ) him for a long time.","heard from"],
+[3,192,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはそんなことを耳にしたことがありますか。","Have you ever (     ) (     ) such a thing?","heard of"],
+[3,193,"次の日本語の意味に合うように空欄に適する語を答えなさい。","料理を自由にお取りください。","Please (     ) (     ) (     ) the dish.","help yourself to"],
+[3,194,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「なんてわくわくするのでしょう」と彼女は大きな声で言いました。",'"(     ) (     )!" she shouted.',"How exciting"],
+[3,195,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは月に何回映画を見に行きますか。","(     ) (     ) do you go to the movies in a month?","How often"],
+[3,196,"次の日本語の意味に合うように空欄に適する語を答えなさい。","駅への行き方を教えてくれませんか。","Will you tell me (     ) (     ) get to the station?","how to"],
+[3,197,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「僕たちは遅れている。急ごう」とトムは言いました。",'"We are late. Let\'s (     ) (     )." Tom said.',"hurry up"],
+[3,198,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「わかった」と彼はにっこりして言いました。",'"(     ) (     ) (     )," he said with a smile.',"I got it"],
+[3,199,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼のおじさんがこの本を書いたのだそうです。","(     ) (     ) (     ) his uncle wrote this book.","I hear that"],
+[3,200,"次の日本語の意味に合うように空欄に適する語を答えなさい。","残念ながら彼は遅れるだろうと思います。","(     ) (     ) (     ) he will be late.","I'm afraid that"],
+[3,201,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はきっと私たちを手伝ってくれると思います。","(     ) (     ) (     ) he will help us.","I'm sure that"],
+[3,202,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは全部でいくつの教科を勉強しているのですか。","How many subjects do you study (     ) (     )?","in all"],
+[3,203,"次の日本語の意味に合うように空欄に適する語を答えなさい。","夜そこへ行くと危険ですよ。","You will be (     ) (     ) if you go there at night.","in danger"],
+[3,204,"次の日本語の意味に合うように空欄に適する語を答えなさい。","実のところ私はりんごが好きではありません。","(     ) (     ) I do not like apples.","In fact"],
+[3,205,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の意見では、子どもは携帯電話を使うべきではありません。","(     ) (     ) (     ), children should not use cellphones.","In my opinion"],
+[3,206,"次の日本語の意味に合うように空欄に適する語を答えなさい。","お返しに彼女は私にこの本をくれました。","She gave me this book (     ) (     ).","in return"],
+[3,207,"次の日本語の意味に合うように空欄に適する語を答えなさい。","そのころはこの地域に野生生物がたくさんいました。","(     ) (     ) (     ), there were many wild animals in this area.","In those days"],
+[3,208,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼らは何時間も話し続けました。","They (     ) (     ) for hours.","kept talking"],
+[3,209,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は猫の世話をするために家にいなければなりません。","I have to stay home to (     ) (     ) my cat.","look after"],
+[3,210,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は空を見上げました。","He (     ) (     ) at the sky.","looked up"],
+[3,211,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はそのレポートでいくつか間違えました。","I (     ) (     ) (     ) in the report.","made some mistakes"],
+[3,212,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はたくさんの人と友達になりたい。","I would like to (     ) (     ) (     ) many people.","make friends with"],
+[3,213,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「ジェーンさんをお願いします」「すみません、今外出しています。」",'"(     ) (     ) (     ) (     ) Jane, please?" "Sorry, she is out now."',"May I speak to"],
+[3,214,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女は赤色と白色を混ぜました。","She (     ) red (     ) white.","mixed … with"],
+[3,215,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の姉はCDを１００枚以上持ています。","My sister has (     ) (     ) one hundred CDs.","more than"],
+[3,216,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼らのほとんどは東南アジアから来ていました。","(     ) (     ) them were from Southeast Asia.","Most of"],
+[3,217,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼らは新しい家に引っ越しました。","They (     ) (     ) a new house.","moved to"],
+[3,218,"次の日本語の意味に合うように空欄に適する語を答えなさい。","冷蔵庫に牛乳はもうありません。","There is (     ) (     ) milk in the refrigerator.","no more"],
+[3,219,"次の日本語の意味に合うように空欄に適する語を答えなさい。","だれもあなたに会いに来ませんでした。","(     ) (     ) came to see you.","No one"],
+[3,220,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「ここにすわってもいいですか」「いいですよ」",'"Can I sit here?" "(     ) (     )."',"No problem"],
+[3,221,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はもうあなたのことを怒っていません。","I am (     ) angry with you (     ) (     ).","not … any more"],
+[3,222,"次の日本語の意味に合うように空欄に適する語を答えなさい。","その映画は少しも面白くありませんでした。","The movie was (     ) interesting (     ) (     ).","not … at all"],
+[3,223,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「どうもありがとう」「どういたしまして」",'"Thank you very much." "(     ) (     ) (     )."',"Not at all"],
+[3,224,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「お元気ですか」「まあまあです」",'"How are you?" "(     ) (     )."',"Not bad"],
+[3,225,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は英語だけでなくフランス語も話します。","He speaks (     ) (     ) English (     ) (     ) French.","not only … but also"],
+[3,226,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「あなたは漫画が好きですか」「そうでもありません」",'"Do you like comics?" "(     ) (     )."',"Not really"],
+[3,227,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は駅へ行く途中で先生に会いました。","I met my teacher (     ) (     ) (     ) (     ) the station.","on the way to"],
+[3,228,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私には姉が二人います。一人は京都に、もう一人は大阪にいます。","I have two sisters. (     ) is in Kyoto and (     ) (     ) is in Osaka.","One … the other"],
+[3,229,"次の日本語の意味に合うように空欄に適する語を答えなさい。","走者は次々に帰ってきました。","The runners came back (     ) (     ) (     ).","one after another"],
+[3,230,"次の日本語の意味に合うように空欄に適する語を答えなさい。","一人ずつ部屋に入ってきてください。","Please come into the room (     ) (     ) (     ).","one by one"],
+[3,231,"次の日本語の意味に合うように空欄に適する語を答えなさい。","もう一回やるつもりです。","I'm going to try (     ) (     ) time.","one more"],
+[3,232,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは何度も何度もその歌を歌いました。","We sang the song (     ) (     ) (     ) (     ).","over and over again"],
+[3,233,"次の日本語の意味に合うように空欄に適する語を答えなさい。","駅まであなたを（車で）迎えに行ってあげましょう。","I'll (     ) you (     ) at the station.","pick up"],
+[3,234,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは旅行の準備ができていますか。","Are you (     ) (     ) the trip?","ready for"],
+[3,235,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「大丈夫だ」とポールは自分に言い聞かせました。","Paul (     ) (     ) (     ), \"That's OK.\"","said to himself"],
+[3,236,"次の日本語の意味に合うように空欄に適する語を答えなさい。","医者に診（み）てもらったほうがいいよ。","You had better (     ) (     ) (     ).","see a doctor"],
+[3,237,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女は私に町を案内してくれました。","She (     ) me (     ) the town.","showed … around"],
+[3,238,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はとても疲れていたので早く寝ました。","I was (     ) tired (     ) I went to bed early.","so … that"],
+[3,239,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちの意見に賛成した人もいれば、賛成しない人もいました。","(     ) agreed with us, (     ) didn't.","Some … others"],
+[3,240,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はバスケットボールやバレーボールのようなスポーツが好きです。","I like sports (     ) (     ) basketball and volleyball.","such as"],
+[3,241,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は毎日ふろに入ります。","I (     ) (     ) (     ) everyday.","take a bath"],
+[3,242,"次の日本語の意味に合うように空欄に適する語を答えなさい。","これらの絵〔写真〕を見なさい。","(     ) (     ) (     ) (     ) these pictures.","Take a look at"],
+[3,243,"次の日本語の意味に合うように空欄に適する語を答えなさい。","気をつけて、良い一日を。","(     ) (     ), and have a good day.","Take care"],
+[3,244,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼らの飛行機は１０時に離陸しました。","Their plane (     ) (     ) at 10 o'clock.","took off"],
+[3,245,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ここで靴を脱いでください。","Please (     ) (     ) your shoes here.","take off"],
+[3,246,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はお父さんの仕事を引き継ぎました。","He (     ) (     ) his father's business.","took over"],
+[3,247,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はコンテストに参加したのですか。","Did he (     ) (     ) (     ) the contest?","take part in"],
+[3,248,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は太郎と彼のお兄さんとの見分けがつきませんでした。","I could not (     ) Taro (     ) his brother.","tell … from"],
+[3,249,"次の日本語の意味に合うように空欄に適する語を答えなさい。","父は私に車を洗うように言いました。","My father (     ) me (     ) wash the car.","told … to"],
+[3,250,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたのおかげで、私は時間内に仕事を終えることができました。","(     ) (     ) your help, I was able to finish the work in time.","Thanks to"],
+[3,251,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「それだけですか」「はい、それだけです」",'"Is that all?" "Yes, (     ) (     )."',"that's all"],
+[3,252,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「私は頭が痛いです」「それはお気の毒に」",'"I have a headache." "(     ) (     ) (     )."',"That's too bad"],
+[3,253,"次の日本語の意味に合うように空欄に適する語を答えなさい。","近頃私はとても忙しいです。","I have been very busy (     ) (     ).","these days"],
+[3,254,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はあまりにうれしすぎて眠れませんでした。","I was (     ) happy (     ) sleep.","too … to"],
+[3,255,"次の日本語の意味に合うように空欄に適する語を答えなさい。","このシャツをを試着してもいいですか。","Can I (     ) this shirt (     )?","try … on"],
+[3,256,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はその難しい英語の本を読もうとしました。","He (     ) (     ) read the difficult English book.","tried to"],
+[3,257,"次の日本語の意味に合うように空欄に適する語を答えなさい。","「準備できましたか」「ちょっと待ってください」",'"Are you ready?" "(     ) (     ) (     ), please."',"Wait a minute"],
+[3,258,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ケン、起きなさい。　もう７時ですよ。","(     ) (     ), Ken! It's already seven.","Wake up"],
+[3,259,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私に一緒に行って欲しいのですか。","Do you (     ) me (     )  go with you?","want … to"],
+[3,260,"次の日本語の意味に合うように空欄に適する語を答えなさい。","調子がよくなさそうですね、どうしたのですか。","You don't look well. (     ) (     ) (     )?","What's the matter"],
+[3,261,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は今晩のコンサートに行きたいです。","I (     ) (     ) (     ) go to the concert this evening.","would like to"],
+[4,262,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ケイトはその店で靴を一足買いました。","Kate bought (     ) (     ) (     ) shoes at the store.","a pair of"],
+[4,263,"次の日本語の意味に合うように空欄に適する語を答えなさい。","それは一種の果物でした。","It was (     ) (     ) (     ) fruit.","a sort of"],
+[4,264,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ニュースによると、多くの家がその落石で破壊されました。","(     ) (     ) the news, lots of houses were destroyed by the falling rocks.","According to"],
+[4,265,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちはできるだけ速く歩きました。","We walked (     ) fast (     ) (     ).","as … as possible"],
+[4,266,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ジムはいつものように遅れました。","Jim was late (     ) (     ).","as usual"],
+[4,267,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はその仕事を終えるのに少なくとも３日必要です。","I need (     ) (     ) three days to finish the work.","at least"],
+[4,268,"次の日本語の意味に合うように空欄に適する語を答えなさい。","すぐに出発しましょう。","Let's start (     ) (     ).","at once"],
+[4,269,"次の日本語の意味に合うように空欄に適する語を答えなさい。","今のところ忙しすぎてあなたを手伝えません。","(     ) (     ) I am too busy to help you.","At present"],
+[4,270,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちの学校はあの丘のふもとにあります。","Our school is (     ) (     ) (     ) (     ) that hill.","at the foot of"],
+[4,271,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼らは同時に話し始めました。","They began to speak (     ) (     ) (     ) (     ).","at the same time"],
+[4,272,"次の日本語の意味に合うように空欄に適する語を答えなさい。","直美は３日間学校を休んでいます。","Naomi has (     ) (     ) (     ) school for three days.","been absent from"],
+[4,273,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼の物語は自分自身の経験に基づいたものでした。","His story (     ) (     ) (     ) his own experiences.","was based on"],
+[4,274,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は職探しに忙しい。","I (     ) (     ) (     ) for a job.","am busy looking"],
+[4,275,"次の日本語の意味に合うように空欄に適する語を答えなさい。","その箱はおもちゃでいっぱいでした。","The box (     ) (     ) (     ) toys.","was filled with"],
+[4,276,"次の日本語の意味に合うように空欄に適する語を答えなさい。","トムはテレビゲームが好きです。","Tom (     ) (     ) (     ) video games.","is fond of"],
+[4,277,"次の日本語の意味に合うように空欄に適する語を答えなさい。","戻ってきたら私の自転車はなくなっていました。","When I came back, my bike (     ) (     ).","was gone"],
+[4,278,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はメアリーに恋をしています。","He (     ) (     ) (     ) (     ) Mary.","is in love with"],
+[4,279,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはバスに間に合いましたか。","(     ) you (     ) (     ) (     ) the bus?","Were … in time for"],
+[4,280,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はいつも私が困っているときに助けてくれます。","He always helps me when I (     ) (     ) (     ).","am in trouble"],
+[4,281,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は眼科医として知られています。","He (     ) (     ) (     ) an eye doctor.","is known as"],
+[4,282,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ブラウンさんはこの町のみんなに知られています。","Mr. Brown (     ) (     ) (     ) everyone in this town.","is known to"],
+[4,283,"次の日本語の意味に合うように空欄に適する語を答えなさい。","パンは何から作られますか。","What (     ) bread (     ) (     )?","is made from"],
+[4,284,"次の日本語の意味に合うように空欄に適する語を答えなさい。","牛乳からチーズを作ります。","Milk (     ) (     ) (     ) cheese.","is made into"],
+[4,285,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼の家は木でできています。","His house (     ) (     ) (     ) wood.","is made of"],
+[4,286,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女はそのプレゼントが気に入りました。","She (     ) (     ) (     ) the present.","was pleased with"],
+[4,287,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はギターを弾くのがへたです。","He (     ) (     ) (     ) playing the guitar.","is poor at"],
+[4,288,"次の日本語の意味に合うように空欄に適する語を答えなさい。","久美はそのパーティーに出席していました。","Kumi (     ) (     ) (     ) the party.","was present at"],
+[4,289,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたのコートは色が彼女のと似ています。","Your coat (     ) (     ) in color (     ) hers.","is similar to"],
+[4,290,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は自分の成功を確信しています。","I (     ) (     ) (     ) my success.","am sure of"],
+[4,291,"次の日本語の意味に合うように空欄に適する語を答えなさい。","出かけるときは必ずドアを閉めなさい。","(     ) (     ) (     ) close the door when you go out.","Be sure to"],
+[4,292,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私のコンピュータはどこか具合が悪い。","Something (     ) (     ) (     ) my computer.","is wrong with"],
+[4,293,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の母はまもなく帰ってくるでしょう。","My mother will be back (     ) (     ).","before long"],
+[4,294,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは何のクラブに入っていますか。","What club do you (     ) (     )?","belong to"],
+[4,295,"次の日本語の意味に合うように空欄に適する語を答えなさい。","昨夜私の近所で火事がありました。","A fire (     ) (     ) in my neighborhood last night.","broke out"],
+[4,296,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は祖母によって育てられました。","He was (     ) (     )  by his grandmother.","brought up"],
+[4,297,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は偶然、公園でジョンに会いました。","I met John in the park (     ) (     ).","by chance"],
+[4,298,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは彼の冗談を聞いて笑わずにはいられませんでした。","We (     ) (     ) (     ) at his joke.","couldn't help laughing"],
+[4,299,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちはその計画を実行するつもりです。","We will (     ) (     ) the plan.","carry out"],
+[4,300,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女はそれ以後彼に対する考えを変えました。","She (     ) (     ) (     ) about him after that.","changed her mind"],
+[4,301,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は通りで偶然おじに会いました。","I (     ) (     ) my uncle on the street.","came across"],
+[4,302,"次の日本語の意味に合うように空欄に適する語を答えなさい。","やっと校長先生の長い話が終わりました。","At last the principal's long talk (     ) (     ) (     ) (     ).","came to an end"],
+[4,303,"次の日本語の意味に合うように空欄に適する語を答えなさい。","騒音のため私は勉強に集中できませんでした。","I could not (     ) (     ) my study because of the noise.","concentrate on"],
+[4,304,"次の日本語の意味に合うように空欄に適する語を答えなさい。","疲れていましたが、私たちは歩き続けました。","Though we were tired, we (     ) (     ) walk.","continued to"],
+[4,305,"次の日本語の意味に合うように空欄に適する語を答えなさい。","日本は石油を外国に頼っています。","Japan (     ) (     ) foreign countries for oil.","depends on"],
+[4,306,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちはパーティーで楽しい時間を過ごしました。","We (     ) (     ) at the party.","enjoyed ourselves"],
+[4,307,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女は勉強している間に寝てしまいました。","She (     ) (     ) while she was studying.","fell asleep"],
+[4,308,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私の家は駅から遠いです。","My house is (     ) (     ) the station.","far from"],
+[4,309,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は音楽を聞きたい気がします。","I (     ) (     ) (     ) to music.","feel like listening"],
+[4,310,"次の日本語の意味に合うように空欄に適する語を答えなさい。","しばらく静かにしていてください。","Please keep quiet (     ) (     ) (     ).","for a while"],
+[4,311,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちはそれに関する意見を集めるために１軒１軒回りました。","We went (     ) (     ) (     ) (     ) to gather opinions about it.","from door to door"],
+[4,312,"次の日本語の意味に合うように空欄に適する語を答えなさい。","これからはもっと気をつけます。","I will be more careful (     ) (     ) (     ).","from now on"],
+[4,313,"次の日本語の意味に合うように空欄に適する語を答えなさい。","由香はときどき私に電話をかけてきます。","Yuka calls me up (     ) (     ) (     ) (     ).","from time to time"],
+[4,314,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は彼らと仲よくやっていきたいと思います。","I'd like to (     ) (     ) well (     ) them.","get along with"],
+[4,315,"次の日本語の意味に合うように空欄に適する語を答えなさい。","なぜあなたはあのとき彼に腹を立てたのですか。","Why did you (     ) (     ) (     ) him at that time?","get angry with"],
+[4,316,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女はまだショックから立ち直っていません。","She has not (     ) (     ) the shock yet.","gotten over"],
+[4,317,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちはまもなくやってくる冬に備えなければなりません。","We must (     ) (     ) (     ) the coming winter.","get ready for"],
+[4,318,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはすぐ東京で暮らすのに慣れるでしょう。","You will soon (     ) (     ) (     ) living in Tokyo.","get used to"],
+[4,319,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼のお父さんは東京のある有名大学を卒業しました。","His father (     ) (     ) a famous university in Tokyo.","graduated from"],
+[4,320,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はたまたま駅で先生に会いました。","I (     ) (     )  meet my teacher at the station.","happened to"],
+[4,321,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は戦後つらいめにあいました。","He (     ) (     ) (     ) (     ) after the war.","had a hard time"],
+[4,322,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はこのクラブと関係があります。","He (     ) (     ) (     ) (     ) (     ) this club.","has something to do with"],
+[4,323,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女は私の腕につかまりました。","She (     ) (     ) (     ) my arm.","held on to"],
+[4,324,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は人形ではありません。人間です。","I am not a doll. I am a (     ) (     ).","human being"],
+[4,325,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はなぜ遅れているのかしら。","(     ) (     ) why he is late.","I wonder"],
+[4,326,"次の日本語の意味に合うように空欄に適する語を答えなさい。","なぜあなたはそんなに急いでいるのですか。","Why are you (     ) such (     ) (     )?","in a hurry"],
+[4,327,"次の日本語の意味に合うように空欄に適する語を答えなさい。","そのうえ私は皿洗いをしなければなりませんでした。","(     ) (     ), I had to do the dishes.","In addition"],
+[4,328,"次の日本語の意味に合うように空欄に適する語を答えなさい。","父と私は釣りに行くために早く起きました。","My father and I got up early (     ) (     ) (     ) go fishing.","in order to"],
+[4,329,"次の日本語の意味に合うように空欄に適する語を答えなさい。","いいかえると、それは怪物です。","(     ) (     ) (     ), it is a monster.","In other words"],
+[4,330,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼らはひどい雨にも関わらず出かけました。","They went out (     ) (     ) (     ) the heavy rain.","in spite of"],
+[4,331,"次の日本語の意味に合うように空欄に適する語を答えなさい。","遠くに船が見えました。","We saw a boat (     ) (     ) (     ).","in the distance"],
+[4,332,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は今朝はコーヒーの代わりに紅茶を飲みます。","I will have tea (     ) (     ) coffee this morning.","instead of"],
+[4,333,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは今度の日曜日は何をするつもりですか。","What do you (     ) (     ) do next Sunday?","intend to"],
+[4,334,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はボールを空中へけりあげました。","He kicked the ball high (     ) (     ) (     ).","into the air"],
+[4,335,"次の日本語の意味に合うように空欄に適する語を答えなさい。","騒がしくて私は眠れませんでした。","The noise (     ) me (     ) (     ).","kept … from sleeping"],
+[4,336,"次の日本語の意味に合うように空欄に適する語を答えなさい。","約束は守らなければいけません。","You must  (     )  (     )  (     ).","keep your promise"],
+[4,337,"次の日本語の意味に合うように空欄に適する語を答えなさい。","もっとゆっくり歩いてください。　ついていけません。","Please walk more slowly. I cannot (     ) (     ) (     ) you.","keep up with"],
+[4,338,"次の日本語の意味に合うように空欄に適する語を答えなさい。","そんなことをしたら彼らはあなたのことを笑うでしょう。","They will (     ) (     ) you if you do such a thing.","laugh at"],
+[4,339,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は眼下の海を見下ろしました。","I (     ) (     ) at the sea below.","looked down"],
+[4,340,"次の日本語の意味に合うように空欄に適する語を答えなさい。","物音を立てないで。","Don't  (     ) (     ) (     ).","make a noise"],
+[4,341,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は彼にそのCDをあげる約束をしました。","I (     ) (     ) (     ) to give him the CD.","made a promise"],
+[4,342,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は夢をかなえようと努力しました。","He (     ) (     ) (     ) to realize his dream.","made an effort"],
+[4,343,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはそれがどういう意味なのか理解できますか。","Can you (     ) (     ) what it means?","make out"],
+[4,344,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは事実を確認しなければなりません。","We must (     ) (     ) (     ) the fact.","make sure of"],
+[4,345,"次の日本語の意味に合うように空欄に適する語を答えなさい。","騒ぎ〔もめごと〕を起こすな。","Don't (     ) (     ).","make trouble"],
+[4,346,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼は大学で科学を勉強することに決めました。","He (     ) (     ) (     ) (     ) to study science at university.","made up his mind"],
+[4,347,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは多かれ少なかれその知らせに驚きました。","We were (     ) (     ) (     ) surprised at the news.","more or less"],
+[4,348,"次の日本語の意味に合うように空欄に適する語を答えなさい。","その本はだいたい２０ドルくらいでしょう。","The book will cost twenty dollars, (     ) (     ) (     ).","more or less"],
+[4,349,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女はバレーボールもバスケットボールもしません。","She plays (     ) volleyball (     ) basketball.","neither … nor"],
+[4,350,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はもう少年ではない。","He is (     ) (     ) a boy.","no longer"],
+[4,351,"次の日本語の意味に合うように空欄に適する語を答えなさい。","それはオレンジじゃなくてりんごです。","It is (     ) an orange (     ) an apple.","not … but"],
+[4,352,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はいつも彼と同意見というわけではありません。","I do (     ) (     ) agree with him.","not always"],
+[4,353,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女は本を読んでばかりいます。","She does (     ) (     ) read books.","nothing but"],
+[4,354,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたは歩いて学校へ行くのですか。","Do you go to school (     ) (     )?","on foot"],
+[4,355,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はそれを１人でやりました。","He did it (     ) (     ) (     ).","on his own"],
+[4,356,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは食べ物はたくさんありましたが、一方水はほとんどありませんでした。","We had plenty of food. But (     ) (     ) (     ) (     ), there was little water.","on the other hand"],
+[4,357,"次の日本語の意味に合うように空欄に適する語を答えなさい。","バスは時間通りに来ました。","The bus came (     ) (     ).","on time"],
+[4,358,"次の日本語の意味に合うように空欄に適する語を答えなさい。","昔々年をとった犬がいました。","(     ) (     ) (     ) (     ) there was an old dog.","Once upon a time"],
+[4,359,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはお母さんの手伝いをすべきです。","You (     ) (     ) help your mother.","ought to"],
+[4,360,"次の日本語の意味に合うように空欄に適する語を答えなさい。","建物の一部が破壊されました。","(     ) (     ) the building was destroyed.","Part of"],
+[4,361,"次の日本語の意味に合うように空欄に適する語を答えなさい。","それから何年も過ぎました。","Many years have (     ) (     ) since then.","passed by"],
+[4,362,"次の日本語の意味に合うように空欄に適する語を答えなさい。","先生のおっしゃることを注意して聞きなさい。","(     ) (     ) (     ) your teacher.","Pay attention to"],
+[4,363,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あなたはそのかばんにいくら払ったのですか。","How much did you (     ) (     ) the bag?","pay for"],
+[4,364,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私は肉より魚のほうが好きです。","I (     ) fish (     ) meat.","prefer … to"],
+[4,365,"次の日本語の意味に合うように空欄に適する語を答えなさい。","パーティーの準備をしましょう。","Let's (     ) (     ) the party.","prepare for"],
+[4,366,"次の日本語の意味に合うように空欄に適する語を答えなさい。","あらしのため私たちはそこに行けませんでした。","The storm (     ) us (     ) (     ) there.","prevented … from going"],
+[4,367,"次の日本語の意味に合うように空欄に適する語を答えなさい。","試合は今度の日曜日まで延期されました。","The game was (     ) (     ) till next Sunday.","put off"],
+[4,368,"次の日本語の意味に合うように空欄に適する語を答えなさい。","父は新しい帽子をかぶって出かけました。","My father (     ) (     ) his new hat and went out.","put on"],
+[4,369,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はすぐに戻ってくるでしょう。","He will be back (     ) (     ).","right away"],
+[4,370,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちはエミリーを見送りに空港へ行きました。","We went to the airport to (     ) Emily (     ).","see … off"],
+[4,371,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ここにテントを張りましょう。","Let's (     ) (     ) a tent here.","set up"],
+[4,372,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ジムはテレビゲームにたくさんのお金を費やします。","Jim (     ) a lot of money (     ) video games.","spends … on"],
+[4,373,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女は１週間仕事を休んでいます。","She has (     ) (     ) (     ) work for a week.","stayed away from"],
+[4,374,"次の日本語の意味に合うように空欄に適する語を答えなさい。","夜更かししてはいけません。","Don't (     ) (     ) (     ).","stay up late"],
+[4,375,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼らは新薬の開発に成功しました。","They (     ) (     ) developing a new medicine.","succeeded in"],
+[4,376,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私たちは日陰で一休みしました。","We (     ) (     ) (     ) in the shade.","took a rest"],
+[4,377,"次の日本語の意味に合うように空欄に適する語を答えなさい。","だれかが私のかばんを持って行きました。","Someone (     ) my bag (     ).","took … away"],
+[4,378,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼の意見は私の意見と同じです。","His opinion is (     ) (     ) (     ) mine.","the same as"],
+[4,379,"次の日本語の意味に合うように空欄に適する語を答えなさい。","きのうと同じ場所で会いましょう。","Let's meet at (     ) (     ) place (     ) yesterday.","the same … as"],
+[4,380,"次の日本語の意味に合うように空欄に適する語を答えなさい。","まず第一にその問題は私には難しすぎます。","(     ) (     ) (     ), the question is too difficult for me.","To begin with"],
+[4,381,"次の日本語の意味に合うように空欄に適する語を答えなさい。","実を言うと私は肉が好きではありません。","(     ) (     ) (     ) (     ), I don't like meat.","To tell the truth"],
+[4,382,"次の日本語の意味に合うように空欄に適する語を答えなさい。","寝るときには明りを消しなさい。","(     ) (     ) the light when you go to sleep.","Turn off"],
+[4,383,"次の日本語の意味に合うように空欄に適する語を答えなさい。","中学生の時私はよくサッカーをしたものでした。","I (     ) (     ) play soccer when I was in junior high school.","used to"],
+[4,384,"次の日本語の意味に合うように空欄に適する語を答えなさい。","若い女の人が私の車のところへ近寄ってきました。","A young woman (     ) (     ) (     ) my car.","walked up to"],
+[4,385,"次の日本語の意味に合うように空欄に適する語を答えなさい。","大雨がその神社を押し流してしまいました。","The heavy rain (     ) (     ) the shrine.","washed away"],
+[4,386,"次の日本語の意味に合うように空欄に適する語を答えなさい。","だれも次に何をしたらいいかわかりませんでした。","Nobody knew (     ) (     ) do next.","what to"],
+[4,387,"次の日本語の意味に合うように空欄に適する語を答えなさい。","いつ始めたらいいか教えて。","Tell me (     ) (     ) begin.","when to"],
+[4,388,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼はそのCDを買うにはどこへ行ったらいいか私に尋ねました。","He asked me (     ) (     ) go to get the CD.","where to"],
+[4,389,"次の日本語の意味に合うように空欄に適する語を答えなさい。","彼女は将来のことを心配しすぎです。","She (     ) too much (     ) her future.","worries … about"],
+[4,390,"次の日本語の意味に合うように空欄に適する語を答えなさい。","私はむしろ映画を見に行きたいです。","I (     ) (     ) go to the movies.","would rather"],
+[4,391,"次の日本語の意味に合うように空欄に適する語を答えなさい。","窓を閉めてくださいませんか。","(     ) (     ) (     ) closing the window?","Would you mind"],
+[4,392,"次の日本語の意味に合うように空欄に適する語を答えなさい。","ジェーンは一カ月に一回私に手紙をくれます。","Jane (     ) (     ) me once a month.","writes to"],
+];
+
+// Build per-grade decks
+const decks = {1:[],2:[],3:[],4:[]};
+raw.forEach(r => decks[r[0]].push({ grade:r[0], num:r[1], inst:r[2], jp:r[3], en:r[4], ans:r[5] }));
+
+// Update home counts
+[1,2,3,4].forEach(g => {
+  document.getElementById('count-'+g).textContent = decks[g].length + ' 問';
+});
+
+// ═══════ STATE ═══════
+let currentGrade = 1;
+let currentDeck  = [];
+let idx          = 0;
+let answerShown  = false;
+
+const gradeNames = {1:'Grade 1',2:'Grade 2',3:'Grade 3',4:'Grade 4'};
+const gradeClasses = {1:'g1',2:'g2',3:'g3',4:'g4'};
+
+// ═══════ SPEECH ═══════
+const synth = window.speechSynthesis;
+let enVoice = null;
+function loadVoice() {
+  const v = synth.getVoices();
+  enVoice = v.find(x=>x.lang==='en-US') || v.find(x=>x.lang==='en-GB') || v.find(x=>x.lang.startsWith('en'));
+}
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoice;
+loadVoice();
+
+function speakFilled() {
+  if (!currentDeck[idx]) return;
+  const card = currentDeck[idx];
+  const ansWords = card.ans.split(/\s+/).filter(w => w !== '…');
+  const blankCount = (card.en.match(/\([^)]*\)/g) || []).length;
+  const words = [];
+  for (let i = 0; i < blankCount; i++) {
+    words.push(ansWords[i % ansWords.length]);
+  }
+  let wi = 0;
+  let enText = card.en.replace(/\([^)]*\)/g, () => words[wi++] || '');
+  const doSpeak = () => {
+    const u = new SpeechSynthesisUtterance(enText);
+    u.lang = 'en-US'; u.rate = 0.88;
+    if (enVoice) u.voice = enVoice;
+    synth.speak(u);
+  };
+  if (synth.speaking) {
+    synth.cancel();
+    setTimeout(doSpeak, 150);
+  } else {
+    doSpeak();
+  }
+}
+
+// ═══════ BLANK FILL LOGIC ═══════
+/**
+ * Build an HTML string where each (     ) blank is replaced with
+ * the corresponding answer word wrapped in a .filled-word span.
+ * Extra blanks beyond available answer words get a "?" placeholder.
+ */
+function buildFilledHTML(enTemplate, answerPhrase) {
+  // Split answer phrase by spaces, then remove "…" tokens
+  const ansWords = answerPhrase.split(/\s+/).filter(w => w !== '…');
+  // Count how many blanks exist in the template
+  const blankCount = (enTemplate.match(/\([^)]*\)/g) || []).length;
+  // If ansWords doesn't cover all blanks, repeat the word list to fill them
+  const words = [];
+  for (let i = 0; i < blankCount; i++) {
+    words.push(ansWords[i % ansWords.length]);
+  }
+  let wi = 0;
+  return enTemplate.replace(/\([^)]*\)/g, () => {
+    const word = words[wi];
+    wi++;
+    return `<span class="filled-word" style="animation-delay:${(wi-1)*0.07}s">${escapeHtml(word)}</span>`;
+  });
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/** Build the blank version (question state) */
+function buildBlankHTML(enTemplate) {
+  return escapeHtml(enTemplate).replace(/\([^)]*\)/g, '<span style="color:var(--text-hint)">(\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0)</span>');
+}
+
+// ═══════ SCREENS ═══════
+function startGrade(g) {
+  currentGrade = g;
+  currentDeck  = decks[g];
+  idx          = 0;
+  answerShown  = false;
+  document.getElementById('screen-home').style.display='none';
+  const sq = document.getElementById('screen-quiz');
+  sq.style.display='flex';
+  const badge = document.getElementById('grade-badge');
+  badge.className = 'grade-badge ' + gradeClasses[g];
+  badge.textContent = gradeNames[g];
+  document.getElementById('prog-total').textContent = currentDeck.length;
+  renderCard();
+}
+
+function goHome() {
+  if (synth.speaking) synth.cancel();
+  document.getElementById('screen-quiz').style.display='none';
+  document.getElementById('screen-home').style.display='flex';
+}
+
+// ═══════ RENDER ═══════
+function renderCard(direction) {
+  answerShown = false;
+  const card = currentDeck[idx];
+  const main = document.getElementById('quiz-main');
+  main.style.opacity='0';
+  main.style.transform=`translateX(${direction===1?'30px':direction===-1?'-30px':'0'})`;
+  requestAnimationFrame(()=>{
+    document.getElementById('txt-instruction').textContent = card.inst;
+    document.getElementById('txt-japanese').textContent   = card.jp;
+
+    // Show blanks as empty placeholders
+    const enEl = document.getElementById('txt-english');
+    enEl.innerHTML = buildBlankHTML(card.en);
+
+    document.getElementById('answer-wrap').classList.add('hidden');
+    document.getElementById('answer-text').textContent = '';
+    document.getElementById('answer-status').textContent = '';
+    document.getElementById('answer-status').classList.remove('shown');
+
+    document.getElementById('prog-cur').textContent = idx + 1;
+    document.getElementById('prog-num').textContent = card.num;
+    const pct = ((idx + 1) / currentDeck.length) * 100;
+    document.getElementById('prog-bar').style.width = pct + '%';
+
+    requestAnimationFrame(()=>{
+      main.style.transition='opacity 0.3s ease, transform 0.3s ease';
+      main.style.opacity='1';
+      main.style.transform='translateX(0)';
+    });
+  });
+}
+
+function showAnswer() {
+  if (answerShown) return;
+  answerShown = true;
+  const card = currentDeck[idx];
+
+  // Fill blanks inline with gold animated words
+  const enEl = document.getElementById('txt-english');
+  enEl.innerHTML = buildFilledHTML(card.en, card.ans);
+
+  // Show small answer label below (dimmed, for reference)
+  document.getElementById('answer-text').textContent = card.ans;
+  document.getElementById('answer-wrap').classList.remove('hidden');
+  document.getElementById('answer-status').textContent = '解答表示中';
+  document.getElementById('answer-status').classList.add('shown');
+
+  // Auto-speak filled sentence
+  speakFilled();
+}
+
+// ═══════ KEYBOARD ═══════
+document.addEventListener('keydown', e => {
+  const quizVisible = document.getElementById('screen-quiz').style.display === 'flex';
+  if (!quizVisible) return;
+
+  if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    if (synth.speaking) synth.cancel();
+    if (idx < currentDeck.length - 1) { idx++; renderCard(1); }
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    if (synth.speaking) synth.cancel();
+    if (idx > 0) { idx--; renderCard(-1); }
+  } else if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    speakFilled();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (answerShown) {
+      if (synth.speaking) synth.cancel();
+      if (idx < currentDeck.length - 1) { idx++; renderCard(1); }
+    } else {
+      showAnswer();
+    }
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    goHome();
+  }
+});
+</script>
+</body>
+</html>

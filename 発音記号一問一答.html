@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>IPA Flashcards</title>
+<link href="https://fonts.googleapis.com/css2?family=Doulos+SIL&family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #111418;
+    --border: #1e2530;
+    --accent: #00e5ff;
+    --accent2: #7c3aed;
+    --text-primary: #e8edf5;
+    --text-muted: #4a5568;
+    --text-hint: #2d3748;
+    --glow: 0 0 30px rgba(0,229,255,0.15), 0 0 60px rgba(0,229,255,0.05);
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Noto Sans JP', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Ambient glow orbs */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -20%; left: -10%;
+    width: 60vw; height: 60vw;
+    background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .orb2 {
+    position: fixed;
+    bottom: -20%; right: -10%;
+    width: 50vw; height: 50vw;
+    background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    width: min(90vw, 720px);
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding: 0 4px;
+  }
+
+  .header-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .header-title span {
+    color: var(--accent);
+  }
+
+  .counter {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 60px 60px 48px;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.4s ease;
+  }
+
+  .card.revealed {
+    box-shadow: var(--glow);
+    border-color: rgba(0,229,255,0.2);
+  }
+
+  /* Top line accent */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .card.revealed::before { opacity: 0.6; }
+
+  /* IPA Symbol */
+  .symbol-wrap {
+    text-align: center;
+    padding: 20px 0 40px;
+    position: relative;
+  }
+
+  #symbol {
+    font-family: 'Doulos SIL', 'Charis SIL', 'Gentium Plus', 'DejaVu Sans', 'Times New Roman', serif;
+    font-size: clamp(64px, 10vw, 120px);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    display: block;
+
+    /* Flip-in animation */
+    animation: flipIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes flipIn {
+    from { transform: rotateX(60deg) scale(0.85); opacity: 0; }
+    to   { transform: rotateX(0deg) scale(1);    opacity: 1; }
+  }
+
+  /* Divider */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 0 0 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .divider::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .card.revealed .divider::after { left: 100%; }
+
+  /* Answer area */
+  #answerArea {
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  #wordInfo {
+    flex: 1;
+  }
+
+  .word-en {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 8px;
+
+    animation: slideUp 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+  .word-jp {
+    font-size: clamp(14px, 2vw, 18px);
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+
+    animation: slideUp 0.4s 0.06s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  /* Speaker button */
+  #speakerButton {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,229,255,0.3);
+    background: rgba(0,229,255,0.05);
+    color: var(--accent);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+
+    animation: fadeIn 0.3s 0.1s both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  #speakerButton:hover {
+    background: rgba(0,229,255,0.12);
+    box-shadow: 0 0 20px rgba(0,229,255,0.2);
+    transform: scale(1.08);
+  }
+
+  #speakerButton:active { transform: scale(0.93); }
+
+  #speakerButton.hidden { display: none; }
+
+  /* Footer hint */
+  .footer {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+  }
+
+  .hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-hint);
+  }
+
+  .key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #1e2530;
+    border-radius: 5px;
+    padding: 2px 8px;
+    background: #0d1117;
+    font-size: 10px;
+    color: #2d3748;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* Flash on answer reveal */
+  @keyframes borderPulse {
+    0%   { border-color: rgba(0,229,255,0.6); }
+    100% { border-color: rgba(0,229,255,0.2); }
+  }
+
+  .card.just-revealed {
+    animation: borderPulse 0.5s ease-out forwards;
+  }
+</style>
+</head>
+<body>
+
+<div class="orb2"></div>
+
+<div class="wrapper">
+  <div class="header">
+    <div class="header-title">IPA Flashcards <span>@AVC</span></div>
+    <div class="counter" id="counter">—</div>
+  </div>
+
+  <div class="card" id="card">
+    <div class="symbol-wrap">
+      <span id="symbol"></span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div id="answerArea">
+      <div id="wordInfo"></div>
+      <button id="speakerButton" class="hidden" onclick="speakWord()">🔊</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="hint"><span class="key">Enter</span> 答えを表示 / 次へ</div>
+    <div class="hint"><span class="key">Esc</span> 読み上げ停止</div>
+  </div>
+</div>
+
+<script>
+const words = [
+  { word: "about", symbol: "/əˈbaʊt/", jp: "〜について" },
+  { word: "above", symbol: "/əˈbʌv/", jp: "上に" },
+  { word: "after", symbol: "/ˈaf.tɚ/", jp: "〜のあとで" },
+  { word: "again", symbol: "/əˈgen/", jp: "もう一度" },
+  { word: "air", symbol: "/er/", jp: "空気" },
+  { word: "all", symbol: "/ɔːl/", jp: "すべて" },
+  { word: "always", symbol: "/ˈɔːl.weɪz/", jp: "いつも" },
+  { word: "animal", symbol: "/ˈæn.ə.məl/", jp: "動物" },
+  { word: "another", symbol: "/əˈnʌð.ɚ/", jp: "もう一つの" },
+  { word: "answer", symbol: "/ˈæn.sɚ/", jp: "答える／答え" },
+  { word: "any", symbol: "/ˈe.ni/", jp: "いくつかの／どれでも" },
+  { word: "around", symbol: "/əˈraʊnd/", jp: "周りに" },
+  { word: "ask", symbol: "/æsk/", jp: "たずねる" },
+  { word: "back", symbol: "/bæk/", jp: "後ろへ" },
+  { word: "because", symbol: "/bɪˈkʌz/", jp: "なぜなら" },
+  { word: "before", symbol: "/bɪˈfɔːr/", jp: "〜の前に" },
+  { word: "begin", symbol: "/bɪˈgɪn/", jp: "始める" },
+  { word: "below", symbol: "/bəˈloʊ/", jp: "下に" },
+  { word: "between", symbol: "/bɪˈtwiːn/", jp: "〜の間に" },
+  { word: "big", symbol: "/bɪg/", jp: "大きい" },
+  { word: "black", symbol: "/blæk/", jp: "黒い" },
+  { word: "blue", symbol: "/bluː/", jp: "青い" },
+  { word: "body", symbol: "/ˈbɑː.di/", jp: "体" },
+  { word: "book", symbol: "/bʊk/", jp: "本" },
+  { word: "both", symbol: "/boʊθ/", jp: "両方とも" },
+  { word: "bring", symbol: "/brɪŋ/", jp: "持ってくる" },
+  { word: "brother", symbol: "/ˈbrʌð.ɚ/", jp: "兄、弟" },
+  { word: "brown", symbol: "/braʊn/", jp: "茶色の" },
+  { word: "bus", symbol: "/bʌs/", jp: "バス" },
+  { word: "buy", symbol: "/baɪ/", jp: "買う" },
+  { word: "call", symbol: "/kɔːl/", jp: "呼ぶ、電話する" },
+  { word: "car", symbol: "/kɑːr/", jp: "車" },
+  { word: "carry", symbol: "/ˈke.ri/", jp: "運ぶ" },
+  { word: "change", symbol: "/tʃeɪndʒ/", jp: "変える" },
+  { word: "child", symbol: "/tʃaɪld/", jp: "子ども" },
+  { word: "children", symbol: "/ˈtʃɪl.drən/", jp: "子どもたち" },
+  { word: "city", symbol: "/ˈsɪ.ti/", jp: "市、街" },
+  { word: "class", symbol: "/klæs/", jp: "授業、クラス" },
+  { word: "clean", symbol: "/kliːn/", jp: "きれいな／掃除する" },
+  { word: "close", symbol: "/kloʊz/", jp: "閉じる" },
+  { word: "color", symbol: "/ˈkʌl.ɚ/", jp: "色" },
+  { word: "come", symbol: "/kʌm/", jp: "来る" },
+  { word: "cold", symbol: "/koʊld/", jp: "寒い" },
+  { word: "common", symbol: "/ˈkɑː.mən/", jp: "一般的な" },
+  { word: "cook", symbol: "/kʊk/", jp: "料理する" },
+  { word: "country", symbol: "/ˈkʌn.tri/", jp: "国" },
+  { word: "course", symbol: "/kɔːrs/", jp: "コース、進路" },
+  { word: "cut", symbol: "/kʌt/", jp: "切る" },
+  { word: "dad", symbol: "/dæd/", jp: "お父さん" },
+  { word: "dance", symbol: "/dæns/", jp: "踊る" },
+  { word: "dark", symbol: "/dɑːrk/", jp: "暗い" },
+  { word: "day", symbol: "/deɪ/", jp: "日、1日" },
+  { word: "decide", symbol: "/dɪˈsaɪd/", jp: "決める" },
+  { word: "deep", symbol: "/diːp/", jp: "深い" },
+  { word: "doctor", symbol: "/ˈdɑːk.tɚ/", jp: "医者" },
+  { word: "dog", symbol: "/dɔːg/", jp: "犬" },
+  { word: "door", symbol: "/dɔːr/", jp: "ドア" },
+  { word: "down", symbol: "/daʊn/", jp: "下へ" },
+  { word: "draw", symbol: "/drɔː/", jp: "描く" },
+  { word: "drink", symbol: "/drɪŋk/", jp: "飲む" },
+  { word: "drive", symbol: "/draɪv/", jp: "運転する" },
+  { word: "early", symbol: "/ˈɚ.li/", jp: "早い" },
+  { word: "earth", symbol: "/ɚθ/", jp: "地球" },
+  { word: "eat", symbol: "/iːt/", jp: "食べる" },
+  { word: "eight", symbol: "/eɪt/", jp: "8" },
+  { word: "enough", symbol: "/ɪˈnʌf/", jp: "じゅうぶん" },
+  { word: "evening", symbol: "/ˈiːv.nɪŋ/", jp: "夕方" },
+  { word: "example", symbol: "/ɪgˈzæm.pəl/", jp: "例" },
+  { word: "eye", symbol: "/aɪ/", jp: "目" },
+  { word: "face", symbol: "/feɪs/", jp: "顔" },
+  { word: "fall", symbol: "/fɔːl/", jp: "落ちる" },
+  { word: "family", symbol: "/ˈfæm.ə.li/", jp: "家族" },
+  { word: "far", symbol: "/fɑːr/", jp: "遠い" },
+  { word: "farm", symbol: "/fɑːrm/", jp: "農場" },
+  { word: "fast", symbol: "/fæst/", jp: "速い" },
+  { word: "father", symbol: "/ˈfɑːð.ɚ/", jp: "父" },
+  { word: "feel", symbol: "/fiːl/", jp: "感じる" },
+  { word: "feet", symbol: "/fiːt/", jp: "足（両足）" },
+  { word: "few", symbol: "/fjuː/", jp: "少しの" },
+  { word: "find", symbol: "/faɪnd/", jp: "見つける" },
+  { word: "fire", symbol: "/faɪr/", jp: "火" },
+  { word: "first", symbol: "/fɚst/", jp: "1番目" },
+  { word: "five", symbol: "/faɪv/", jp: "5" },
+  { word: "floor", symbol: "/flɔːr/", jp: "床" },
+  { word: "food", symbol: "/fuːd/", jp: "食べ物" },
+  { word: "foot", symbol: "/fʊt/", jp: "足" },
+  { word: "form", symbol: "/fɔːrm/", jp: "形、用紙" },
+  { word: "four", symbol: "/fɔːr/", jp: "4" },
+  { word: "friend", symbol: "/fren/", jp: "友だち" },
+  { word: "full", symbol: "/fʊl/", jp: "いっぱいの" },
+  { word: "game", symbol: "/geɪm/", jp: "ゲーム" },
+  { word: "garden", symbol: "/ˈgɑːr.dən/", jp: "庭" },
+  { word: "girl", symbol: "/gɚl/", jp: "女の子" },
+  { word: "give", symbol: "/gɪv/", jp: "与える" },
+  { word: "glass", symbol: "/glæs/", jp: "ガラス、コップ" },
+  { word: "go", symbol: "/goʊ/", jp: "行く" },
+  { word: "good", symbol: "/gʊd/", jp: "良い" },
+  { word: "great", symbol: "/greɪt/", jp: "すばらしい" },
+  { word: "green", symbol: "/griːn/", jp: "緑の" },
+  { word: "group", symbol: "/gruːp/", jp: "グループ" },
+  { word: "grow", symbol: "/groʊ/", jp: "成長する" },
+  { word: "half", symbol: "/hæf/", jp: "半分" },
+  { word: "hand", symbol: "/hænd/", jp: "手" },
+  { word: "happen", symbol: "/ˈhæp.ən/", jp: "起こる" },
+  { word: "hard", symbol: "/hɑːrd/", jp: "難しい／固い" },
+  { word: "head", symbol: "/hed/", jp: "頭" },
+  { word: "hear", symbol: "/hɪr/", jp: "聞こえる" },
+  { word: "help", symbol: "/help/", jp: "助ける" },
+  { word: "here", symbol: "/hɪr/", jp: "ここに" },
+  { word: "high", symbol: "/haɪ/", jp: "高い" },
+  { word: "home", symbol: "/hoʊm/", jp: "家" },
+  { word: "hope", symbol: "/hoʊp/", jp: "望む" },
+  { word: "hot", symbol: "/hɑːt/", jp: "熱い、暑い" },
+  { word: "hour", symbol: "/aʊ.ɚ/", jp: "1時間" },
+  { word: "house", symbol: "/haʊs/", jp: "家" },
+  { word: "idea", symbol: "/aɪˈdiː.ə/", jp: "考え" },
+  { word: "important", symbol: "/ɪmˈpɔːr.tənt/", jp: "大切な" },
+  { word: "inside", symbol: "/ɪnˈsaɪd/", jp: "中に" },
+  { word: "job", symbol: "/dʒɑːb/", jp: "仕事" },
+  { word: "join", symbol: "/dʒɔɪn/", jp: "加わる" },
+  { word: "juice", symbol: "/dʒuːs/", jp: "ジュース" },
+  { word: "jump", symbol: "/dʒʌmp/", jp: "飛ぶ" },
+  { word: "just", symbol: "/dʒʌst/", jp: "ちょうど、ただ" },
+  { word: "keep", symbol: "/kiːp/", jp: "保つ" },
+  { word: "kind", symbol: "/kaɪnd/", jp: "親切な／種類" },
+  { word: "kitchen", symbol: "/ˈkɪtʃ.ən/", jp: "台所" },
+  { word: "know", symbol: "/noʊ/", jp: "知っている" },
+  { word: "language", symbol: "/ˈlæŋ.gwɪdʒ/", jp: "言語" },
+  { word: "large", symbol: "/lɑːrdʒ/", jp: "大きい" },
+  { word: "last", symbol: "/læst/", jp: "最後の" },
+  { word: "late", symbol: "/leɪt/", jp: "遅い" },
+  { word: "learn", symbol: "/lɚn/", jp: "学ぶ" },
+  { word: "leave", symbol: "/liːv/", jp: "去る" },
+  { word: "left", symbol: "/left/", jp: "左" },
+  { word: "less", symbol: "/les/", jp: "より少ない" },
+  { word: "letter", symbol: "/ˈle.tɚ/", jp: "手紙／文字" },
+  { word: "life", symbol: "/laɪf/", jp: "生活、人生" },
+  { word: "light", symbol: "/laɪt/", jp: "光" },
+  { word: "line", symbol: "/laɪn/", jp: "線" },
+  { word: "listen", symbol: "/ˈlɪs.ən/", jp: "聞く" },
+  { word: "little", symbol: "/ˈlɪt.əl/", jp: "小さい、少し" },
+  { word: "long", symbol: "/lɔːŋ/", jp: "長い" },
+  { word: "look", symbol: "/lʊk/", jp: "見る" },
+  { word: "lose", symbol: "/luːz/", jp: "失う" },
+  { word: "love", symbol: "/lʌv/", jp: "愛する" },
+  { word: "lunch", symbol: "/lʌntʃ/", jp: "昼食" },
+  { word: "machine", symbol: "/məˈʃiːn/", jp: "機械" },
+  { word: "main", symbol: "/meɪn/", jp: "主な" },
+  { word: "make", symbol: "/meɪk/", jp: "作る" },
+  { word: "man", symbol: "/mæn/", jp: "男" },
+  { word: "many", symbol: "/ˈme.ni/", jp: "多くの" },
+  { word: "map", symbol: "/mæp/", jp: "地図" },
+  { word: "matter", symbol: "/ˈmæt.ɚ/", jp: "事柄／問題" },
+  { word: "mean", symbol: "/miːn/", jp: "意味する" },
+  { word: "meat", symbol: "/miːt/", jp: "肉" },
+  { word: "meet", symbol: "/miːt/", jp: "会う" },
+  { word: "middle", symbol: "/ˈmɪd.əl/", jp: "中央" },
+  { word: "might", symbol: "/maɪt/", jp: "〜かもしれない" },
+  { word: "milk", symbol: "/mɪlk/", jp: "牛乳" },
+  { word: "minute", symbol: "/ˈmɪn.ət/", jp: "分" },
+  { word: "miss", symbol: "/mɪs/", jp: "〜がいなくて寂しい／〜を逃す" },
+  { word: "mom", symbol: "/mɑːm/", jp: "お母さん" },
+  { word: "money", symbol: "/ˈmʌn.i/", jp: "お金" },
+  { word: "month", symbol: "/mʌnθ/", jp: "月（1か月）" },
+  { word: "moon", symbol: "/muːn/", jp: "月（天体）" },
+  { word: "more", symbol: "/mɔːr/", jp: "もっと" },
+  { word: "morning", symbol: "/ˈmɔːr.nɪŋ/", jp: "朝" },
+  { word: "most", symbol: "/moʊst/", jp: "もっとも" },
+  { word: "mother", symbol: "/ˈmʌð.ɚ/", jp: "母" },
+  { word: "move", symbol: "/muːv/", jp: "動く、動かす" },
+  { word: "much", symbol: "/mʌtʃ/", jp: "たくさんの" },
+  { word: "music", symbol: "/ˈmjuː.zɪk/", jp: "音楽" },
+  { word: "name", symbol: "/neɪm/", jp: "名前" },
+  { word: "near", symbol: "/nɪr/", jp: "近くの" },
+  { word: "need", symbol: "/niːd/", jp: "必要とする" },
+  { word: "never", symbol: "/ˈne.vɚ/", jp: "決して〜ない" },
+  { word: "new", symbol: "/njuː/", jp: "新しい" },
+  { word: "next", symbol: "/nekst/", jp: "次の" },
+  { word: "night", symbol: "/naɪt/", jp: "夜" },
+  { word: "noise", symbol: "/nɔɪz/", jp: "音、雑音" },
+  { word: "north", symbol: "/nɔːrθ/", jp: "北" },
+  { word: "note", symbol: "/noʊt/", jp: "メモ、注意書き" },
+  { word: "nothing", symbol: "/ˈnʌθ.ɪŋ/", jp: "何も〜ない" },
+  { word: "notice", symbol: "/ˈnoʊ.tɪs/", jp: "気づく" },
+  { word: "number", symbol: "/ˈnʌm.bɚ/", jp: "数字" },
+  { word: "often", symbol: "/ˈɔːf.ən/", jp: "しばしば" },
+  { word: "once", symbol: "/wʌns/", jp: "一度" },
+  { word: "only", symbol: "/ˈoʊn.li/", jp: "〜だけ" },
+  { word: "open", symbol: "/ˈoʊ.pən/", jp: "開ける" },
+  { word: "other", symbol: "/ˈʌð.ɚ/", jp: "他の" },
+  { word: "our", symbol: "/aʊ.ɚ/", jp: "私たちの" },
+  { word: "outside", symbol: "/aʊtˈsaɪd/", jp: "外側" },
+  { word: "over", symbol: "/ˈoʊ.vɚ/", jp: "〜の上に、終わって" },
+  { word: "page", symbol: "/peɪdʒ/", jp: "ページ" },
+  { word: "paint", symbol: "/peɪnt/", jp: "塗る、描く" },
+  { word: "pair", symbol: "/per/", jp: "一組" },
+  { word: "parent", symbol: "/ˈpe.rənt/", jp: "親" },
+  { word: "part", symbol: "/pɑːrt/", jp: "部分" },
+  { word: "party", symbol: "/ˈpɑːr.ti/", jp: "パーティー" },
+  { word: "pass", symbol: "/pæs/", jp: "通る／合格する" },
+  { word: "past", symbol: "/pæst/", jp: "過去" },
+  { word: "pay", symbol: "/peɪ/", jp: "支払う" },
+  { word: "people", symbol: "/ˈpiː.pəl/", jp: "人々" },
+  { word: "picture", symbol: "/ˈpɪk.tʃɚ/", jp: "絵、写真" },
+  { word: "place", symbol: "/pleɪs/", jp: "場所" },
+  { word: "plan", symbol: "/plæn/", jp: "計画する" },
+  { word: "plant", symbol: "/plænt/", jp: "植物／植える" },
+  { word: "play", symbol: "/pleɪ/", jp: "遊ぶ、演奏する" },
+  { word: "point", symbol: "/pɔɪnt/", jp: "指し示す、点" },
+  { word: "police", symbol: "/pəˈliːs/", jp: "警察" },
+  { word: "poor", symbol: "/pʊr/", jp: "貧しい" },
+  { word: "possible", symbol: "/ˈpɑː.sə.bəl/", jp: "可能な" },
+  { word: "power", symbol: "/ˈpaʊ.ɚ/", jp: "力、電力" },
+  { word: "present", symbol: "/ˈpre.zənt/", jp: "現在" },
+  { word: "pretty", symbol: "/ˈprɪ.ti/", jp: "かわいい" },
+  { word: "problem", symbol: "/ˈprɑː.bləm/", jp: "問題" },
+  { word: "pull", symbol: "/pʊl/", jp: "引く" },
+  { word: "push", symbol: "/pʊʃ/", jp: "押す" },
+  { word: "question", symbol: "/ˈkwes.tʃən/", jp: "質問" },
+  { word: "quick", symbol: "/kwɪk/", jp: "速い" },
+  { word: "quiet", symbol: "/ˈkwaɪ.ət/", jp: "静かな" },
+  { word: "quite", symbol: "/kwaɪt/", jp: "かなり" },
+  { word: "rain", symbol: "/reɪn/", jp: "雨" },
+  { word: "reach", symbol: "/riːtʃ/", jp: "到達する" },
+  { word: "read", symbol: "/riːd/", jp: "読む" },
+  { word: "ready", symbol: "/ˈre.di/", jp: "準備ができた" },
+  { word: "real", symbol: "/ˈriː.əl/", jp: "本当の" },
+  { word: "really", symbol: "/ˈriː.ə.li/", jp: "本当に" },
+  { word: "reason", symbol: "/ˈriː.zən/", jp: "理由" },
+  { word: "receive", symbol: "/rɪˈsiːv/", jp: "受け取る" },
+  { word: "record", symbol: "/ˈre.kɔːrd/", jp: "記録" },
+  { word: "remember", symbol: "/rɪˈmem.bɚ/", jp: "覚えている" },
+  { word: "return", symbol: "/rɪˈtɚn/", jp: "戻る" },
+  { word: "right", symbol: "/raɪt/", jp: "右" },
+  { word: "river", symbol: "/ˈrɪ.vɚ/", jp: "川" },
+  { word: "road", symbol: "/roʊd/", jp: "道" },
+  { word: "room", symbol: "/ruːm/", jp: "部屋" },
+  { word: "round", symbol: "/raʊnd/", jp: "丸い" },
+  { word: "rule", symbol: "/ruːl/", jp: "規則" },
+  { word: "run", symbol: "/rʌn/", jp: "走る" },
+  { word: "sad", symbol: "/sæd/", jp: "悲しい" },
+  { word: "safe", symbol: "/seɪf/", jp: "安全な" },
+  { word: "same", symbol: "/seɪm/", jp: "同じ" },
+  { word: "school", symbol: "/skuːl/", jp: "学校" },
+  { word: "second", symbol: "/ˈse.kənd/", jp: "2番目" },
+  { word: "see", symbol: "/siː/", jp: "見る" },
+  { word: "seem", symbol: "/siːm/", jp: "〜のように見える" },
+  { word: "send", symbol: "/send/", jp: "送る" },
+  { word: "sentence", symbol: "/ˈsen.təns/", jp: "文" },
+  { word: "serve", symbol: "/sɚv/", jp: "仕える、提供する" },
+  { word: "set", symbol: "/set/", jp: "置く／一組" },
+  { word: "seven", symbol: "/ˈse.vən/", jp: "7" },
+  { word: "several", symbol: "/ˈse.vrəl/", jp: "いくつかの" },
+  { word: "shake", symbol: "/ʃeɪk/", jp: "振る" },
+  { word: "shape", symbol: "/ʃeɪp/", jp: "形" },
+  { word: "share", symbol: "/ʃer/", jp: "分け合う" },
+  { word: "sheep", symbol: "/ʃiːp/", jp: "羊" },
+  { word: "ship", symbol: "/ʃɪp/", jp: "船" },
+  { word: "shoe", symbol: "/ʃuː/", jp: "靴" },
+  { word: "shop", symbol: "/ʃɑːp/", jp: "店" },
+  { word: "short", symbol: "/ʃɔːrt/", jp: "短い" },
+  { word: "show", symbol: "/ʃoʊ/", jp: "見せる" },
+  { word: "side", symbol: "/saɪd/", jp: "側" },
+  { word: "simple", symbol: "/ˈsɪm.pəl/", jp: "簡単な" },
+  { word: "since", symbol: "/sɪns/", jp: "〜以来" },
+  { word: "sing", symbol: "/sɪŋ/", jp: "歌う" },
+  { word: "sister", symbol: "/ˈsɪs.tɚ/", jp: "姉、妹" },
+  { word: "six", symbol: "/sɪks/", jp: "6" },
+  { word: "size", symbol: "/saɪz/", jp: "大きさ" },
+  { word: "sleep", symbol: "/sliːp/", jp: "眠る" },
+  { word: "slow", symbol: "/sloʊ/", jp: "遅い" },
+  { word: "small", symbol: "/smɔːl/", jp: "小さい" },
+  { word: "smile", symbol: "/smaɪl/", jp: "ほほえむ" },
+  { word: "snow", symbol: "/snoʊ/", jp: "雪" },
+  { word: "so", symbol: "/soʊ/", jp: "だから／とても" },
+  { word: "some", symbol: "/sʌm/", jp: "いくつかの" },
+  { word: "someone", symbol: "/ˈsʌm.wʌn/", jp: "誰か" },
+  { word: "something", symbol: "/ˈsʌm.θɪŋ/", jp: "何か" },
+  { word: "sometimes", symbol: "/ˈsʌm.taɪmz/", jp: "ときどき" },
+  { word: "song", symbol: "/sɔːŋ/", jp: "歌" },
+  { word: "soon", symbol: "/suːn/", jp: "すぐに" },
+  { word: "sound", symbol: "/saʊnd/", jp: "音" },
+  { word: "south", symbol: "/saʊθ/", jp: "南" },
+  { word: "space", symbol: "/speɪs/", jp: "空間" },
+  { word: "speak", symbol: "/spiːk/", jp: "話す" },
+  { word: "special", symbol: "/ˈspe.ʃəl/", jp: "特別な" },
+  { word: "spend", symbol: "/spend/", jp: "使う、過ごす" },
+  { word: "sport", symbol: "/spɔːrt/", jp: "スポーツ" },
+  { word: "spring", symbol: "/sprɪŋ/", jp: "春" },
+  { word: "stand", symbol: "/stænd/", jp: "立つ" },
+  { word: "start", symbol: "/stɑːrt/", jp: "始める" },
+  { word: "station", symbol: "/ˈsteɪ.ʃən/", jp: "駅" },
+  { word: "stay", symbol: "/steɪ/", jp: "とどまる" },
+  { word: "step", symbol: "/step/", jp: "歩み／段" },
+  { word: "stop", symbol: "/stɑːp/", jp: "止める" },
+  { word: "store", symbol: "/stɔːr/", jp: "店" },
+  { word: "story", symbol: "/ˈstɔːr.i/", jp: "物語" },
+  { word: "street", symbol: "/striːt/", jp: "通り" },
+  { word: "strong", symbol: "/strɔːŋ/", jp: "強い" },
+  { word: "student", symbol: "/ˈstuː.dənt/", jp: "生徒、学生" }
+];
+
+let current = null;
+let count = 0;
+const symbolEl   = document.getElementById("symbol");
+const wordInfoEl = document.getElementById("wordInfo");
+const speakerBtn = document.getElementById("speakerButton");
+const cardEl     = document.getElementById("card");
+const counterEl  = document.getElementById("counter");
+
+function showSymbolOnly() {
+  const r = Math.floor(Math.random() * words.length);
+  current = words[r];
+  count++;
+
+  // Reset symbol animation by re-inserting
+  symbolEl.style.animation = 'none';
+  symbolEl.offsetHeight; // reflow
+  symbolEl.style.animation = '';
+  symbolEl.textContent = current.symbol;
+
+  wordInfoEl.innerHTML = "";
+  speakerBtn.classList.add("hidden");
+  cardEl.classList.remove("revealed", "just-revealed");
+  counterEl.textContent = `#${count}`;
+}
+
+function showAnswer() {
+  wordInfoEl.innerHTML = `
+    <div class="word-en">${current.word}</div>
+    <div class="word-jp">${current.jp}</div>
+  `;
+  speakerBtn.classList.remove("hidden");
+  cardEl.classList.add("revealed", "just-revealed");
+  setTimeout(() => cardEl.classList.remove("just-revealed"), 600);
+  speakWord();
+}
+
+function speakWord() {
+  if (!current) return;
+  const u = new SpeechSynthesisUtterance(current.word);
+  u.lang = 'en-US';
+  if (speechSynthesis.speaking) speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") { speechSynthesis.cancel(); return; }
+  if (e.key === "Enter") {
+    speechSynthesis.cancel();
+    wordInfoEl.innerHTML === "" ? showAnswer() : showSymbolOnly();
+  }
+});
+
+showSymbolOnly();
+</script>
+</body>
+</html>

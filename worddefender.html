@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>WORD DEFENDER - AVC presents</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        :root { --retro-font: 'Press Start 2P', cursive; }
+        body { font-family: var(--retro-font); background-color: #000; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        #game-container { position: relative; width: 600px; height: 500px; border: 6px solid #444; background: #050510; overflow: hidden; }
+        .damage-flash { background-color: #b00 !important; }
+        
+        /* 星をオーバーレイより前に出す(250) */
+        .star { position: absolute; background: #fff; border-radius: 50%; pointer-events: none; z-index: 250; }
+        
+        /* UIレイヤーを最前面(300)に配置 */
+        #ui-layer { position: absolute; inset: 0; pointer-events: none; z-index: 300; padding: 15px; box-sizing: border-box; }
+        .score-label { font-size: 10px; color: #888; margin-bottom: 5px; }
+        #score-box { position: absolute; top: 15px; left: 15px; color: #0f0; display: none; }
+        #hi-score-box { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); color: #ffeb3b; text-align: center; }
+        #life-box { position: absolute; bottom: 15px; left: 15px; font-size: 20px; color: #f00; display: flex; gap: 5px; }
+
+        /* オーバーレイ背景(200) */
+        #overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #050510; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 200; text-align: center; }
+        
+        .score-popup {
+            position: absolute; font-family: var(--retro-font); pointer-events: none; z-index: 150;
+            animation: popup-anim 1.2s ease-out forwards;
+        }
+        @keyframes popup-anim {
+            0%, 40%, 80% { opacity: 1; }
+            20%, 60% { opacity: 0; }
+            100% { transform: translateY(-40px); opacity: 0; }
+        }
+
+        #cannon { position: absolute; bottom: 0; width: 44px; height: 30px; background: #666; border-radius: 4px 4px 0 0; z-index: 10; border: 2px solid #444; display: none; }
+        #cannon::after { content: ''; position: absolute; top: -14px; left: 16px; width: 8px; height: 16px; background: #888; }
+        .word-enemy { position: absolute; font-size: 1.2rem; white-space: nowrap; transform: translateX(-50%); z-index: 12; text-shadow: 2px 2px #000; }
+        .ufo-word { color: #0f0 !important; text-shadow: 0 0 10px #0f0; }
+        .char-done { color: #444 !important; }
+        .char-next { color: #ffeb3b !important; text-decoration: underline; }
+        .bullet { position: absolute; width: 6px; height: 14px; background: #fff; border: 2px solid #ff0; z-index: 5; }
+        
+        #ranking-board { display: none; width: 90%; font-size: 12px; margin-top: 15px; text-align: left; }
+        .ranking-item { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .naming-cursor { border-bottom: 2px solid #0f0; display: inline-block; width: 12px; animation: cursor-blink 0.4s infinite; }
+        @keyframes cursor-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .blink-text-red { animation: slow-blink 0.8s infinite; color: #f00 !important; font-size: 32px; }
+        .blink-text-yellow { animation: slow-blink 1.0s infinite; color: #ffeb3b !important; }
+        @keyframes slow-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+<div id="game-container">
+    <div id="ui-layer">
+        <div id="score-box"><div class="score-label">SCORE</div><span id="score">000000</span></div>
+        <div id="hi-score-box"><div class="score-label">HI-SCORE</div><span id="hi-score">000000</span></div>
+        <div id="life-box"></div>
+    </div>
+    <div id="cannon" style="left: 278px;"></div>
+    <div id="overlay">
+        <div id="menu-view">
+            <p style="font-size: 10px; color: #888; margin-bottom: 10px;">AVC presents</p>
+            <h1 style="font-size: 24px; color: #4a90e2; margin-top: 0; letter-spacing: 2px;">WORD DEFENDER</h1>
+            <p class="blink-text-yellow" style="font-size:10px; margin-top: 40px;">[ SPACE TO START ]</p>
+        </div>
+        <div id="quit-view" style="display: none;">
+            <p style="font-size: 14px; color: #fff;">QUIT GAME?</p>
+            <p style="font-size: 18px; color: #f00; margin-top: 10px;">Y / N</p>
+        </div>
+        <div id="gameover-view" style="display: none;"><h1 class="blink-text-red">GAME OVER</h1></div>
+        <div id="ranking-view" style="display: none;">
+            <h2 style="color: #ffeb3b; font-size: 16px; margin: 0;">TOP 10 PILOTS</h2>
+            <div id="ranking-board"></div>
+            <p id="rank-input-msg" style="font-size: 8px; color: #888; margin-top: 15px;"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const wordList = ["this", "that", "not", "is", "are", "have", "with", "they", "from", "word", "what", "some", "your", "when", "how", "said", "each", "tell", "does", "want", "well", "here", "take", "help", "make", "look", "name", "good", "think", "great", "where", "after", "back", "year", "came", "show", "every", "under", "line", "very", "water"];
+    const ufoTriggers = [2000, 4000, 6000, 8000], extendPoints = [1000, 3000, 5000];
+    let score = 0, hiScore = localStorage.getItem('hiScore') || 0;
+    let life = 3, isPlaying = false, isPaused = false, isGameOvering = false;
+    let speed = 0.8, spawnInterval = 2200;
+    let enemies = [], bullets = [], stars = [], ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+    let currentEnemy = null, typedIndex = 0, inputName = "", isNaming = false, ufoSpawnedFlags = {};
+    let ufoSndInterval = null, spawnTimer = null;
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playNote(f, d, t='square', v=0.05, dl=0) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime + dl);
+        g.gain.setValueAtTime(v, audioCtx.currentTime + dl);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dl + d);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(audioCtx.currentTime + dl); o.stop(audioCtx.currentTime + dl + d);
+    }
+
+    function initStars() {
+        const container = document.getElementById('game-container');
+        for(let i=0; i<45; i++) {
+            const s = { el: document.createElement('div'), x: Math.random()*600, y: Math.random()*500, sp: 0.5 + Math.random()*2 };
+            s.el.className = 'star';
+            s.el.style.width = (s.sp > 1.8 ? 2 : 1) + 'px'; s.el.style.height = s.el.style.width;
+            container.appendChild(s.el); stars.push(s);
+        }
+    }
+    initStars();
+
+    function animateStars() {
+        stars.forEach(s => {
+            s.y += s.sp; if(s.y > 500) { s.y = -5; s.x = Math.random()*600; }
+            s.el.style.left = s.x+'px'; s.el.style.top = s.y+'px';
+        });
+        requestAnimationFrame(animateStars);
+    }
+    animateStars();
+
+    function updateUI() {
+        document.getElementById('score').innerText = score.toString().padStart(6, '0');
+        document.getElementById('hi-score').innerText = hiScore.toString().padStart(6, '0');
+        const lb = document.getElementById('life-box'); lb.innerHTML = '';
+        if (isPlaying) {
+            for(let i=0; i<life; i++) { const h = document.createElement('span'); h.innerText = '❤'; lb.appendChild(h); }
+        }
+    }
+    updateUI();
+
+    function createScorePopup(x, y, val, isUfo) {
+        const p = document.createElement('div');
+        p.className = 'score-popup';
+        p.innerText = val; p.style.left = x + 'px'; p.style.top = y + 'px';
+        if (isUfo) { p.style.color = '#f00'; p.style.fontSize = '18px'; p.style.fontWeight = 'bold'; }
+        else if (val === 20) { p.style.color = '#ddd'; p.style.fontSize = '12px'; }
+        else if (val === 30 || val === 40) { p.style.color = '#40e0d0'; p.style.fontSize = '13px'; }
+        else if (val >= 50) { p.style.color = '#ffeb3b'; p.style.fontSize = '14px'; }
+        document.getElementById('game-container').appendChild(p);
+        setTimeout(() => p.remove(), 1200);
+    }
+
+    function updateDifficulty() {
+        speed = 0.8 + (Math.floor(score / 2000) * 0.2);
+        const newInterval = Math.max(800, 2200 - (Math.floor(score / 1000) * 150));
+        if (newInterval !== spawnInterval) {
+            spawnInterval = newInterval;
+            if(isPlaying) setSpawnTimer();
+        }
+    }
+
+    function setSpawnTimer() {
+        if(spawnTimer) clearInterval(spawnTimer);
+        spawnTimer = setInterval(() => {
+            if(!isPlaying || isPaused || enemies.length > 6) return;
+            const text = wordList[Math.floor(Math.random()*wordList.length)];
+            const el = document.createElement('div'); el.className = 'word-enemy'; el.innerText = text;
+            const x = 60 + Math.random()*480; el.style.left = x+'px'; el.style.top = '-30px';
+            document.getElementById('game-container').appendChild(el);
+            enemies.push({el, text, x, y: -30, vx: 0, vy: speed, isUfo: false});
+        }, spawnInterval);
+    }
+
+    function startGame() {
+        stopUfoSound();
+        score = 0; life = 3; speed = 0.8; spawnInterval = 2200;
+        isPlaying = true; isPaused = false; isGameOvering = false; isNaming = false;
+        inputName = ""; ufoSpawnedFlags = {};
+        enemies.forEach(en => en.el.remove()); enemies = [];
+        bullets.forEach(b => b.el.remove()); bullets = [];
+        currentEnemy = null; typedIndex = 0;
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('cannon').style.display = 'block';
+        document.getElementById('score-box').style.display = 'block';
+        updateUI();
+        setSpawnTimer();
+    }
+
+    function runGameLoop() {
+        if (!isPlaying || isPaused) return;
+        enemies.forEach((en, i) => {
+            en.x += en.vx; en.y += en.vy;
+            en.el.style.left = en.x + 'px'; en.el.style.top = en.y + 'px';
+            if (en.y > 465) {
+                if (!en.isUfo) { 
+                    life--; playNote(80, 0.3, 'sawtooth', 0.15);
+                    document.getElementById('game-container').classList.add('damage-flash');
+                    setTimeout(() => document.getElementById('game-container').classList.remove('damage-flash'), 100);
+                    enemies.forEach(e => e.el.remove()); enemies = []; 
+                    currentEnemy = null; typedIndex = 0; stopUfoSound();
+                    updateUI(); if (life <= 0) gameOver();
+                } else { en.el.remove(); enemies.splice(i, 1); checkUfoSnd(); }
+            }
+        });
+        bullets.forEach((b, i) => {
+            b.y -= 15; b.el.style.top = b.y + 'px';
+            if (b.y < -20) { b.el.remove(); bullets.splice(i, 1); }
+        });
+    }
+    setInterval(runGameLoop, 20);
+
+    function gameOver() {
+        if(isGameOvering) return;
+        isGameOvering = true; isPlaying = false; isPaused = false;
+        clearInterval(spawnTimer); stopUfoSound();
+        document.getElementById('cannon').style.display = 'none';
+        document.getElementById('score-box').style.display = 'none';
+        document.getElementById('quit-view').style.display = 'none';
+        for(let i=0; i<20; i++) playNote(100 - (i*5), 0.6, 'sawtooth', 0.1, i * 0.08);
+        document.getElementById('overlay').style.display = 'flex';
+        document.getElementById('menu-view').style.display = 'none';
+        document.getElementById('gameover-view').style.display = 'block';
+        if (score > hiScore) { hiScore = score; localStorage.setItem('hiScore', hiScore); }
+        setTimeout(() => { 
+            document.getElementById('gameover-view').style.display = 'none'; 
+            isGameOvering = false; showRanking(); 
+        }, 3000);
+    }
+
+    function showRanking() {
+        isNaming = ranking.length < 10 || score > (ranking[ranking.length-1]?.score || 0);
+        document.getElementById('ranking-view').style.display = 'block';
+        document.getElementById('ranking-board').style.display = 'block';
+        document.getElementById('rank-input-msg').innerText = isNaming ? "ENTER TO SUBMIT" : "SPACE TO TITLE SCREEN";
+        renderRanking();
+    }
+
+    function renderRanking() {
+        let displayList = [...ranking];
+        if (isNaming) {
+            let n = inputName.padEnd(3, ' ');
+            let f = "";
+            for(let i=0; i<3; i++) {
+                if(i === inputName.length) f += '<span class="naming-cursor"></span>';
+                else f += (n[i] === ' ' ? '_' : n[i]);
+            }
+            displayList.push({ name: f, score: score });
+        }
+        displayList.sort((a,b) => b.score - a.score);
+        document.getElementById('ranking-board').innerHTML = displayList.slice(0, 10).map((r, i) => `
+            <div class="ranking-item"><span>${i+1}. ${r.name}</span><span>${r.score.toString().padStart(6,'0')}</span></div>`).join('');
+    }
+
+    window.addEventListener('keydown', e => {
+        const k = e.key.toLowerCase();
+        if (document.getElementById('ranking-view').style.display === 'block' && !isNaming) {
+            if (e.code === 'Space') { location.reload(); return; }
+        }
+        if (!isPlaying && !isNaming && !isGameOvering && e.code === 'Space' && document.getElementById('ranking-view').style.display !== 'block') { 
+            startGame(); return; 
+        }
+        if (isPaused) {
+            if (k === 'y') { gameOver(); return; }
+            if (k === 'n') { isPaused = false; document.getElementById('overlay').style.display = 'none'; return; }
+        }
+        if (isPlaying && e.code === 'Escape') {
+            isPaused = true;
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('menu-view').style.display = 'none';
+            document.getElementById('quit-view').style.display = 'block';
+            return;
+        }
+        if (isNaming) {
+            if (e.key === 'Enter' && inputName.length === 3) {
+                const finalName = inputName; isNaming = false; inputName = ""; 
+                ranking.push({name: finalName, score: score}); 
+                ranking.sort((a,b) => b.score - a.score);
+                ranking = ranking.slice(0, 10);
+                localStorage.setItem('ranking', JSON.stringify(ranking));
+                document.getElementById('rank-input-msg').innerText = "SPACE TO TITLE SCREEN";
+                renderRanking();
+            } else if (e.key.length === 1 && inputName.length < 3 && /[a-zA-Z]/.test(e.key)) {
+                inputName += e.key.toUpperCase(); playNote(800, 0.1, 'sine'); renderRanking();
+            } else if (e.key === 'Backspace') { inputName = inputName.slice(0, -1); renderRanking(); }
+            return;
+        }
+        if (isPlaying && !isPaused) {
+            if (!currentEnemy) {
+                const t = enemies.find(en => en.text[0] === k);
+                if (t) { currentEnemy = t; typedIndex = 1; document.getElementById('cannon').style.left = (t.x - 22) + 'px'; fireBullet(); checkWord(); }
+            } else if (k === currentEnemy.text[typedIndex]) { typedIndex++; fireBullet(); checkWord(); }
+        }
+    });
+
+    function fireBullet() {
+        const b = document.createElement('div'); b.className = 'bullet';
+        const cannonX = parseFloat(document.getElementById('cannon').style.left);
+        b.style.left = (cannonX + 19) + 'px'; b.style.top = '460px';
+        document.getElementById('game-container').appendChild(b);
+        bullets.push({el: b, y: 460}); playNote(1000, 0.05, 'square', 0.02);
+    }
+
+    function checkWord() {
+        if (typedIndex === currentEnemy.text.length) {
+            const oldS = score;
+            const points = currentEnemy.isUfo ? 300 : currentEnemy.text.length * 10;
+            score += points;
+            createScorePopup(currentEnemy.x, currentEnemy.y, points, currentEnemy.isUfo);
+            if (currentEnemy.isUfo) [880, 1318, 1760].forEach((f,i) => playNote(f, 0.4, 'sine', 0.05, i*0.08));
+            else playNote(1400, 0.1, 'sine', 0.05);
+            updateDifficulty();
+            ufoTriggers.forEach(t => { if(oldS < t && score >= t && !ufoSpawnedFlags[t]) { ufoSpawnedFlags[t]=true; spawnUfo(); } });
+            extendPoints.forEach(p => { 
+                if(oldS < p && score >= p) { 
+                    life++; updateUI();
+                    playNote(600, 0.1, 'sine'); playNote(900, 0.3, 'sine', 0.05, 0.1);
+                } 
+            });
+            updateUI();
+            currentEnemy.el.remove(); enemies = enemies.filter(en => en !== currentEnemy);
+            checkUfoSnd(); currentEnemy = null; typedIndex = 0;
+        } else {
+            let h = "";
+            for(let i=0; i<currentEnemy.text.length; i++) {
+                if(i < typedIndex) h += `<span class="char-done">${currentEnemy.text[i]}</span>`;
+                else if(i === typedIndex) h += `<span class="char-next">${currentEnemy.text[i]}</span>`;
+                else h += `<span>${currentEnemy.text[i]}</span>`;
+            }
+            currentEnemy.el.innerHTML = h;
+        }
+    }
+
+    function spawnUfo() {
+        const t = wordList[Math.floor(Math.random()*wordList.length)];
+        const el = document.createElement('div');
+        const side = Math.random() < 0.5 ? -60 : 660;
+        el.className = 'word-enemy ufo-word'; el.innerText = t;
+        const y = 80 + Math.random()*150; el.style.left = side + 'px'; el.style.top = y + 'px';
+        document.getElementById('game-container').appendChild(el);
+        enemies.push({el, text: t, x: side, y, vx: side < 0 ? 1.5 : -1.5, vy: 0, isUfo: true});
+        if(!ufoSndInterval) ufoSndInterval = setInterval(() => { playNote(1200, 0.05, 'sine', 0.02); playNote(1500, 0.05, 'sine', 0.02, 0.05); }, 100);
+    }
+    function checkUfoSnd() { if(!enemies.some(e => e.isUfo)) stopUfoSound(); }
+    function stopUfoSound() { clearInterval(ufoSndInterval); ufoSndInterval = null; }
+</script>
+</body>
+</html>

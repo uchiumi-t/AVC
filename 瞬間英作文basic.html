@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>瞬間英作文トレーニング</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text-dim: #6a6a8a;
+    --accent: #f5c842;
+    --accent2: #4af0c0;
+    --btn-primary: #2a2aff;
+    --btn-hover: #3a3aff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* HUD: stopwatch top-left */
+  #hud-sw {
+    position: fixed; top: 18px; left: 22px;
+    display: flex; align-items: center; gap: 10px;
+    z-index: 1000; opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+  }
+  #hud-sw.visible { opacity: 1; pointer-events: auto; }
+
+  #sw-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.25rem; font-weight: 700;
+    color: var(--accent2); letter-spacing: 2px;
+    text-shadow: 0 0 12px rgba(74,240,192,.5);
+  }
+  .sw-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent2); box-shadow: 0 0 8px var(--accent2);
+    animation: blink 1s infinite;
+  }
+  .sw-dot.paused { animation: none; opacity: .3; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  #sw-toggle-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-dim); font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem; padding: 3px 8px; border-radius: 4px;
+    cursor: pointer; transition: all .2s;
+  }
+  #sw-toggle-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* HUD: fullscreen top-right */
+  #hud-fs {
+    position: fixed; top: 18px; right: 22px;
+    z-index: 1000; opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+  }
+  #hud-fs.visible { opacity: 1; pointer-events: auto; }
+
+  #fs-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-dim); font-size: 1.1rem;
+    width: 38px; height: 38px; border-radius: 8px;
+    cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #fs-btn:hover { border-color: var(--text); color: var(--text); }
+
+  /* HUD: counter bottom-right */
+  #hud-counter {
+    position: fixed; bottom: 22px; right: 28px;
+    z-index: 1000; text-align: right;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+  }
+  #hud-counter.visible { opacity: 1; }
+
+  #counter-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .7rem; color: var(--text-dim);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px;
+  }
+  #counter-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem; color: var(--text-dim);
+    line-height: 1; display: inline-block;
+    transition: color .15s, transform .15s;
+  }
+  #counter-num.bump { color: var(--accent); transform: scale(1.15); }
+
+  /* Pages */
+  .page {
+    width: 100vw; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 60px 30px;
+  }
+  .hidden { display: none !important; }
+
+  /* Home */
+  #page-top .inner { text-align: center; max-width: 620px; }
+  .logo-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; letter-spacing: 4px;
+    color: var(--text-dim); text-transform: uppercase; margin-bottom: 28px;
+  }
+  #page-top h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem; letter-spacing: 3px; line-height: 1;
+    color: var(--text); margin-bottom: 10px;
+  }
+  #page-top h1 span { color: var(--accent); }
+  .subtitle { font-size: .9rem; color: var(--text-dim); margin-bottom: 56px; letter-spacing: 1px; }
+
+  .type-cards { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .type-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px; padding: 34px 44px;
+    cursor: pointer; transition: all .25s;
+    text-align: left; min-width: 210px;
+  }
+  .type-card:hover {
+    border-color: var(--accent); background: var(--surface2);
+    transform: translateY(-4px); box-shadow: 0 16px 48px rgba(245,200,66,.07);
+  }
+  .type-card .tag {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem; color: var(--accent); display: block; margin-bottom: 6px;
+  }
+  .type-card .desc { font-size: .88rem; color: var(--text-dim); line-height: 1.6; }
+
+  /* Settings */
+  #page-settings .inner { max-width: 680px; width: 100%; }
+  .settings-header { display: flex; align-items: center; gap: 16px; margin-bottom: 38px; }
+  .settings-header h2 {
+    font-family: 'Bebas Neue', sans-serif; font-size: 2.6rem; letter-spacing: 2px;
+  }
+  .badge {
+    background: var(--accent); color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .7rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px; letter-spacing: 1px;
+  }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .68rem; letter-spacing: 3px;
+    color: var(--text-dim); text-transform: uppercase; margin-bottom: 12px;
+  }
+  .check-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
+  .check-pill { position: relative; }
+  .check-pill input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .check-pill label {
+    display: inline-block; padding: 9px 22px;
+    border: 1px solid var(--border); border-radius: 100px;
+    font-size: .95rem; cursor: pointer; color: var(--text-dim);
+    transition: all .2s; user-select: none;
+  }
+  .check-pill input:checked + label {
+    border-color: var(--accent); color: var(--accent);
+    background: rgba(245,200,66,.07);
+  }
+  .check-pill label:hover { border-color: #555; color: var(--text); }
+
+  .settings-actions { display: flex; align-items: center; gap: 12px; margin-top: 38px; flex-wrap: wrap; }
+  .btn-primary {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 1rem; font-weight: 700; padding: 14px 38px;
+    border: none; border-radius: 10px;
+    background: var(--btn-primary); color: #fff; cursor: pointer;
+    letter-spacing: 1px; transition: all .2s;
+  }
+  .btn-primary:hover { background: var(--btn-hover); transform: translateY(-1px); }
+  .btn-ghost {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: .9rem; padding: 13px 24px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: transparent; color: var(--text-dim); cursor: pointer; transition: all .2s;
+  }
+  .btn-ghost:hover { border-color: #555; color: var(--text); }
+  .btn-home {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: .88rem; padding: 12px 22px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: transparent; color: var(--text-dim); cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-home:hover { border-color: #555; color: var(--text); }
+
+  /* Drill */
+  #page-drill { flex-direction: column; }
+  #drill-inner {
+    width: 100%; max-width: 900px;
+    text-align: center; padding: 0 20px;
+  }
+
+  #jp-text {
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 700; color: var(--text);
+    line-height: 1.4; margin-bottom: 32px; min-height: 2em;
+  }
+  .divider { width: 48px; height: 1px; background: var(--border); margin: 0 auto 32px; }
+  #en-text {
+    font-size: clamp(1.8rem, 4.5vw, 3rem);
+    font-weight: 700; color: var(--accent);
+    line-height: 1.3; min-height: 1.5em; visibility: hidden;
+    text-shadow: 0 0 40px rgba(245,200,66,.18);
+  }
+
+  .drill-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; color: var(--text-dim);
+    letter-spacing: 2px; margin-top: 52px; margin-bottom: 22px;
+  }
+  .drill-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* Fullscreen overrides */
+  body.fullscreen #drill-inner { max-width: 96vw; padding: 0 2vw; }
+  body.fullscreen #jp-text { white-space: nowrap; }
+  body.fullscreen #en-text { white-space: nowrap; }
+  body.fullscreen .drill-hint { font-size: .82rem; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- HUD: Stopwatch -->
+<div id="hud-sw">
+  <div class="sw-dot paused" id="sw-dot"></div>
+  <span id="sw-time">00:00</span>
+  <button id="sw-toggle-btn" onclick="toggleSw()">START</button>
+</div>
+
+<!-- HUD: Fullscreen -->
+<div id="hud-fs">
+  <button id="fs-btn" onclick="toggleFullscreen()" title="全画面切替">⛶</button>
+</div>
+
+<!-- HUD: Counter -->
+<div id="hud-counter">
+  <div id="counter-label">SENTENCES</div>
+  <div id="counter-num">0</div>
+</div>
+
+<!-- Home -->
+<div id="page-top" class="page">
+  <div class="inner">
+    <div class="logo-line">Instant English Composition Trainer</div>
+    <h1>瞬間<span>英作文</span></h1>
+    <p class="subtitle">文型を選んで練習を始める</p>
+    <div class="type-cards">
+      <div class="type-card" onclick="openSettings('SVC')">
+        <span class="tag">SVC</span>
+        <span class="desc">be動詞タイプ<br>形容詞・状態を表す</span>
+      </div>
+      <div class="type-card" onclick="openSettings('SVO')">
+        <span class="tag">SVO</span>
+        <span class="desc">一般動詞タイプ<br>動作・行為を表す</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings -->
+<div id="page-settings" class="page hidden">
+  <div class="inner">
+    <div class="settings-header">
+      <h2 id="mode-title">設定</h2>
+      <span class="badge" id="mode-badge">SVC</span>
+    </div>
+
+    <div class="section-label">文の種類（複数可）</div>
+    <div class="check-group">
+      <div class="check-pill"><input type="checkbox" class="opt-type" id="t-pos" value="pos" checked><label for="t-pos">肯定文</label></div>
+      <div class="check-pill"><input type="checkbox" class="opt-type" id="t-neg" value="neg"><label for="t-neg">否定文</label></div>
+      <div class="check-pill"><input type="checkbox" class="opt-type" id="t-que" value="que"><label for="t-que">疑問文</label></div>
+    </div>
+
+    <div class="section-label">時制</div>
+    <div class="check-group" id="tense-group">
+      <div class="check-pill"><input type="checkbox" class="opt-tense" id="ten-pres" value="pres" checked><label for="ten-pres">現在形</label></div>
+      <div class="check-pill"><input type="checkbox" class="opt-tense" id="ten-past" value="past"><label for="ten-past">過去形</label></div>
+      <div class="check-pill"><input type="checkbox" class="opt-tense fut-opt" id="fut_will" value="fut_will"><label for="fut_will">未来形（will）</label></div>
+      <div class="check-pill"><input type="checkbox" class="opt-tense fut-opt" id="fut_going" value="fut_going"><label for="fut_going">未来形（be going to）</label></div>
+    </div>
+
+    <div class="settings-actions">
+      <button class="btn-primary" onclick="start()">▶ スタート</button>
+      <button class="btn-ghost" onclick="goHome()">← 戻る</button>
+      <button class="btn-home" onclick="goHome()">🏠 ホーム</button>
+    </div>
+  </div>
+</div>
+
+<!-- Drill -->
+<div id="page-drill" class="page hidden">
+  <div id="drill-inner">
+    <div id="jp-text">—</div>
+    <div class="divider"></div>
+    <div id="en-text">—</div>
+    <div class="drill-hint">[ Enter ] で回答表示 &nbsp;／&nbsp; もう一度 [ Enter ] で次の問題</div>
+    <div class="drill-actions">
+      <button class="btn-ghost" onclick="goToSettings()">← 設定に戻る</button>
+      <button class="btn-home" onclick="goHome()">🏠 ホーム</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ Stopwatch ══
+var swSec = 0, swRunning = false, swTick = null;
+
+function toggleSw() {
+  if (swRunning) { pauseSw(); } else { startSw(); }
+}
+function startSw() {
+  if (swRunning) return;
+  swTick = setInterval(function() { swSec++; renderSw(); }, 1000);
+  swRunning = true;
+  document.getElementById('sw-dot').classList.remove('paused');
+  document.getElementById('sw-toggle-btn').textContent = 'STOP';
+}
+function pauseSw() {
+  if (!swRunning) return;
+  clearInterval(swTick);
+  swRunning = false;
+  document.getElementById('sw-dot').classList.add('paused');
+  document.getElementById('sw-toggle-btn').textContent = 'START';
+}
+function resetSw() {
+  clearInterval(swTick);
+  swRunning = false; swSec = 0;
+  renderSw();
+  document.getElementById('sw-dot').classList.add('paused');
+  document.getElementById('sw-toggle-btn').textContent = 'START';
+}
+function renderSw() {
+  var m = String(Math.floor(swSec / 60)).padStart(2, '0');
+  var s = String(swSec % 60).padStart(2, '0');
+  document.getElementById('sw-time').textContent = m + ':' + s;
+}
+
+// ══ Counter ══
+var cnt = 0;
+function bumpCounter() {
+  cnt++;
+  var el = document.getElementById('counter-num');
+  el.textContent = cnt;
+  el.classList.add('bump');
+  setTimeout(function() { el.classList.remove('bump'); }, 200);
+}
+function resetCounter() {
+  cnt = 0;
+  document.getElementById('counter-num').textContent = '0';
+}
+
+// ══ Fullscreen ══
+var isFull = false;
+function toggleFullscreen() {
+  isFull = !isFull;
+  if (isFull) {
+    document.body.classList.add('fullscreen');
+    document.getElementById('fs-btn').textContent = '⊠';
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function() {});
+    }
+  } else {
+    document.body.classList.remove('fullscreen');
+    document.getElementById('fs-btn').textContent = '⛶';
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(function() {});
+    }
+    // CSSのフォントサイズに戻す
+    document.getElementById('jp-text').style.fontSize = '';
+    document.getElementById('en-text').style.fontSize = '';
+  }
+  // ボタンのフォーカスを外してEnterキーをドリルに返す
+  document.getElementById('fs-btn').blur();
+  requestAnimationFrame(fitText);
+}
+
+document.addEventListener('fullscreenchange', function() {
+  if (!document.fullscreenElement && isFull) {
+    isFull = false;
+    document.body.classList.remove('fullscreen');
+    document.getElementById('fs-btn').textContent = '⛶';
+    document.getElementById('jp-text').style.fontSize = '';
+    document.getElementById('en-text').style.fontSize = '';
+  }
+});
+
+// ══ fitText: 全画面時に1行に収まるよう自動調整 ══
+function fitText() {
+  if (!isFull) return;
+  var inner = document.getElementById('drill-inner');
+  var availW = inner.clientWidth;
+  ['jp-text', 'en-text'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el.textContent || el.textContent === '—') return;
+    // まずCSSデフォルトに戻してから測る
+    el.style.fontSize = '';
+    var size = parseFloat(window.getComputedStyle(el).fontSize);
+    el.style.whiteSpace = 'nowrap';
+    // 収まるまで縮小
+    while (el.scrollWidth > availW && size > 18) {
+      size -= 1;
+      el.style.fontSize = size + 'px';
+    }
+    // 限界まで拡大
+    var maxSize = 100;
+    while (el.scrollWidth <= availW && size < maxSize) {
+      size += 1;
+      el.style.fontSize = size + 'px';
+    }
+    if (el.scrollWidth > availW) {
+      el.style.fontSize = (size - 1) + 'px';
+    }
+  });
+}
+window.addEventListener('resize', fitText);
+
+// ══ Navigation ══
+function showPage(id) {
+  ['page-top', 'page-settings', 'page-drill'].forEach(function(p) {
+    document.getElementById(p).classList.add('hidden');
+  });
+  document.getElementById(id).classList.remove('hidden');
+  var drill = id === 'page-drill';
+  ['hud-sw', 'hud-fs', 'hud-counter'].forEach(function(h) {
+    document.getElementById(h).classList.toggle('visible', drill);
+  });
+}
+
+function goHome() {
+  resetSw();
+  resetCounter();
+  showPage('page-top');
+}
+function goToSettings() {
+  pauseSw();
+  showPage('page-settings');
+}
+
+// ══ Future exclusive ══
+document.getElementById('fut_will').addEventListener('change', function() {
+  if (this.checked) document.getElementById('fut_going').checked = false;
+});
+document.getElementById('fut_going').addEventListener('change', function() {
+  if (this.checked) document.getElementById('fut_will').checked = false;
+});
+
+// ══ Data ══
+var subjects = [
+  {en:"I",      jp:"私は",      be:"am",  past_be:"was",  does:false},
+  {en:"You",    jp:"あなたは",  be:"are", past_be:"were", does:false},
+  {en:"He",     jp:"彼は",      be:"is",  past_be:"was",  does:true},
+  {en:"She",    jp:"彼女は",    be:"is",  past_be:"was",  does:true},
+  {en:"It",     jp:"それは",    be:"is",  past_be:"was",  does:true},
+  {en:"We",     jp:"私たちは",  be:"are", past_be:"were", does:false},
+  {en:"They",   jp:"彼らは",    be:"are", past_be:"were", does:false}
+];
+var adjectives = [
+  {en:"happy",   pres:"幸せです",           neg:"幸せではありません",           past:"幸せでした",           past_neg:"幸せではありませんでした",           fut_v:"幸せになる"},
+  {en:"kind",    pres:"親切です",           neg:"親切ではありません",           past:"親切でした",           past_neg:"親切ではありませんでした",           fut_v:"親切になる"},
+  {en:"hungry",  pres:"お腹が空いています",  neg:"お腹が空いていません",         past:"お腹が空いていました",  past_neg:"お腹が空いていませんでした",         fut_v:"お腹が空く"},
+  {en:"ready",   pres:"準備ができています",   neg:"準備ができていません",          past:"準備ができていました",   past_neg:"準備ができていませんでした",          fut_v:"準備ができる"},
+  {en:"tall",    pres:"背が高いです",         neg:"背が高くありません",            past:"背が高かったです",        past_neg:"背が高くなかったです",              fut_v:"背が高くなる"},
+  {en:"careful", pres:"注意深いです",         neg:"注意深くありません",            past:"注意深かったです",        past_neg:"注意深くなかったです",              fut_v:"注意深くなる"},
+  {en:"sad",     pres:"悲しいです",           neg:"悲しくありません",             past:"悲しかったです",          past_neg:"悲しくなかったです",               fut_v:"悲しくなる"},
+  {en:"thirsty", pres:"喉が渇いています",     neg:"喉が渇いていません",           past:"喉が渇いていました",      past_neg:"喉が渇いていませんでした",          fut_v:"喉が渇く"}
+];
+var verbs = [
+  {id:"have", en:"have a book", en_3rd:"has a book", past_en:"had a book", ing_en:"having a book",
+   pres:"本を持っています", neg:"本を持っていません", past:"本を持っていました", past_neg:"本を持っていませんでした",
+   fut_will_pos:"本を持つでしょう", fut_will_neg:"本を持たないでしょう", fut_will_que:"本を持つでしょう",
+   fut_going_pos:"本を持つつもりです", fut_going_neg:"本を持つつもりはありません", fut_going_que:"本を持つつもりですか", can_cont:false},
+  {id:"like", en:"like cats", en_3rd:"likes cats", past_en:"liked cats", ing_en:"liking cats",
+   pres:"猫が好きです", neg:"猫が好きではありません", past:"猫が好きでした", past_neg:"猫が好きではありませんでした",
+   fut_will_pos:"猫が好きになるでしょう", fut_will_neg:"猫が好きにはならないでしょう", fut_will_que:"猫が好きになるでしょう",
+   fut_going_pos:"猫を好きになるつもりです", fut_going_neg:"猫を好きになるつもりはありません", fut_going_que:"猫を好きになるつもりですか", can_cont:false},
+  {id:"clean", en:"clean the house", en_3rd:"cleans the house", past_en:"cleaned the house", ing_en:"cleaning the house",
+   pres:"家を掃除します", neg:"家を掃除しません", past:"家を掃除しました", past_neg:"家を掃除しませんでした",
+   fut_will_pos:"家を掃除するでしょう", fut_will_neg:"家を掃除しないでしょう", fut_will_que:"家を掃除するでしょう",
+   fut_going_pos:"家を掃除するつもりです", fut_going_neg:"家を掃除するつもりはありません", fut_going_que:"家を掃除するつもりですか",
+   cont_pres:"家を掃除しています", cont_past:"家を掃除していました", can_cont:true},
+  {id:"study", en:"study math", en_3rd:"studies math", past_en:"studied math", ing_en:"studying math",
+   pres:"数学を勉強します", neg:"数学を勉強しません", past:"数学を勉強しました", past_neg:"数学を勉強しませんでした",
+   fut_will_pos:"数学を勉強するでしょう", fut_will_neg:"数学を勉強しないでしょう", fut_will_que:"数学を勉強するでしょう",
+   fut_going_pos:"数学を勉強するつもりです", fut_going_neg:"数学を勉強するつもりはありません", fut_going_que:"数学を勉強するつもりですか",
+   cont_pres:"数学を勉強しています", cont_past:"数学を勉強していました", can_cont:true}
+];
+
+// ══ App state ══
+var currentMode = '', isAnswerShowing = false, currentEN = '';
+
+function openSettings(mode) {
+  currentMode = mode;
+  document.getElementById('mode-title').textContent = mode + 'タイプの設定';
+  document.getElementById('mode-badge').textContent = mode;
+  if (mode === 'SVO' && !document.querySelector('.cont-opt')) {
+    var g = document.getElementById('tense-group');
+    function addPill(id, val, lbl) {
+      var d = document.createElement('div');
+      d.className = 'check-pill cont-opt';
+      d.innerHTML = '<input type="checkbox" class="opt-tense" id="' + id + '" value="' + val + '"><label for="' + id + '">' + lbl + '</label>';
+      g.appendChild(d);
+    }
+    addPill('ten-pres-cont', 'pres_cont', '現在進行形');
+    addPill('ten-past-cont', 'past_cont', '過去進行形');
+  }
+  showPage('page-settings');
+}
+
+function start() {
+  var types  = Array.from(document.querySelectorAll('.opt-type:checked')).map(function(e) { return e.value; });
+  var tenses = Array.from(document.querySelectorAll('.opt-tense:checked')).map(function(e) { return e.value; });
+  if (!types.length || !tenses.length) { alert('文の種類と時制を選択してください'); return; }
+  showPage('page-drill');
+  resetSw();
+  resetCounter();
+  startSw();  // 練習開始と同時にスタート
+  makeQuestion(types, tenses);
+}
+
+function formatSub(s) { return s === 'I' ? 'I' : s.toLowerCase(); }
+function cap(s) { return s[0].toUpperCase() + s.slice(1); }
+function toQ(s) {
+  return s.replace('です','ですか').replace('でした','でしたか')
+          .replace('ます','ますか').replace('ました','ましたか')
+          .replace('でしょう','でしょうか');
+}
+
+function makeQuestion(types, tenses) {
+  var type  = types [Math.floor(Math.random() * types.length)];
+  var tense = tenses[Math.floor(Math.random() * tenses.length)];
+  var sub   = subjects[Math.floor(Math.random() * subjects.length)];
+  var jp = '', en = '';
+
+  if (currentMode === 'SVC') {
+    var adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    if (tense === 'pres') {
+      if (type === 'pos') { en = sub.en+' '+sub.be+' '+adj.en+'.';           jp = sub.jp+adj.pres+'。'; }
+      if (type === 'neg') { en = sub.en+' '+sub.be+' not '+adj.en+'.';       jp = sub.jp+adj.neg+'。'; }
+      if (type === 'que') { en = cap(sub.be)+' '+formatSub(sub.en)+' '+adj.en+'?'; jp = sub.jp+toQ(adj.pres)+'？'; }
+    } else if (tense === 'past') {
+      if (type === 'pos') { en = sub.en+' '+sub.past_be+' '+adj.en+'.';      jp = sub.jp+adj.past+'。'; }
+      if (type === 'neg') { en = sub.en+' '+sub.past_be+' not '+adj.en+'.';  jp = sub.jp+adj.past_neg+'。'; }
+      if (type === 'que') { en = cap(sub.past_be)+' '+formatSub(sub.en)+' '+adj.en+'?'; jp = sub.jp+toQ(adj.past)+'？'; }
+    } else if (tense === 'fut_will') {
+      if (type === 'pos') { en = sub.en+' will be '+adj.en+'.';              jp = sub.jp+adj.fut_v+'でしょう。'; }
+      if (type === 'neg') { en = sub.en+' will not be '+adj.en+'.';          jp = sub.jp+adj.fut_v+'ないでしょう。'; }
+      if (type === 'que') { en = 'Will '+formatSub(sub.en)+' be '+adj.en+'?'; jp = sub.jp+adj.fut_v+'でしょうか？'; }
+    } else if (tense === 'fut_going') {
+      if (type === 'pos') { en = sub.en+' '+sub.be+' going to be '+adj.en+'.';     jp = sub.jp+adj.fut_v+'予定です。'; }
+      if (type === 'neg') { en = sub.en+' '+sub.be+' not going to be '+adj.en+'.'; jp = sub.jp+adj.fut_v+'予定はありません。'; }
+      if (type === 'que') { en = cap(sub.be)+' '+formatSub(sub.en)+' going to be '+adj.en+'?'; jp = sub.jp+adj.fut_v+'予定ですか？'; }
+    }
+  } else {
+    var vl = tense.indexOf('cont') >= 0 ? verbs.filter(function(v) { return v.can_cont; }) : verbs;
+    var v  = vl[Math.floor(Math.random() * vl.length)];
+    if (tense === 'pres') {
+      if (type === 'pos') { en = sub.en+' '+(sub.does ? v.en_3rd : v.en)+'.';      jp = sub.jp+v.pres+'。'; }
+      if (type === 'neg') { en = sub.en+' '+(sub.does ? "doesn't" : "don't")+' '+v.en+'.'; jp = sub.jp+v.neg+'。'; }
+      if (type === 'que') { en = (sub.does ? 'Does' : 'Do')+' '+formatSub(sub.en)+' '+v.en+'?'; jp = sub.jp+toQ(v.pres)+'？'; }
+    } else if (tense === 'past') {
+      if (type === 'pos') { en = sub.en+' '+v.past_en+'.';     jp = sub.jp+v.past+'。'; }
+      if (type === 'neg') { en = sub.en+" didn't "+v.en+'.';   jp = sub.jp+v.past_neg+'。'; }
+      if (type === 'que') { en = 'Did '+formatSub(sub.en)+' '+v.en+'?'; jp = sub.jp+toQ(v.past)+'？'; }
+    } else if (tense === 'fut_will') {
+      if (type === 'pos') { en = sub.en+' will '+v.en+'.';     jp = sub.jp+v.fut_will_pos+'。'; }
+      if (type === 'neg') { en = sub.en+" won't "+v.en+'.';    jp = sub.jp+v.fut_will_neg+'。'; }
+      if (type === 'que') { en = 'Will '+formatSub(sub.en)+' '+v.en+'?'; jp = sub.jp+v.fut_will_que+'か？'; }
+    } else if (tense === 'fut_going') {
+      if (type === 'pos') { en = sub.en+' '+sub.be+' going to '+v.en+'.';     jp = sub.jp+v.fut_going_pos+'。'; }
+      if (type === 'neg') { en = sub.en+' '+sub.be+' not going to '+v.en+'.'; jp = sub.jp+v.fut_going_neg+'。'; }
+      if (type === 'que') { en = cap(sub.be)+' '+formatSub(sub.en)+' going to '+v.en+'?'; jp = sub.jp+v.fut_going_que+'？'; }
+    } else if (tense.indexOf('cont') >= 0) {
+      var be_c = tense === 'pres_cont' ? sub.be : sub.past_be;
+      var jp_c = tense === 'pres_cont' ? v.cont_pres : v.cont_past;
+      if (type === 'pos') { en = sub.en+' '+be_c+' '+v.ing_en+'.'; jp = sub.jp+jp_c+'。'; }
+      if (type === 'neg') { en = sub.en+' '+be_c+' not '+v.ing_en+'.'; jp = sub.jp+jp_c.replace('います','いません').replace('いました','いませんでした')+'。'; }
+      if (type === 'que') { en = cap(be_c)+' '+formatSub(sub.en)+' '+v.ing_en+'?'; jp = sub.jp+toQ(jp_c)+'？'; }
+    }
+  }
+
+  var jpEl = document.getElementById('jp-text');
+  var enEl = document.getElementById('en-text');
+  jpEl.textContent = jp;
+  enEl.textContent = en;
+  enEl.style.visibility = 'hidden';
+  // inline font-size をリセットしてCSSに戻す
+  jpEl.style.fontSize = '';
+  enEl.style.fontSize = '';
+  currentEN = en;
+  isAnswerShowing = false;
+  requestAnimationFrame(fitText);
+}
+
+function handleEnter() {
+  if (!isAnswerShowing) {
+    document.getElementById('en-text').style.visibility = 'visible';
+    var u = new SpeechSynthesisUtterance(currentEN);
+    u.lang = 'en-US';
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+    isAnswerShowing = true;
+    bumpCounter();
+    requestAnimationFrame(fitText);
+  } else {
+    var tenses = Array.from(document.querySelectorAll('.opt-tense:checked')).map(function(e) { return e.value; });
+    var types  = Array.from(document.querySelectorAll('.opt-type:checked')).map(function(e) { return e.value; });
+    makeQuestion(types, tenses);
+  }
+}
+
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') handleEnter();
+});
+</script>
+</body>
+</html>
