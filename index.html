@@ -1,609 +1,391 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>⌨️ AVCのタイピング練習</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2313151a'/%3E%3Crect x='4' y='9' width='24' height='14' rx='3' fill='%231c1f27' stroke='%23f0a500' stroke-width='1.5'/%3E%3Crect x='7' y='12' width='3' height='2.5' rx='0.8' fill='%23f0a500'/%3E%3Crect x='11.5' y='12' width='3' height='2.5' rx='0.8' fill='%23f0a500'/%3E%3Crect x='16' y='12' width='3' height='2.5' rx='0.8' fill='%23f0a500'/%3E%3Crect x='20.5' y='12' width='4.5' height='2.5' rx='0.8' fill='%23f0a500'/%3E%3Crect x='7' y='16' width='3' height='2.5' rx='0.8' fill='%23666d85'/%3E%3Crect x='11.5' y='16' width='3' height='2.5' rx='0.8' fill='%23666d85'/%3E%3Crect x='16' y='16' width='3' height='2.5' rx='0.8' fill='%23666d85'/%3E%3Crect x='20.5' y='16' width='4.5' height='2.5' rx='0.8' fill='%23666d85'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #13151a;
-    --surface: #1c1f27;
-    --surface2: #22263000;
-    --border: #2e3240;
-    --amber: #f0a500;
-    --amber-dim: #7a5200;
-    --amber-glow: rgba(240,165,0,0.18);
-    --green: #3ecf8e;
-    --red: #f25f5c;
-    --blue: #5b9cf6;
-    --text: #dde1ec;
-    --text-muted: #666d85;
-    --f-lp: #e879b0; --f-lr: #a78bfa; --f-lm: #60a5fa; --f-li: #4ade80;
-    --f-ri: #fb923c; --f-rm: #f87171; --f-rr: #a16207; --f-rp: #94a3b8;
-  }
-
-  html, body {
-    min-height: 100vh; background: var(--bg);
-    color: var(--text); font-family: 'Zen Kaku Gothic New', sans-serif;
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden;
-  }
-
-  /* ─── HOME SCREEN ─── */
-  #home-screen {
-    text-align: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 40px 36px;
-    width: 95%; max-width: 780px;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
-  }
-
-  .home-title {
-    font-size: 26px; font-weight: 900; letter-spacing: 0.06em;
-    color: var(--amber); margin-bottom: 6px;
-  }
-  .home-sub {
-    font-size: 12px; color: var(--text-muted);
-    letter-spacing: 0.15em; margin-bottom: 32px;
-  }
-
-  .menu-list {
-    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
-  }
-  .menu-btn {
-    padding: 14px 10px; font-size: 12px; font-family: inherit; font-weight: 700;
-    cursor: pointer; border: 1.5px solid var(--border); border-radius: 12px;
-    background: var(--bg); color: var(--text-muted);
-    transition: all 0.18s; line-height: 1.6; letter-spacing: 0.04em;
-  }
-  .menu-btn:hover { border-color: var(--amber); color: var(--amber); background: var(--amber-glow); transform: translateY(-2px); }
-  .menu-btn.full { grid-column: span 3; font-size: 14px; padding: 18px; color: var(--amber); border-color: var(--amber-dim); }
-  .menu-btn.full:hover { background: var(--amber-glow); }
-
-  /* ─── GAME SCREEN ─── */
-  #game-screen {
-    display: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 20px 24px 18px;
-    width: 95%; max-width: 860px;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
-  }
-
-  .top-nav {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px;
-  }
-
-  .set-title { font-size: 13px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.1em; }
-
-  .mode-toggle { display: flex; gap: 6px; }
-  .sub-btn {
-    padding: 5px 14px; font-size: 11px; font-family: inherit; font-weight: 700;
-    letter-spacing: 0.08em; border-radius: 20px; cursor: pointer;
-    border: 1.5px solid var(--border); background: transparent; color: var(--text-muted);
-    transition: all 0.15s;
-  }
-  .sub-btn.active { background: var(--amber); border-color: var(--amber); color: #000; }
-  .back-btn {
-    font-size: 11px; font-family: inherit; font-weight: 700; letter-spacing: 0.08em;
-    padding: 5px 12px; border: 1.5px solid var(--border); border-radius: 20px;
-    background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s;
-  }
-  .back-btn:hover { border-color: var(--text-muted); color: var(--text); }
-
-  /* ─── MAIN DISPLAY ─── */
-  .main-display {
-    display: flex; align-items: center; justify-content: center;
-    gap: 32px; margin: 8px 0 12px;
-  }
-
-  /* Ring gauge */
-  .ring-wrap {
-    position: relative; width: 130px; height: 130px; flex-shrink: 0;
-  }
-  .ring-wrap svg { width: 130px; height: 130px; transform: rotate(-90deg); }
-  .ring-track { fill: none; stroke: var(--border); stroke-width: 8; }
-  .ring-fill {
-    fill: none; stroke: var(--amber); stroke-width: 8;
-    stroke-linecap: round;
-    stroke-dasharray: 339.29; /* 2π×54 */
-    stroke-dashoffset: 339.29;
-    transition: stroke-dashoffset 0.25s ease, stroke 0.3s;
-    filter: drop-shadow(0 0 4px var(--amber));
-  }
-  .ring-center {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-  }
-  .ring-count {
-    font-family: 'DM Mono', monospace; font-size: 28px; font-weight: 500;
-    color: var(--amber); line-height: 1;
-  }
-  .ring-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; margin-top: 2px; }
-
-  /* Hidden in game mode */
-  .ring-wrap.game-mode { display: none; }
-
-  /* Score/timer block (game mode) */
-  #info-row {
-    display: flex; gap: 20px; font-family: 'DM Mono', monospace;
-    font-size: 14px; color: var(--text-muted);
-    visibility: hidden;
-  }
-  #info-row span em { font-style: normal; color: var(--amber); font-size: 18px; }
-
-  /* Game gauge bar */
-  #gauge-container {
-    width: 100%; height: 6px; background: var(--border);
-    border-radius: 3px; margin-bottom: 10px; display: none; overflow: hidden;
-  }
-  #gauge-bar {
-    height: 100%; width: 0%;
-    background: linear-gradient(90deg, var(--amber-dim), var(--amber));
-    border-radius: 3px; transition: width 0.3s;
-  }
-
-  /* Target character */
-  .target-wrap {
-    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 110px; position: relative;
-  }
-  #target-char {
-    font-family: 'DM Mono', monospace;
-    font-size: 88px; font-weight: 500; color: var(--text); line-height: 1;
-    transition: color 0.1s;
-  }
-  #countdown-overlay {
-    position: absolute; font-family: 'DM Mono', monospace;
-    font-size: 72px; font-weight: 500; color: var(--amber);
-    display: none; z-index: 10;
-  }
-  #guide-message {
-    font-size: 13px; color: var(--text-muted); margin-top: 6px;
-    min-height: 1.4em; letter-spacing: 0.05em;
-  }
-
-  /* ─── KEYBOARD ─── */
-  #keyboard {
-    display: flex; flex-direction: column; align-items: flex-start;
-    gap: 4px; margin-top: 10px;
-  }
-  .row { display: flex; gap: 4px; }
-  .row-top  { margin-left: 0px; }
-  .row-middle { margin-left: 18px; }
-  .row-bottom { margin-left: 42px; }
-
-  .key {
-    width: 46px; height: 46px; border: 1.5px solid var(--border);
-    border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500;
-    background: var(--bg); color: var(--text-muted);
-    transition: background 0.12s, border-color 0.12s, transform 0.08s;
-  }
-  .key.basic-home { background: #1a2030; border-color: #3a4560; color: var(--text); }
-  .key.dummy { opacity: 0.12; pointer-events: none; }
-  .key.highlight { background: rgba(240,165,0,0.15); border-color: var(--amber); color: var(--amber); }
-  .key.correct { background: rgba(62,207,142,0.2); border-color: var(--green); color: var(--green); transform: scale(0.93); }
-  .key.wrong { background: rgba(242,95,92,0.2); border-color: var(--red); color: var(--red); animation: shake 0.2s; }
-  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
-
-  .f-lp { color: var(--f-lp); } .f-lr { color: var(--f-lr); } .f-lm { color: var(--f-lm); } .f-li { color: var(--f-li); }
-  .f-ri { color: var(--f-ri); } .f-rm { color: var(--f-rm); } .f-rr { color: var(--f-rr); } .f-rp { color: var(--f-rp); }
-
-  /* ─── COMPLETION DIALOG ─── */
-  .dialog-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-  }
-  .dialog-overlay.show { opacity: 1; pointer-events: auto; }
-
-  .dialog {
-    background: var(--surface); border: 1px solid var(--amber-dim);
-    border-radius: 20px; padding: 44px 48px; text-align: center;
-    box-shadow: 0 0 60px rgba(240,165,0,0.15), 0 32px 64px rgba(0,0,0,0.6);
-    transform: scale(0.88); transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    max-width: 380px; width: 90%;
-  }
-  .dialog-overlay.show .dialog { transform: scale(1); }
-
-  .dialog-icon { font-size: 52px; margin-bottom: 12px; animation: bounce 0.6s 0.3s both; }
-  @keyframes bounce { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
-  .dialog-title { font-size: 22px; font-weight: 900; color: var(--amber); margin-bottom: 8px; letter-spacing: 0.05em; }
-  .dialog-body { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 28px; }
-  .dialog-btns { display: flex; gap: 12px; justify-content: center; }
-  .dialog-btn {
-    padding: 11px 28px; font-size: 13px; font-family: inherit; font-weight: 700;
-    letter-spacing: 0.08em; border-radius: 30px; cursor: pointer;
-    border: 1.5px solid var(--border); background: transparent; color: var(--text-muted);
-    transition: all 0.15s;
-  }
-  .dialog-btn:hover { border-color: var(--text-muted); color: var(--text); }
-  .dialog-btn.primary {
-    background: var(--amber); border-color: var(--amber); color: #000;
-    box-shadow: 0 4px 16px rgba(240,165,0,0.3);
-  }
-  .dialog-btn.primary:hover { background: #ffb82e; }
-</style>
-</head>
-<body>
-
-<!-- ─── HOME ─── -->
-<div id="home-screen">
-  <div class="home-title">⌨️ AVC タイピング練習</div>
-  <div class="home-sub">TYPING PRACTICE</div>
-  <div class="menu-list">
-    <button class="menu-btn full" onclick="initGame('basic')">🏠 基本ホームポジション</button>
-    <button class="menu-btn" onclick="initGame('left_index')">👈 左手：人差し指<br>G T R B V</button>
-    <button class="menu-btn" onclick="initGame('left_middle')">👈 左手：中指<br>E C</button>
-    <button class="menu-btn" onclick="initGame('left_ring')">👈 左手：薬指<br>W X</button>
-    <button class="menu-btn" onclick="initGame('left_pinky')">👈 左手：小指<br>Q Z</button>
-    <button class="menu-btn" onclick="initGame('right_index')">👉 右手：人差し指<br>H Y U N M</button>
-    <button class="menu-btn" onclick="initGame('right_middle')">👉 右手：中指<br>I ,</button>
-    <button class="menu-btn" onclick="initGame('right_ring')">👉 右手：薬指<br>O .</button>
-    <button class="menu-btn" onclick="initGame('right_pinky')">👉 右手：小指<br>P /</button>
-  </div>
-</div>
-
-<!-- ─── GAME ─── -->
-<div id="game-screen">
-  <div class="top-nav">
-    <button class="back-btn" onclick="showHome()">← 戻る</button>
-    <span class="set-title" id="current-set-title">—</span>
-    <div class="mode-toggle">
-      <button id="btn-practice" class="sub-btn active" onclick="setPlayMode('practice')">練習</button>
-      <button id="btn-game"     class="sub-btn"        onclick="setPlayMode('game')">30秒ゲーム</button>
-    </div>
-  </div>
-
-  <!-- Game mode info -->
-  <div id="info-row">
-    <span>残り <em id="timer-val">30</em>s</span>
-    <span>スコア <em id="score-val">0</em></span>
-  </div>
-  <div id="gauge-container"><div id="gauge-bar"></div></div>
-
-  <!-- Main area: ring + target -->
-  <div class="main-display">
-    <div class="ring-wrap" id="ring-wrap">
-      <svg viewBox="0 0 130 130">
-        <circle class="ring-track" cx="65" cy="65" r="54"/>
-        <circle class="ring-fill" id="ring-fill" cx="65" cy="65" r="54"/>
-      </svg>
-      <div class="ring-center">
-        <div class="ring-count" id="ring-count">0</div>
-        <div class="ring-label">/ 100</div>
-      </div>
-    </div>
-
-    <div class="target-wrap">
-      <div id="countdown-overlay"></div>
-      <div id="target-char">READY</div>
-      <div id="guide-message">スペースキーで開始！</div>
-    </div>
-  </div>
-
-  <div id="keyboard"></div>
-</div>
-
-<!-- ─── COMPLETION DIALOG ─── -->
-<div class="dialog-overlay" id="dialog-overlay">
-  <div class="dialog">
-    <div class="dialog-icon">🎉</div>
-    <div class="dialog-title">100回 達成！</div>
-    <div class="dialog-body">お疲れさまでした！<br>もう一度練習しますか？</div>
-    <div class="dialog-btns">
-      <button class="dialog-btn" onclick="goBackFromDialog()">終わる</button>
-      <button class="dialog-btn primary" onclick="restartPractice()">もう一度！</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playTypeSound() {
-  const t = audioCtx.currentTime;
-  // ノイズバースト（キーの打鍵感）
-  const bufSize = audioCtx.sampleRate * 0.04;
-  const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1);
-  const noise = audioCtx.createBufferSource();
-  noise.buffer = buf;
-  const hp = audioCtx.createBiquadFilter();
-  hp.type = 'highpass'; hp.frequency.value = 1800;
-  const ng = audioCtx.createGain();
-  ng.gain.setValueAtTime(0.18, t);
-  ng.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
-  noise.connect(hp); hp.connect(ng); ng.connect(audioCtx.destination);
-  noise.start(t); noise.stop(t + 0.04);
-  // 低いクリック音（底打ち感）
-  const o = audioCtx.createOscillator(), og = audioCtx.createGain();
-  o.type = 'sine'; o.frequency.setValueAtTime(180, t);
-  o.frequency.exponentialRampToValueAtTime(60, t + 0.025);
-  og.gain.setValueAtTime(0.12, t);
-  og.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
-  o.connect(og); og.connect(audioCtx.destination);
-  o.start(t); o.stop(t + 0.03);
-}
-function playErrorSound() {
-  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-  o.type='sawtooth'; o.frequency.setValueAtTime(110, audioCtx.currentTime);
-  g.gain.setValueAtTime(0.04, audioCtx.currentTime);
-  g.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime+0.18);
-  o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.18);
-}
-function playCompleteSound() {
-  [440,554,659,880].forEach((f,i) => {
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    const t = audioCtx.currentTime + i*0.1;
-    o.type='sine'; o.frequency.setValueAtTime(f,t);
-    g.gain.setValueAtTime(0.06,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
-    o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t+0.4);
-  });
-}
-
-const allKeysInfo = {
-  'a':{f:'左手 小指',c:'f-lp',home:'a'},'s':{f:'左手 薬指',c:'f-lr',home:'s'},
-  'd':{f:'左手 中指',c:'f-lm',home:'d'},'f':{f:'左手 人差し指',c:'f-li',home:'f'},
-  'j':{f:'右手 人差し指',c:'f-ri',home:'j'},'k':{f:'右手 中指',c:'f-rm',home:'k'},
-  'l':{f:'右手 薬指',c:'f-rr',home:'l'},';':{f:'右手 小指',c:'f-rp',home:';'},
-  'g':{f:'左手 人差し指',c:'f-li',home:'f'},'t':{f:'左手 人差し指',c:'f-li',home:'f'},
-  'r':{f:'左手 人差し指',c:'f-li',home:'f'},'b':{f:'左手 人差し指',c:'f-li',home:'f'},
-  'v':{f:'左手 人差し指',c:'f-li',home:'f'},
-  'h':{f:'右手 人差し指',c:'f-ri',home:'j'},'y':{f:'右手 人差し指',c:'f-ri',home:'j'},
-  'u':{f:'右手 人差し指',c:'f-ri',home:'j'},'n':{f:'右手 人差し指',c:'f-ri',home:'j'},
-  'm':{f:'右手 人差し指',c:'f-ri',home:'j'},
-  'e':{f:'左手 中指',c:'f-lm',home:'d'},'c':{f:'左手 中指',c:'f-lm',home:'d'},
-  'i':{f:'右手 中指',c:'f-rm',home:'k'},',':{f:'右手 中指',c:'f-rm',home:'k'},
-  'w':{f:'左手 薬指',c:'f-lr',home:'s'},'x':{f:'左手 薬指',c:'f-lr',home:'s'},
-  'o':{f:'右手 薬指',c:'f-rr',home:'l'},'.':{f:'右手 薬指',c:'f-rr',home:'l'},
-  'q':{f:'左手 小指',c:'f-lp',home:'a'},'z':{f:'左手 小指',c:'f-lp',home:'a'},
-  'p':{f:'右手 小指',c:'f-rp',home:';'},'/':{f:'右手 小指',c:'f-rp',home:';'}
-};
-const basicHome = ['a','s','d','f','j','k','l',';'];
-const sets = {
-  'basic':       { title:'🏠 基本ホームポジション',   keys:[...basicHome] },
-  'left_index':  { title:'👈 基礎 ＋ 左手人差し指',  keys:[...basicHome,'g','t','r','b','v'] },
-  'right_index': { title:'👉 基礎 ＋ 右手人差し指',  keys:[...basicHome,'h','y','u','n','m'] },
-  'left_middle': { title:'👈 基礎 ＋ 左手中指',      keys:[...basicHome,'e','c'] },
-  'right_middle':{ title:'👉 基礎 ＋ 右手中指',      keys:[...basicHome,'i',','] },
-  'left_ring':   { title:'👈 基礎 ＋ 左手薬指',      keys:[...basicHome,'w','x'] },
-  'right_ring':  { title:'👉 基礎 ＋ 右手薬指',      keys:[...basicHome,'o','.'] },
-  'left_pinky':  { title:'👈 基礎 ＋ 左手小指',      keys:[...basicHome,'q','z'] },
-  'right_pinky': { title:'👉 基礎 ＋ 右手小指',      keys:[...basicHome,'p','/'] }
-};
-
-// State
-let currentSet='basic', playMode='practice', currentTarget='',
-    score=0, timeLeft=30, timerInterval=null,
-    isPlaying=false, isCountingDown=false, practiceState=0,
-    practiceCount=0;
-
-const PRACTICE_GOAL = 100;
-const CIRCUMFERENCE = 2 * Math.PI * 54; // ≈339.29
-
-// ─── RING GAUGE ───
-function updateRing(n) {
-  const pct = Math.min(n / PRACTICE_GOAL, 1);
-  const offset = CIRCUMFERENCE * (1 - pct);
-  const fill = document.getElementById('ring-fill');
-  fill.style.strokeDashoffset = offset;
-  // Color shift: amber → green at 100
-  fill.style.stroke = pct >= 1 ? 'var(--green)' : 'var(--amber)';
-  fill.style.filter = pct >= 1 ? 'drop-shadow(0 0 6px var(--green))' : 'drop-shadow(0 0 4px var(--amber))';
-  document.getElementById('ring-count').textContent = n;
-}
-
-// ─── KEYBOARD ───
-function keyId(c) {
-  const map={';':'Semicolon',',':'Comma','.':'Period','/':'Slash'};
-  return 'key-'+(map[c]||c.toUpperCase());
-}
-function renderKeyboard() {
-  const kb=document.getElementById('keyboard'); kb.innerHTML='';
-  const targetKeys=sets[currentSet].keys;
-  const layout=[
-    {c:'row-top',    k:['Q','W','E','R','T','Y','U','I','O','P']},
-    {c:'row-middle', k:['A','S','D','F','G','H','J','K','L',';']},
-    {c:'row-bottom', k:['Z','X','C','V','B','N','M',',','.','/']}
-  ];
-  layout.forEach(row=>{
-    const div=document.createElement('div'); div.className='row '+row.c;
-    row.k.forEach(key=>{
-      const cl=key.toLowerCase();
-      const d=document.createElement('div');
-      d.id=keyId(cl);
-      d.className='key'+(basicHome.includes(cl)?' basic-home':'')+(targetKeys.includes(cl)?'':' dummy');
-      d.innerText=key; div.appendChild(d);
-    });
-    kb.appendChild(div);
-  });
-}
-
-// ─── INIT ───
-function initGame(s) {
-  if(audioCtx.state==='suspended') audioCtx.resume();
-  currentSet=s;
-  document.getElementById('home-screen').style.display='none';
-  document.getElementById('game-screen').style.display='block';
-  document.getElementById('current-set-title').innerText=sets[s].title;
-  renderKeyboard();
-  setPlayMode('practice');
-}
-
-function showHome() { clearInterval(timerInterval); resetGame(); document.getElementById('home-screen').style.display='block'; document.getElementById('game-screen').style.display='none'; }
-function goBackFromDialog() {
-  // 「終わる」= ゲーム画面に戻る（セット選択はそのまま）
-  hideDialog();
-  resetGame();
-}
-
-function setPlayMode(m) {
-  playMode=m;
-  document.getElementById('btn-practice').classList.toggle('active', m==='practice');
-  document.getElementById('btn-game').classList.toggle('active', m==='game');
-  const isGame=m==='game';
-  document.getElementById('gauge-container').style.display=isGame?'block':'none';
-  document.getElementById('info-row').style.visibility=isGame?'visible':'hidden';
-  document.getElementById('ring-wrap').style.display=isGame?'none':'flex';
-  resetGame();
-}
-
-function resetGame() {
-  clearInterval(timerInterval); timerInterval=null;
-  isPlaying=false; isCountingDown=false; score=0; timeLeft=30;
-  currentTarget=''; practiceState=0; practiceCount=0;
-  document.getElementById('target-char').innerText='READY';
-  document.getElementById('target-char').style.opacity='1';
-  document.getElementById('countdown-overlay').style.display='none';
-  document.getElementById('guide-message').innerText='スペースキーで開始！';
-  updateRing(0);
-  updateGameUI();
-  document.querySelectorAll('.key').forEach(k=>k.classList.remove('highlight','correct','wrong'));
-}
-
-function updateGameUI() {
-  document.getElementById('timer-val').textContent=Math.max(0,timeLeft);
-  document.getElementById('score-val').textContent=score;
-  const pct=Math.min(100,(score/100)*100);
-  document.getElementById('gauge-bar').style.width=(playMode==='game'?pct:0)+'%';
-}
-
-// ─── TARGETS ───
-function nextTarget() {
-  if(!isPlaying) return;
-  document.querySelectorAll('.key').forEach(k=>k.classList.remove('highlight','correct','wrong'));
-  const tKeys=sets[currentSet].keys;
-  const extraKeys=tKeys.filter(k=>!basicHome.includes(k));
-
-  if(playMode==='practice' && extraKeys.length>0) {
-    if(practiceState===0)      { currentTarget=basicHome[Math.floor(Math.random()*basicHome.length)]; practiceState=1; }
-    else if(practiceState===1) { currentTarget=extraKeys[Math.floor(Math.random()*extraKeys.length)]; practiceState=2; }
-    else                       { currentTarget=allKeysInfo[currentTarget].home; practiceState=0; }
-  } else {
-    currentTarget=tKeys[Math.floor(Math.random()*tKeys.length)];
-  }
-
-  document.getElementById('target-char').innerText=currentTarget.toUpperCase();
-  const info=allKeysInfo[currentTarget];
-  document.getElementById('guide-message').innerHTML=`指: <span class="${info.c}">${info.f}</span>`;
-  const el=document.getElementById(keyId(currentTarget)); if(el) el.classList.add('highlight');
-}
-
-// ─── START / TIMER ───
-function startGameFlow() {
-  if(isCountingDown||isPlaying) return;
-  if(playMode==='game') {
-    isCountingDown=true; score=0; timeLeft=30;
-    let count=3;
-    document.getElementById('target-char').style.opacity='0.15';
-    const ov=document.getElementById('countdown-overlay'); ov.style.display='block'; ov.innerText=count;
-    const itv=setInterval(()=>{
-      count--;
-      if(count>0) ov.innerText=count;
-      else {
-        clearInterval(itv); ov.style.display='none';
-        document.getElementById('target-char').style.opacity='1';
-        isCountingDown=false; isPlaying=true; startTimer(); nextTarget();
-      }
-    },800);
-  } else {
-    isPlaying=true; nextTarget();
-  }
-}
-
-function startTimer() {
-  if(timerInterval) clearInterval(timerInterval);
-  timerInterval=setInterval(()=>{
-    timeLeft--;
-    if(timeLeft<=0) { timeLeft=0; updateGameUI(); endGame(); }
-    else updateGameUI();
-  },1000);
-}
-
-function endGame() {
-  isPlaying=false;
-  clearInterval(timerInterval); timerInterval=null;
-  currentTarget='';
-  document.getElementById('target-char').innerText='終了！';
-  document.getElementById('guide-message').innerHTML=`最終スコア: <strong style="color:var(--amber)">${score}</strong> &nbsp;[スペース]でもう一度`;
-  document.querySelectorAll('.highlight').forEach(k=>k.classList.remove('highlight'));
-}
-
-// ─── COMPLETION DIALOG ───
-function showDialog() {
-  document.getElementById('dialog-overlay').classList.add('show');
-}
-function hideDialog() {
-  document.getElementById('dialog-overlay').classList.remove('show');
-}
-function restartPractice() {
-  hideDialog();
-  practiceCount=0;
-  updateRing(0);
-  isPlaying=true;
-  practiceState=0;
-  nextTarget();
-}
-
-// ─── KEY INPUT ───
-window.addEventListener('keydown', e=>{
-  // ダイアログ表示中のキー操作
-  const dialogOpen = document.getElementById('dialog-overlay').classList.contains('show');
-  if (dialogOpen) {
-    if (e.key === 'Enter') { e.preventDefault(); restartPractice(); }
-    if (e.key === 'Escape') { e.preventDefault(); goBackFromDialog(); }
-    return;
-  }
-
-  if(e.code==='Space') {
-    e.preventDefault();
-    if(!isCountingDown&&!isPlaying) startGameFlow();
-    return;
-  }
-  if(!isPlaying||timeLeft<=0) return;
-  const pk=e.key.toLowerCase();
-
-  if(pk===currentTarget) {
-    playTypeSound();
-    if(playMode==='game') score+=2;
-
-    const el=document.getElementById(keyId(currentTarget));
-    if(el) el.classList.add('correct');
-
-    // Practice ring
-    if(playMode==='practice') {
-      practiceCount++;
-      updateRing(practiceCount);
-      if(practiceCount>=PRACTICE_GOAL) {
-        // Complete!
-        isPlaying=false;
-        playCompleteSound();
-        document.getElementById('target-char').innerText='🎉';
-        document.getElementById('guide-message').innerText='';
-        document.querySelectorAll('.highlight').forEach(k=>k.classList.remove('highlight'));
-        setTimeout(showDialog, 600);
-        return;
-      }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVCのアプリ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --surface: #161a23;
+      --border: #252b38;
+      --accent: #4f8ef7;
+      --accent2: #e05c5c;
+      --text: #e8ecf5;
+      --muted: #7a859a;
+      --card-hover: #1e2535;
     }
 
-    setTimeout(()=>{ if(isPlaying) nextTarget(); },100);
-  } else if(pk.length===1) {
-    playErrorSound();
-    if(playMode==='game') score=Math.max(0,score-5);
-    const el=document.getElementById(keyId(currentTarget));
-    if(el){ el.classList.add('wrong'); setTimeout(()=>el.classList.remove('wrong'),200); }
-  }
-  updateGameUI();
-});
-</script>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans JP', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 背景グリッド装飾 */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    /* ヘッダー */
+    header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .header-label {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 4px 14px;
+      border-radius: 2px;
+      margin-bottom: 20px;
+      animation: fadeDown 0.5s ease both;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', 'Noto Sans JP', sans-serif;
+      font-size: clamp(52px, 10vw, 96px);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, #e8ecf5 30%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeDown 0.5s 0.1s ease both;
+    }
+
+    .subtitle {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      animation: fadeDown 0.5s 0.2s ease both;
+    }
+
+    /* アクセントライン */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 48px 0 40px;
+      animation: fadeIn 0.6s 0.3s ease both;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border));
+    }
+    .divider::after {
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+    .divider-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+    }
+
+    /* ボタングリッド */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    /* ボタンカード */
+    .app-btn {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 22px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      animation: fadeUp 0.4s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ホバー時の光彩 */
+    .app-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .app-btn:hover {
+      background: var(--card-hover);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .app-btn:hover::after {
+      opacity: 0.07;
+    }
+    .app-btn:active {
+      transform: translateY(0);
+    }
+
+    /* アニメーション遅延（1〜10番） */
+    .app-btn:nth-child(1)  { animation-delay: 0.10s; }
+    .app-btn:nth-child(2)  { animation-delay: 0.15s; }
+    .app-btn:nth-child(3)  { animation-delay: 0.20s; }
+    .app-btn:nth-child(4)  { animation-delay: 0.25s; }
+    .app-btn:nth-child(5)  { animation-delay: 0.30s; }
+    .app-btn:nth-child(6)  { animation-delay: 0.35s; }
+    .app-btn:nth-child(7)  { animation-delay: 0.40s; }
+    .app-btn:nth-child(8)  { animation-delay: 0.45s; }
+    .app-btn:nth-child(9)  { animation-delay: 0.50s; }
+    .app-btn:nth-child(10) { animation-delay: 0.55s; }
+
+    .btn-number {
+      font-family: 'Bebas Neue', monospace;
+      font-size: 22px;
+      color: var(--accent);
+      min-width: 28px;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+      position: relative;
+      z-index: 1;
+    }
+    .app-btn:hover .btn-number {
+      opacity: 1;
+    }
+
+    .btn-text {
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+    .btn-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .btn-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-arrow {
+      color: var(--muted);
+      font-size: 18px;
+      transition: color 0.2s, transform 0.2s;
+      position: relative;
+      z-index: 1;
+    }
+    .app-btn:hover .btn-arrow {
+      color: var(--accent);
+      transform: translateX(4px);
+    }
+
+    /* フッター */
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      animation: fadeIn 0.6s 0.8s ease both;
+    }
+
+    /* アニメーション */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 520px) {
+      .container {
+        padding: 40px 16px 60px;
+      }
+      header {
+        margin-bottom: 40px;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .app-btn {
+        padding: 16px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <div class="header-label">Learning Apps</div>
+      <h1>AVCのアプリ</h1>
+      <p class="subtitle">学習用アプリ一覧 — アプリを選んでください</p>
+    </header>
+
+    <div class="divider"><span class="divider-dot"></span></div>
+
+    <!-- ===== ボタン一覧 =====
+         href="..." の部分に各アプリのURLを入れてください。
+         btn-title: ボタンに表示するアプリ名
+         btn-desc:  ボタンに表示する説明文（任意）
+    ============================= -->
+    <div class="grid">
+
+      <!-- ボタン 1 -->
+      <a class="app-btn" href="★ここにアプリ1のURLを入れてください★">
+        <span class="btn-number">01</span>
+        <span class="btn-text">
+          <span class="btn-title">アプリ名1</span>
+          <span class="btn-desc">説明文を入れてください</span>
+        </span>
+        <span class="btn-arrow">→</span>
+      </a>
+
+      <!-- ボタン 2 -->
+      <a class="app-btn" href="★ここにアプリ2のURLを入れてください★">
+        <span class="btn-number">02</span>
+        <span class="btn-text">
+          <span class="btn-title">アプリ名2</span>
+          <span class="btn-desc">説明文を入れてください</span>
+        </span>
+        <span class="btn-arrow">→</span>
+      </a>
+
+      <!-- ボタン 3 -->
+      <a class="app-btn" href="★ここにアプリ3のURLを入れてください★">
+        <span class="btn-number">03</span>
+        <span class="btn-text">
+          <span class="btn-title">アプリ名3</span>
+          <span class="btn-desc">説明文を入れてください</span>
+        </span>
+        <span class="btn-arrow">→</span>
+      </a>
+
+      <!-- ボタン 4 -->
+      <a class="app-btn" href="★ここにアプリ4のURLを入れてください★">
+        <span class="btn-number">04</span>
+        <span class="btn-text">
+          <span class="btn-title">アプリ名4</span>
+          <span class="btn-desc">説明文を入れてください</span>
+        </span>
+        <span class="btn-arrow">→</span>
+      </a>
+
+      <!-- ボタン 5 -->
+      <a class="app-btn" href="★ここにアプリ5のURLを入れてください★">
+        <span class="btn-number">05</span>
+        <span class="btn-text">
+          <span class="btn-title">アプリ名5</span>
+          <span class="btn-desc">説明文を入れてください</span>
+        </span>
+        <span class="btn-arrow">→</span>
+      </a>
+
+      <!-- ボタン 6 -->
+      <a class="app-btn" href="★ここにアプリ6のURLを入れてください★">
+        <span class="btn-number">06</span>
+        <span class="btn-text">
+          <span class="btn-title">アプリ名6</span>
+          <span class="btn-desc">説明文を入れてください</span>
+        </span>
+        <span class="btn-arrow">→</span>
+      </a>
+
+      <!-- ボタン 7 -->
+      <a class="app-btn" href="★ここにアプリ7のURLを入れてください★">
+        <span class="btn-number">07</span>
+        <span class="btn-text">
+          <span class="btn-title">アプリ名7</span>
+          <span class="btn-desc">説明文を入れてください</span>
+        </span>
+        <span class="btn-arrow">→</span>
+      </a>
+
+      <!-- ボタン 8 -->
+      <a class="app-btn" href="★ここにアプリ8のURLを入れてください★">
+        <span class="btn-number">08</span>
+        <span class="btn-text">
+          <span class="btn-title">アプリ名8</span>
+          <span class="btn-desc">説明文を入れてください</span>
+        </span>
+        <span class="btn-arrow">→</span>
+      </a>
+
+      <!-- ボタン 9 -->
+      <a class="app-btn" href="★ここにアプリ9のURLを入れてください★">
+        <span class="btn-number">09</span>
+        <span class="btn-text">
+          <span class="btn-title">アプリ名9</span>
+          <span class="btn-desc">説明文を入れてください</span>
+        </span>
+        <span class="btn-arrow">→</span>
+      </a>
+
+      <!-- ボタン 10 -->
+      <a class="app-btn" href="★ここにアプリ10のURLを入れてください★">
+        <span class="btn-number">10</span>
+        <span class="btn-text">
+          <span class="btn-title">アプリ名10</span>
+          <span class="btn-desc">説明文を入れてください</span>
+        </span>
+        <span class="btn-arrow">→</span>
+      </a>
+
+    </div>
+    <!-- ===== ボタン一覧 ここまで ===== -->
+
+    <footer>
+      &copy; AVC — Learning Apps Portal
+    </footer>
+
+  </div>
 </body>
 </html>
