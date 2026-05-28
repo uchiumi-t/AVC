@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>受動態・瞬間英作文 Pro (Expanded)</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -68,6 +69,44 @@
   .btn-start { padding: 20px 60px; border-radius: 15px; border: none; background: var(--btn-primary); color: #fff; font-weight: 700; cursor: pointer; font-size: 1.2rem; margin-top: 20px; }
 
   .drill-hint { font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--text-dim); margin-top: 6vh; letter-spacing: 2px; opacity: 0.6; }
+
+  /* ── Mobile / Touch ── */
+  #jp-text, #en-text {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  /* スワイプヒント */
+  #swipe-hint {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    opacity: 0; pointer-events: none; transition: opacity .4s; z-index: 20;
+  }
+  #swipe-hint.show { opacity: 1; }
+  .hint-arrow {
+    width: 28px; height: 28px;
+    border-left: 2px solid var(--text-dim); border-top: 2px solid var(--text-dim);
+    transform: rotate(225deg);
+    animation: swipe-bounce .9s ease-in-out infinite;
+  }
+  .hint-label { font-family: 'JetBrains Mono'; font-size: .65rem; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
+  @keyframes swipe-bounce { 0%,100%{transform:rotate(225deg) translateY(0)} 50%{transform:rotate(225deg) translateY(-6px)} }
+
+  /* スマホ向けレイアウト */
+  @media (max-width: 600px) {
+    body { overflow: auto; height: auto; min-height: 100vh; }
+    .inner-settings { padding: 20px 16px; }
+    h1 { font-size: 2.8rem !important; }
+    .check-pill label { padding: 10px 18px; font-size: .9rem; }
+    .btn-start { padding: 16px 40px; font-size: 1rem; }
+    #hud-sw { top: 12px; left: 14px; }
+    #sw-time { font-size: 1rem; }
+    #hud-counter { bottom: 14px; right: 16px; }
+    #counter-num { font-size: 2.5rem; }
+    #hud-fs { top: 12px; right: 14px; }
+    .drill-hint { font-size: .68rem; margin-top: 3vh; }
+  }
 </style>
 </head>
 <body>
@@ -107,12 +146,13 @@
 </div>
 
 <div id="page-drill" class="page hidden">
+  <div id="swipe-hint"><div class="hint-arrow"></div><div class="hint-label">Swipe up</div></div>
   <div id="drill-inner">
     <div id="mode-display" style="font-family:'JetBrains Mono'; font-size:1rem; color:var(--accent2); margin-bottom:15px;"></div>
     <div id="jp-text">LOADING...</div>
     <div class="divider"></div>
     <div id="en-text">ANSWER</div>
-    <div class="drill-hint">[ ENTER ] SHOW / NEXT</div>
+    <div class="drill-hint" id="drill-hint-text">[ ENTER ] or タップ &nbsp;/&nbsp; SHOW → NEXT</div>
     <button onclick="location.reload()" style="background:none; border:none; color:var(--text-dim); cursor:pointer; text-decoration:underline; margin-top:40px; font-size:0.9rem;">QUIT</button>
   </div>
 </div>
@@ -315,6 +355,72 @@ function toggleFullscreen() {
 window.addEventListener('resize', () => setTimeout(fitText, 50));
 document.addEventListener('fullscreenchange', () => setTimeout(fitText, 50));
 window.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleEnter(); });
+
+// ══ Touch / Click support ══
+(function() {
+  var drillInner = document.getElementById('drill-inner');
+  var swHint = document.getElementById('swipe-hint');
+  var startY = 0, startX = 0;
+  var SWIPE_THRESHOLD = 40;
+  var isTouchDevice = false;
+  var hintShown = false;
+
+  function isOnDrillPage() {
+    return !document.getElementById('page-drill').classList.contains('hidden');
+  }
+
+  // クリック（PCでテキスト部分クリックでも進める）
+  drillInner.addEventListener('click', function(e) {
+    if (!isOnDrillPage()) return;
+    if (e.target.closest('button')) return;
+    handleEnter();
+  });
+
+  // タッチ開始
+  drillInner.addEventListener('touchstart', function(e) {
+    if (e.target.closest('button')) return;
+    isTouchDevice = true;
+    startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+
+  // タッチ終了 → スワイプ or タップ判定
+  drillInner.addEventListener('touchend', function(e) {
+    if (!isOnDrillPage()) return;
+    if (e.target.closest('button')) return;
+    var dy = startY - e.changedTouches[0].clientY;
+    var dx = Math.abs(startX - e.changedTouches[0].clientX);
+    if (Math.abs(dy) > SWIPE_THRESHOLD && Math.abs(dy) > dx) {
+      handleEnter();
+    } else if (Math.abs(dy) < 15 && dx < 15) {
+      handleEnter();
+    }
+  }, { passive: true });
+
+  // スワイプヒント（初回のみ）
+  function showSwipeHint() {
+    if (hintShown || !isTouchDevice) return;
+    hintShown = true;
+    swHint.classList.add('show');
+    setTimeout(function() { swHint.classList.remove('show'); }, 2200);
+  }
+
+  // start() 後にヒント表示するため makeQuestion をラップ
+  var origMakeQuestion = window.makeQuestion || makeQuestion;
+  // start関数の後でmakeQuestionが呼ばれるので、startをラップ
+  var origStart = window.start;
+  window.start = function() {
+    origStart();
+    setTimeout(function() { if (!hintShown) showSwipeHint(); }, 800);
+  };
+
+  // タッチデバイス判定後にヒント文言を切り替え
+  drillInner.addEventListener('touchstart', function() {
+    var hint = document.getElementById('drill-hint-text');
+    if (hint) hint.textContent = 'タップ or スワイプ で回答表示 / もう一度で次の問題';
+  }, { once: true, passive: true });
+})();
+
 </script>
 </body>
 </html>
