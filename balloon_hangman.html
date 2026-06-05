@@ -80,15 +80,2406 @@ html,body{width:100%;height:100%;background:#0d0d1f;display:flex;align-items:cen
 
 <script>
 const WORDS = [
-  {no:1001,group:"話す",word:"mention",meaning:"〜について言及する",exEn:"You had better not mention it.",exJa:"それには触れないほうがいい．"},
-  {no:1002,group:"話す",word:"refer",meaning:"（〜に）言及する / （〜を）示す",exEn:"refer to my childhood",exJa:"私の子どもの頃について触れる"},
-  {no:1003,group:"話す",word:"remark",meaning:"〜と発言する / 発言",exEn:"remark that the pot is very old",exJa:"そのつぼはとても古いものだと言う"},
-  {no:1004,group:"話す",word:"whisper",meaning:"ささやき声 / ささやく",exEn:"talk in a whisper",exJa:"小声で話す"},
-  {no:1005,group:"答える・反応する",word:"react",meaning:"（〜に）反応する",exEn:"react angrily to the news",exJa:"その知らせに怒りの反応を示す"},
-  {no:1006,group:"答える・反応する",word:"reply",meaning:"（〜に）返事をする / 返事",exEn:"reply to his email",exJa:"彼のEメールに返事をする"},
-  {no:1007,group:"答える・反応する",word:"respond",meaning:"返答する / 対応する",exEn:"respond to questions",exJa:"質問に回答する"},
-  {no:1008,group:"提案・提出・採用・交渉",word:"propose",meaning:"〜を提案する",exEn:"propose a new project",exJa:"新しい計画を提案する"},
-  {no:1009,group:"提案・提出・採用・交渉",word:"submit",meaning:"〜を提出する / 服従する",exEn:"submit my homework",exJa:"宿題を提出する"},
+  {
+    "no": 701,
+    "group": "生物・植物",
+    "word": "fish",
+    "meaning": "[名] 1魚〈可算〉 2魚肉〈不可算〉",
+    "exEn": "\"1 catch ten fish 2 eat fish for dinner\"",
+    "exJa": "\"1 魚を10匹釣る(捕る) 2 夕食に魚を食べる\""
+  },
+  {
+    "no": 702,
+    "group": "生物・植物",
+    "word": "insect",
+    "meaning": "[名] 昆虫",
+    "exEn": "I had an insect bite.",
+    "exJa": "虫に刺された."
+  },
+  {
+    "no": 703,
+    "group": "生物・植物",
+    "word": "plant",
+    "meaning": "[名] 1植物 2(大規模な)工場 [他] 3〜を植える",
+    "exEn": "\"1 water a plant 2 a chemical plant 3 plant a cherry tree in the schoolyard\"",
+    "exJa": "\"1 植物に水をやる 2 化学工場 3 校庭に桜の木を植える\""
+  },
+  {
+    "no": 704,
+    "group": "生物・植物",
+    "word": "seed",
+    "meaning": "[名] 種",
+    "exEn": "sow sunflower seeds",
+    "exJa": "ひまわりの種をまく"
+  },
+  {
+    "no": 705,
+    "group": "生物・植物",
+    "word": "harvest",
+    "meaning": "[名] 収穫",
+    "exEn": "during the harvest season",
+    "exJa": "収穫期に"
+  },
+  {
+    "no": 706,
+    "group": "生物・植物",
+    "word": "crop",
+    "meaning": "[名] 1作物 2収穫(高)",
+    "exEn": "\"1 the main crop of Idaho 2 this area's rice crop\"",
+    "exJa": "\"1 アイダホ州の主要な農産物 2 この地域の米の収穫(高)\""
+  },
+  {
+    "no": 707,
+    "group": "自然・環境",
+    "word": "nature",
+    "meaning": "[名] 1(無冠詞)自然 2(しばしばthe − of 〜)(〜の)性質,本質",
+    "exEn": "\"1 live together with nature 2 the true nature of the problem\"",
+    "exJa": "\"1 自然と共存する 2 その問題の本質\""
+  },
+  {
+    "no": 708,
+    "group": "自然・環境",
+    "word": "environment",
+    "meaning": "[名] 環境",
+    "exEn": "protect the environment",
+    "exJa": "環境を守る"
+  },
+  {
+    "no": 709,
+    "group": "自然・環境",
+    "word": "ground",
+    "meaning": "[名] 1地面 2根拠,理由",
+    "exEn": "\"1 snow on the ground 2 on the grounds that he is young\"",
+    "exJa": "\"1 地面の(上の)雪 2 彼は若いという理由で\""
+  },
+  {
+    "no": 710,
+    "group": "自然・環境",
+    "word": "wave",
+    "meaning": "[名] 1波〈可算〉 [自] 2手を振る",
+    "exEn": "\"1 hear the sound of waves 2 wave to my host family\"",
+    "exJa": "\"1 波の音が聞こえる 2 ホストファミリーに手を振る\""
+  },
+  {
+    "no": 711,
+    "group": "自然・環境",
+    "word": "earthquake",
+    "meaning": "[名] 地震〈可算〉",
+    "exEn": "There was an earthquake last week.",
+    "exJa": "先週,地震が起きた."
+  },
+  {
+    "no": 712,
+    "group": "自然・環境",
+    "word": "disaster",
+    "meaning": "[名] 災害",
+    "exEn": "natural disasters in Japan",
+    "exJa": "日本の自然災害"
+  },
+  {
+    "no": 713,
+    "group": "自然・環境",
+    "word": "planet",
+    "meaning": "[名] 惑星",
+    "exEn": "Mars is a planet.",
+    "exJa": "火星は惑星だ."
+  },
+  {
+    "no": 714,
+    "group": "自然・環境",
+    "word": "solar",
+    "meaning": "[形] 太陽の",
+    "exEn": "solar panels on the roof",
+    "exJa": "屋根の上のソーラーパネル"
+  },
+  {
+    "no": 715,
+    "group": "自然・環境",
+    "word": "preserve",
+    "meaning": "[他] (自然など)を保護する,(食料など)を保存する",
+    "exEn": "preserve the panda's natural habitat",
+    "exJa": "パンダの自然生息地を保護する"
+  },
+  {
+    "no": 716,
+    "group": "自然・環境",
+    "word": "pollution",
+    "meaning": "[名] 汚染,公害〈不可算〉",
+    "exEn": "prevent air pollution",
+    "exJa": "大気汚染を食い止める"
+  },
+  {
+    "no": 717,
+    "group": "自然・環境",
+    "word": "extinct",
+    "meaning": "[形] 絶滅した",
+    "exEn": "Giraffes are becoming extinct.",
+    "exJa": "キリンは絶滅しかかっている."
+  },
+  {
+    "no": 718,
+    "group": "自然の現象",
+    "word": "freeze",
+    "meaning": "[自] 1凍る [他] 2〜を凍らせる",
+    "exEn": "\"1 The pond froze over. 2 freeze bananas in the freezer\"",
+    "exJa": "\"1 池が一面凍った. 2 冷凍庫でバナナを凍らせる\""
+  },
+  {
+    "no": 719,
+    "group": "自然の現象",
+    "word": "burn",
+    "meaning": "[自] 1焼ける [他] 2〜を燃やす",
+    "exEn": "\"1 The barn burned down. 2 burn fallen leaves in the yard\"",
+    "exJa": "\"1 その納屋が焼け落ちた. 2 庭で落ち葉を燃やす\""
+  },
+  {
+    "no": 720,
+    "group": "自然の現象",
+    "word": "reflect",
+    "meaning": "[他] 1〜を反射する,反映する [自] 2(on 〜)(〜を)熟考する",
+    "exEn": "\"1 reflect heat 2 reflect on my past\"",
+    "exJa": "\"1 熱を反射する 2 私の過去を振り返る\""
+  },
+  {
+    "no": 721,
+    "group": "天気・気候",
+    "word": "weather",
+    "meaning": "[名] 天候,天気〈不可算〉",
+    "exEn": "The weather is good.",
+    "exJa": "天気が良い."
+  },
+  {
+    "no": 722,
+    "group": "天気・気候",
+    "word": "climate",
+    "meaning": "[名] 気候〈可算〉",
+    "exEn": "a mild climate",
+    "exJa": "温暖な気候"
+  },
+  {
+    "no": 723,
+    "group": "天気・気候",
+    "word": "forecast",
+    "meaning": "[名] 予報",
+    "exEn": "The forecast is for showers.",
+    "exJa": "予報ではにわか雨だ."
+  },
+  {
+    "no": 724,
+    "group": "天気・気候",
+    "word": "temperature",
+    "meaning": "[名] 温度",
+    "exEn": "The temperature went up to 40°C.",
+    "exJa": "気温が40度まで上がった."
+  },
+  {
+    "no": 725,
+    "group": "天気・気候",
+    "word": "degree",
+    "meaning": "[名] 1(温度などの)度 2程度",
+    "exEn": "\"1 freeze at zero degrees[×degree] 2 speak French to some degree\"",
+    "exJa": "\"1 0度で凍る 2 ある程度フランス語を話す\""
+  },
+  {
+    "no": 726,
+    "group": "天気・気候",
+    "word": "rain",
+    "meaning": "[自] 1雨が降る [名] 2雨",
+    "exEn": "\"1 It is raining. 2 weep in the rain\"",
+    "exJa": "\"1 雨が降っている. 2 雨の中で泣く\""
+  },
+  {
+    "no": 727,
+    "group": "天気・気候",
+    "word": "humid",
+    "meaning": "[形] 湿気が多い",
+    "exEn": "Kyoto is hot and humid in summer.",
+    "exJa": "京都は夏は蒸し暑い."
+  },
+  {
+    "no": 728,
+    "group": "科学・技術",
+    "word": "science",
+    "meaning": "[名] 科学,理科",
+    "exEn": "I am good at math and science.",
+    "exJa": "算数と理科が得意だ."
+  },
+  {
+    "no": 729,
+    "group": "科学・技術",
+    "word": "technology",
+    "meaning": "[名] (科学)技術",
+    "exEn": "science and technology",
+    "exJa": "科学技術(科学と科学技術)"
+  },
+  {
+    "no": 730,
+    "group": "科学・技術",
+    "word": "research",
+    "meaning": "[名] 1(学術)研究 [他] 2〜を研究する",
+    "exEn": "\"1 do research on clouds 2 research an environmental issue\"",
+    "exJa": "\"1 雲に関する研究を行う 2 環境問題を研究する\""
+  },
+  {
+    "no": 731,
+    "group": "科学・技術",
+    "word": "theory",
+    "meaning": "[名] 理論",
+    "exEn": "Your design is excellent in theory.",
+    "exJa": "あなたの設計は理論上はすばらしい."
+  },
+  {
+    "no": 732,
+    "group": "科学・技術",
+    "word": "experiment",
+    "meaning": "[名] 1実験 [自] 2実験する",
+    "exEn": "\"1 carry out a chemical experiment 2 experiment with a new medicine\"",
+    "exJa": "\"1 化学の実験をする 2 新薬で実験する\""
+  },
+  {
+    "no": 733,
+    "group": "科学・技術",
+    "word": "material",
+    "meaning": "[名] 1材料 2資料,教材",
+    "exEn": "\"1 building materials 2 use movies as teaching materials\"",
+    "exJa": "\"1 建材(建築材料) 2 映画を教材として使う\""
+  },
+  {
+    "no": 734,
+    "group": "科学・技術",
+    "word": "ingredient",
+    "meaning": "[名] (料理などの)材料〈可算〉",
+    "exEn": "the ingredients of curry powder",
+    "exJa": "カレー粉の材料"
+  },
+  {
+    "no": 735,
+    "group": "科学・技術",
+    "word": "raw",
+    "meaning": "[形] 生の,加工されていない",
+    "exEn": "the cost of raw materials",
+    "exJa": "原料(加工されていない材料)費"
+  },
+  {
+    "no": 736,
+    "group": "科学・技術",
+    "word": "artificial",
+    "meaning": "[形] 人工的な",
+    "exEn": "artificial flowers",
+    "exJa": "造花(人工の花)"
+  },
+  {
+    "no": 737,
+    "group": "科学・技術",
+    "word": "electric",
+    "meaning": "[形] 電動の",
+    "exEn": "electric cars",
+    "exJa": "電気自動車"
+  },
+  {
+    "no": 738,
+    "group": "科学・技術",
+    "word": "plastic",
+    "meaning": "[形] ビニールの,プラスチックの",
+    "exEn": "plastic bags",
+    "exJa": "ビニール袋"
+  },
+  {
+    "no": 739,
+    "group": "科学・技術",
+    "word": "invent",
+    "meaning": "[他] 〜を発明する",
+    "exEn": "invent a cleaning robot",
+    "exJa": "掃除ロボットを発明する"
+  },
+  {
+    "no": 740,
+    "group": "科学・技術",
+    "word": "discover",
+    "meaning": "[他] 1〜を発見する 2(that S V)〜を知る,〜に気づく",
+    "exEn": "\"1 discover gold 2 discover that my lunchbox is missing\"",
+    "exJa": "\"1 金を発見する 2 弁当箱がなくなっていることに気づく\""
+  },
+  {
+    "no": 741,
+    "group": "科学・技術",
+    "word": "observe",
+    "meaning": "[他] 1〜を観察する 2(規則など)を遵守する",
+    "exEn": "\"1 observe morning glories 2 observe the school rules\"",
+    "exJa": "\"1 朝顔を観察する 2 校則を守る\""
+  },
+  {
+    "no": 742,
+    "group": "医療",
+    "word": "disease",
+    "meaning": "[名] 病気",
+    "exEn": "get over a serious disease",
+    "exJa": "難病に打ち勝つ"
+  },
+  {
+    "no": 743,
+    "group": "医療",
+    "word": "fever",
+    "meaning": "[名] (体温の)熱",
+    "exEn": "have a high fever",
+    "exJa": "高熱がある"
+  },
+  {
+    "no": 744,
+    "group": "医療",
+    "word": "patient",
+    "meaning": "[名] 1患者 [形] 2忍耐強い",
+    "exEn": "\"1 The patient is getting better. 2 Bob is patient with his students.\"",
+    "exJa": "\"1 その患者は快方に向かっている. 2 ボブは生徒に対して忍耐強い.\""
+  },
+  {
+    "no": 745,
+    "group": "医療",
+    "word": "medicine",
+    "meaning": "[名] 1(for 〜)(〜の)薬 2医学",
+    "exEn": "\"1 take the medicine twice a day 2 study medicine at Harvard University\"",
+    "exJa": "\"1 1日に2回その薬を飲む 2 ハーバード大学で医学を学ぶ\""
+  },
+  {
+    "no": 746,
+    "group": "医療",
+    "word": "medical",
+    "meaning": "[形] 1医療の 2医学の",
+    "exEn": "\"1 medical expenses 2 medical science\"",
+    "exJa": "\"1 医療費  2 医学\""
+  },
+  {
+    "no": 747,
+    "group": "健康",
+    "word": "relax",
+    "meaning": "[自] 1リラックスする [他] 2〜をリラックスさせる",
+    "exEn": "\"1 relax at home 2 Her smile relaxes me.\"",
+    "exJa": "\"1 家でリラックスする 2 彼女の笑顔は私をほっとさせる.\""
+  },
+  {
+    "no": 748,
+    "group": "健康",
+    "word": "rest",
+    "meaning": "[名] 1休憩 2(the −)残り [自] 3(横になったりして)休む",
+    "exEn": "\"1 take a rest 2 the rest of the day 3 You need to rest.\"",
+    "exJa": "\"1(ちょっと)休憩する 2 その日の残り(の時間) 3 君は休む必要があるよ.\""
+  },
+  {
+    "no": 749,
+    "group": "健康",
+    "word": "suffer",
+    "meaning": "\"[自] 1(from 〜)(病気などで)苦しむ [他] 2(苦痛,損害など)を経験する\"",
+    "exEn": "\"1 I am suffering from jet lag. 2 The company suffered a big blow.\"",
+    "exJa": "\"1 時差ぼけに苦しんでいる. 2 その会社は大打撃を受けた(経験した).\""
+  },
+  {
+    "no": 750,
+    "group": "健康",
+    "word": "exhaust",
+    "meaning": "[他] 〜を疲れ果てさせる",
+    "exEn": "I am exhausted.",
+    "exJa": "くたくただ."
+  },
+  {
+    "no": 751,
+    "group": "健康",
+    "word": "stress",
+    "meaning": "[名] 1ストレス 2(on 〜)(〜に対する)強調",
+    "exEn": "\"1 have a lot of stress 2 put stress on good manners\"",
+    "exJa": "\"1 多くのストレスを抱えている 2 マナー(の良さ)に重点を置く\""
+  },
+  {
+    "no": 752,
+    "group": "健康",
+    "word": "disabled",
+    "meaning": "[形] 障がいのある",
+    "exEn": "help disabled people",
+    "exJa": "障がいのある人たちを助ける"
+  },
+  {
+    "no": 753,
+    "group": "身体",
+    "word": "physical",
+    "meaning": "[形] 身体的な,物理的な",
+    "exEn": "maintain my physical health",
+    "exJa": "身体の健康を維持する"
+  },
+  {
+    "no": 754,
+    "group": "身体",
+    "word": "mental",
+    "meaning": "[形] 精神の,知力の",
+    "exEn": "have a mental problem",
+    "exJa": "精神的な問題を抱えている"
+  },
+  {
+    "no": 755,
+    "group": "身体",
+    "word": "strength",
+    "meaning": "[名] 力",
+    "exEn": "build my mental strength",
+    "exJa": "精神力を鍛える"
+  },
+  {
+    "no": 756,
+    "group": "身体",
+    "word": "muscle",
+    "meaning": "[名] 筋肉",
+    "exEn": "develop my arm muscles",
+    "exJa": "腕の筋肉を鍛える"
+  },
+  {
+    "no": 757,
+    "group": "身体",
+    "word": "tear",
+    "meaning": "[名] 1(通例 −s)涙〈可算〉 [他] 2(up)〜を引き裂く",
+    "exEn": "\"1 wipe away my tears 2 tear up the letter\"",
+    "exJa": "\"1 涙をぬぐう 2 その手紙を引き裂く\""
+  },
+  {
+    "no": 758,
+    "group": "身体",
+    "word": "sweat",
+    "meaning": "[名] 1汗(通例〈不可算〉) [自] 2汗をかく",
+    "exEn": "\"1 Sweat appeared on my neck. 2 sweat a lot\"",
+    "exJa": "\"1 首に汗をかいた. 2 汗だくになる(たくさん汗をかく)\""
+  },
+  {
+    "no": 759,
+    "group": "感覚",
+    "word": "sense",
+    "meaning": "[名] 1感覚 2分別 3(熟語で)意味",
+    "exEn": "\"1 lose my sense of time 2 common sense 3 in a broad sense\"",
+    "exJa": "\"1 時間の感覚をなくす 2 常識(共通の分別) 3 広い意味では\""
+  },
+  {
+    "no": 760,
+    "group": "感覚",
+    "word": "smell",
+    "meaning": "[名] 1におい [自] 2〜のにおいがする",
+    "exEn": "\"1 the smell of the sea 2 This tea smells nice.\"",
+    "exJa": "\"1 磯の香り(海のにおい) 2 このお茶は香りが良い(良いにおいがする).\""
+  },
+  {
+    "no": 761,
+    "group": "感覚",
+    "word": "taste",
+    "meaning": "[自] 1〜の味がする [他] 2〜の味をみる [名] 3味,センス",
+    "exEn": "\"1 This apple tastes sweet. 2 taste the soup 3 the taste of mom's cooking\"",
+    "exJa": "\"1 このリンゴは甘い(味がする). 2 スープの味見をする 3 おふくろの味\""
+  },
+  {
+    "no": 762,
+    "group": "形態",
+    "word": "form",
+    "meaning": "[名] 1形態 2用紙",
+    "exEn": "\"1 many forms of wildlife 2 fill out an entry form\"",
+    "exJa": "\"1 野生生物の多くの形態 2 申込用紙に記入する\""
+  },
+  {
+    "no": 763,
+    "group": "形態",
+    "word": "shape",
+    "meaning": "[名] 1 形 [他] 2 〜を形作る",
+    "exEn": "\"1 the shape of a fish 2 a house shaped like a pyramid\"",
+    "exJa": "\"1 魚の形 2 ピラミッドのような形の家(ピラミッドのように形作られた家)\""
+  },
+  {
+    "no": 764,
+    "group": "形態",
+    "word": "surface",
+    "meaning": "[名] 表面",
+    "exEn": "below the earth's surface",
+    "exJa": "地下に(地球の表面の下に)"
+  },
+  {
+    "no": 765,
+    "group": "形態",
+    "word": "aspect",
+    "meaning": "[名] 側面",
+    "exEn": "an aspect of daily life",
+    "exJa": "日常生活の一面"
+  },
+  {
+    "no": 766,
+    "group": "構成",
+    "word": "system",
+    "meaning": "[名] 1組織,制度 2体系 (ともに〈可算〉)",
+    "exEn": "\"1 the nervous system 2 leave the solar system\"",
+    "exJa": "\"1 神経組織 2 太陽系から出る\""
+  },
+  {
+    "no": 767,
+    "group": "構成",
+    "word": "detail",
+    "meaning": "[名] 詳細,(建物などの)細部",
+    "exEn": "explain the problem in detail",
+    "exJa": "その問題を詳しく説明する"
+  },
+  {
+    "no": 768,
+    "group": "構成",
+    "word": "consist",
+    "meaning": "[自] (of 〜)(〜で)構成されている",
+    "exEn": "This train consists of nine cars.",
+    "exJa": "この列車は9両編成です(9両で構成されている)."
+  },
+  {
+    "no": 769,
+    "group": "構成",
+    "word": "compose",
+    "meaning": "[他] 1〜を構成する 2〜を作曲[作文]する",
+    "exEn": "\"1 This jazz group is composed of three members. 2 compose a song\"",
+    "exJa": "\"1 このジャズグループは3人のメンバーで構成されている. 2 歌を作曲する\""
+  },
+  {
+    "no": 770,
+    "group": "構成",
+    "word": "organize",
+    "meaning": "[他] 1(考えなど)をまとめる 2〜を組織する",
+    "exEn": "\"1 organize my thoughts 2 organize an event\"",
+    "exJa": "\"1 私の考えをまとめる 2 イベントを取りまとめる\""
+  },
+  {
+    "no": 771,
+    "group": "構成",
+    "word": "include",
+    "meaning": "[他] 〜を含む",
+    "exEn": "Taxes are included in the price.",
+    "exJa": "価格には税が含まれています."
+  },
+  {
+    "no": 772,
+    "group": "構成",
+    "word": "contain",
+    "meaning": "[他] 〜を含む",
+    "exEn": "This soup contains herbs.",
+    "exJa": "このスープにはハーブが入っている(ハーブを含んでいる)."
+  },
+  {
+    "no": 773,
+    "group": "構成",
+    "word": "attach",
+    "meaning": "[他] 〜をくっつける",
+    "exEn": "attach a file to an email",
+    "exJa": "Eメールにファイルを添付する"
+  },
+  {
+    "no": 774,
+    "group": "構成",
+    "word": "base",
+    "meaning": "[他] 1〜の基礎を置く [名] 2基地",
+    "exEn": "\"1 a novel based on a true story 2 a secret base\"",
+    "exJa": "\"1 実話に基づいている小説 2 秘密基地\""
+  },
+  {
+    "no": 775,
+    "group": "直面する・扱う",
+    "word": "face",
+    "meaning": "[他] 1〜に直面する 2〈方向〉〜向きである [名] 3顔,体面",
+    "exEn": "\"1 be faced with a problem 2 a window facing (to the) south 3 speak face to face\"",
+    "exJa": "\"1 ある問題に直面している 2 南向きの窓 3 面と向かって話す\""
+  },
+  {
+    "no": 776,
+    "group": "直面する・扱う",
+    "word": "expose",
+    "meaning": "[他] 〜をさらす",
+    "exEn": "expose children to art",
+    "exJa": "子どもを芸術に触れさせる(さらす)"
+  },
+  {
+    "no": 777,
+    "group": "直面する・扱う",
+    "word": "avoid",
+    "meaning": "[他] 〜を避ける",
+    "exEn": "avoid the topic",
+    "exJa": "その話題を避ける"
+  },
+  {
+    "no": 778,
+    "group": "直面する・扱う",
+    "word": "involve",
+    "meaning": "[他] (be −d in 〜)(〜に)巻き込まれる,参加する",
+    "exEn": "be involved in a traffic accident",
+    "exJa": "交通事故に巻き込まれる"
+  },
+  {
+    "no": 779,
+    "group": "直面する・扱う",
+    "word": "deal",
+    "meaning": "[自] 1(with 〜)(〜を)扱う [名] 2取り引き",
+    "exEn": "\"1 deal with the problem 2 That is a good deal.\"",
+    "exJa": "\"1 その問題を扱う 2 それは良い取り引きだ.\""
+  },
+  {
+    "no": 780,
+    "group": "直面する・扱う",
+    "word": "treat",
+    "meaning": "[他] 1(副詞を伴って)〜を扱う 2(病人,病気)を治療する 3(A to B)(A)に(B を)おごる ",
+    "exEn": "\"1 treat children fairly 2 treat patients 3 treat him to dinner\"",
+    "exJa": "\"1 公平に子どもを扱う 2 患者を治療する 3 彼に夕食をおごる\""
+  },
+  {
+    "no": 781,
+    "group": "直面する・扱う",
+    "word": "difficulty",
+    "meaning": "[名] 困難〈可算〉",
+    "exEn": "overcome many difficulties ",
+    "exJa": "多くの困難を乗り越える"
+  },
+  {
+    "no": 782,
+    "group": "直面する・扱う",
+    "word": "issue",
+    "meaning": "[名] 1問題 2(雑誌の)号,刊行(物)",
+    "exEn": "\"1 tackle an international issue 2 the latest issue of a magazine\"",
+    "exJa": "\"1 国際問題に取り組む 2 雑誌の最新号\""
+  },
+  {
+    "no": 783,
+    "group": "処分する・隠す",
+    "word": "get rid of 〜",
+    "meaning": "[熟] (不要な物・人)を処分する",
+    "exEn": "get rid of old clothes",
+    "exJa": "古い服を処分する"
+  },
+  {
+    "no": 784,
+    "group": "処分する・隠す",
+    "word": "remove",
+    "meaning": "[他] 〜を取り去る",
+    "exEn": "remove the cap from a bottle",
+    "exJa": "瓶から蓋を取る"
+  },
+  {
+    "no": 785,
+    "group": "処分する・隠す",
+    "word": "relieve",
+    "meaning": "[他] 1〜を和らげる 2〜を安心させる",
+    "exEn": "\"1 relieve my stress 2 be relieved at the news\"",
+    "exJa": "\"1 ストレスを発散させる 2 その知らせを聞いて安心する\""
+  },
+  {
+    "no": 786,
+    "group": "処分する・隠す",
+    "word": "abolish",
+    "meaning": "[他] 〜を廃止する",
+    "exEn": "abolish school uniforms",
+    "exJa": "制服を廃止する"
+  },
+  {
+    "no": 787,
+    "group": "処分する・隠す",
+    "word": "hide",
+    "meaning": "[他] 1〜を隠す [自] 2隠れる",
+    "exEn": "\"1 hide comics under the bed 2 hide behind the door\"",
+    "exJa": "\"1 ベッドの下に漫画を隠す 2 ドアの後ろに隠れる\""
+  },
+  {
+    "no": 788,
+    "group": "痛める・台無しにする",
+    "word": "hurt",
+    "meaning": "[自] 1(身体の部位が)痛む [他] 2〜を傷つける",
+    "exEn": "\"1 My back hurts a lot. 2 hurt his feelings\"",
+    "exJa": "\"1 腰がとても痛い. 2 彼の気持ちを傷つける\""
+  },
+  {
+    "no": 789,
+    "group": "痛める・台無しにする",
+    "word": "injure",
+    "meaning": "[他] 1〜を痛める 2〜をけがさせる",
+    "exEn": "\"1 injure my back 2 be injured in an accident\"",
+    "exJa": "\"1 腰を痛める 2 事故でけがをする\""
+  },
+  {
+    "no": 790,
+    "group": "痛める・台無しにする",
+    "word": "damage",
+    "meaning": "[他] 1〜に損害を与える [名] 2損害,被害〈不可算〉",
+    "exEn": "\"1 badly damage the environment 2 do damage to the environment\"",
+    "exJa": "\"1 環境に大きな被害を与える 2 環境を破壊する(被害を与える)\""
+  },
+  {
+    "no": 791,
+    "group": "痛める・台無しにする",
+    "word": "destroy",
+    "meaning": "[他] 〜を(完全に)破壊する,殺す",
+    "exEn": "Hiroshima and Nagasaki were destroyed in 1945.",
+    "exJa": "広島と長崎は1945年に破壊された."
+  },
+  {
+    "no": 792,
+    "group": "痛める・台無しにする",
+    "word": "spoil",
+    "meaning": "[他] 1〜を損なう 2(子ども)を甘やかす",
+    "exEn": "\"1 The huge factory spoils the view. 2 spoil the child\"",
+    "exJa": "\"1 その巨大な工場はその景色を損ねている. 2 その子どもを甘やかす\""
+  },
+  {
+    "no": 793,
+    "group": "痛める・台無しにする",
+    "word": "ruin",
+    "meaning": "[他] 1〜を台無しにする,破滅させる [名] 2(−s)廃墟,遺跡,荒廃",
+    "exEn": "\"1 The rain ruined our outing. 2 the ruins of Pompeii\"",
+    "exJa": "\"1 雨のため遠足が台無しになった. 2 ポンペイの遺跡\""
+  },
+  {
+    "no": 794,
+    "group": "痛める・台無しにする",
+    "word": "protect",
+    "meaning": "[他] 〜を守る",
+    "exEn": "protect our skin from the sun",
+    "exJa": "日差しから肌を守る"
+  },
+  {
+    "no": 795,
+    "group": "制限する・禁止する",
+    "word": "prevent",
+    "meaning": "[他] 1〜を妨げる 2〜を予防する",
+    "exEn": "\"1 prevent us from moving ahead 2 prevent the spread of the flu\"",
+    "exJa": "\"1 私たちが前進するのを妨げる 2 インフルエンザのまん延を予防をする\""
+  },
+  {
+    "no": 796,
+    "group": "制限する・禁止する",
+    "word": "limit",
+    "meaning": "[他] 1(数量,範囲)を制限する [名] 2制限",
+    "exEn": "\"1 limit the class size to fifteen 2 put a limit on the number of visitors\"",
+    "exJa": "\"1 クラスの人数を15名に制限する 2 訪問者の数に制限を設ける\""
+  },
+  {
+    "no": 797,
+    "group": "制限する・禁止する",
+    "word": "ban",
+    "meaning": "[名] 1禁止〈可算〉 [他] 2〜を禁止する",
+    "exEn": "\"1 impose a ban on human cloning 2 ban the illegal downloading of music\"",
+    "exJa": "\"1 ヒトクローンを禁止する 2 音楽の違法ダウンロードを禁止する\""
+  },
+  {
+    "no": 798,
+    "group": "断る・否定する",
+    "word": "refuse",
+    "meaning": "[他] 1〜を断る 2(to do)〜するのを拒む",
+    "exEn": "\"1 flatly refuse the offer 2 refuse to listen to her\"",
+    "exJa": "\"1 きっぱりとその申し出を断る 2 彼女の話を聞くことを拒む\""
+  },
+  {
+    "no": 799,
+    "group": "断る・否定する",
+    "word": "reject",
+    "meaning": "[他] 〜を拒絶する",
+    "exEn": "reject his idea",
+    "exJa": "彼の考えを拒絶する"
+  },
+  {
+    "no": 800,
+    "group": "断る・否定する",
+    "word": "ignore",
+    "meaning": "[他] (人,物)を無視する",
+    "exEn": "completely ignore him",
+    "exJa": "完全に彼を無視する"
+  },
+  {
+    "no": 801,
+    "group": "断る・否定する",
+    "word": "deny",
+    "meaning": "[他] 〜を否定する",
+    "exEn": "deny that I ever met her",
+    "exJa": "彼女と会ったことを否定する"
+  },
+  {
+    "no": 802,
+    "group": "調べる",
+    "word": "check",
+    "meaning": "[他] 1〜を調べる [名] 2検査,点検",
+    "exEn": "\"1 check my essay 2 have a medical check(up)\"",
+    "exJa": "\"1 (ミスがないか)作文を調べる 2 健康診断を受ける\""
+  },
+  {
+    "no": 803,
+    "group": "調べる",
+    "word": "explore",
+    "meaning": "[他] 〜を探検する",
+    "exEn": "explore the island",
+    "exJa": "その島を探検する"
+  },
+  {
+    "no": 804,
+    "group": "調べる",
+    "word": "survey",
+    "meaning": "[名] 調査〈可算〉",
+    "exEn": "according to a recent survey",
+    "exJa": "最近の調査によると"
+  },
+  {
+    "no": 805,
+    "group": "調べる",
+    "word": "statistic",
+    "meaning": "[名] 統計(値)〈可算〉",
+    "exEn": "Statistics show that this is true.",
+    "exJa": "統計によると,これは正しい."
+  },
+  {
+    "no": 806,
+    "group": "調べる",
+    "word": "evidence",
+    "meaning": "[名] 証拠〈不可算〉",
+    "exEn": "strong evidence",
+    "exJa": "有力な証拠"
+  },
+  {
+    "no": 807,
+    "group": "犯罪・違反",
+    "word": "danger",
+    "meaning": "[名] 危険",
+    "exEn": "\"Tigers are in danger of dying out. ◇ Tigers are dangerous.\"",
+    "exJa": "\"トラが絶滅の危機にある. ◇トラは危険(な動物)だ.\""
+  },
+  {
+    "no": 808,
+    "group": "犯罪・違反",
+    "word": "crime",
+    "meaning": "[名] 犯罪",
+    "exEn": "the number of crimes in Japan",
+    "exJa": "日本の犯罪件数"
+  },
+  {
+    "no": 809,
+    "group": "犯罪・違反",
+    "word": "trick",
+    "meaning": "[名] (悪意のない)いたずら,(ずるい)たくらみ",
+    "exEn": "play tricks on Kevin",
+    "exJa": "ケビンにいたずらをする"
+  },
+  {
+    "no": 810,
+    "group": "犯罪・違反",
+    "word": "punish",
+    "meaning": "[他] 〜を罰する",
+    "exEn": "punish him for breaking the rules",
+    "exJa": "規則を破ったことに対して彼を罰する"
+  },
+  {
+    "no": 811,
+    "group": "犯罪・違反",
+    "word": "guilty",
+    "meaning": "[形] 1罪悪感がある 2(of 〜)(〜の)罪を犯した",
+    "exEn": "\"1 feel guilty about lying to her 2 be guilty of stealing a bicycle\"",
+    "exJa": "\"1 彼女にうそをついたことを申し訳なく思う 2 自転車窃盗の罪を犯す\""
+  },
+  {
+    "no": 812,
+    "group": "犯罪・違反",
+    "word": "innocent",
+    "meaning": "[形] 1(of 〜)(〜に関して)無実の 2無邪気な",
+    "exEn": "\"1 be innocent of the crime 2 an innocent girl\"",
+    "exJa": "\"1 その犯罪に関して無実である 2 無邪気な少女\""
+  },
+  {
+    "no": 813,
+    "group": "よい性格・気質",
+    "word": "smart",
+    "meaning": "[形] 1(主に〈米〉)利口な 2(主に〈英〉)(服・建物などが)洗練された",
+    "exEn": "\"1 a smart girl 2 work in a smart office\"",
+    "exJa": "\"1 利口な女の子 2 洗練されたオフィスで働く\""
+  },
+  {
+    "no": 814,
+    "group": "よい性格・気質",
+    "word": "intelligent",
+    "meaning": "[形] 知能が高い,賢い",
+    "exEn": "Dolphins are intelligent animals.",
+    "exJa": "イルカは賢い動物だ."
+  },
+  {
+    "no": 815,
+    "group": "よい性格・気質",
+    "word": "polite",
+    "meaning": "[形] (人,言動が)礼儀正しい",
+    "exEn": "a polite young man",
+    "exJa": "礼儀正しい若い男性"
+  },
+  {
+    "no": 816,
+    "group": "よい性格・気質",
+    "word": "active",
+    "meaning": "[形] 積極的な,活発な",
+    "exEn": "play an active role in the team",
+    "exJa": "チームで活躍する(活発な役割を演じる)"
+  },
+  {
+    "no": 817,
+    "group": "よい性格・気質",
+    "word": "positive",
+    "meaning": "[形] 前向きな,積極的な",
+    "exEn": "positive thinking",
+    "exJa": "前向きな考え"
+  },
+  {
+    "no": 818,
+    "group": "よい性格・気質",
+    "word": "brave",
+    "meaning": "[形] 勇敢な",
+    "exEn": "a brave firefighter",
+    "exJa": "勇敢な消防士"
+  },
+  {
+    "no": 819,
+    "group": "よい性格・気質",
+    "word": "energetic",
+    "meaning": "[形] (人,行動などが)活発な",
+    "exEn": "energetic children",
+    "exJa": "活発な子どもたち"
+  },
+  {
+    "no": 820,
+    "group": "よい性格・気質",
+    "word": "eager",
+    "meaning": "[形] 熱心な",
+    "exEn": "be eager to hear his news",
+    "exJa": "彼のニュースを聞きたい"
+  },
+  {
+    "no": 821,
+    "group": "よい性格・気質",
+    "word": "honest",
+    "meaning": "[形] 正直な",
+    "exEn": "an[×a] honest person",
+    "exJa": "裏表のない(正直な)人間"
+  },
+  {
+    "no": 822,
+    "group": "よい性格・気質",
+    "word": "punctual",
+    "meaning": "[形] (約束などの)時間を守る",
+    "exEn": "be always punctual",
+    "exJa": "いつも時間に正確である"
+  },
+  {
+    "no": 823,
+    "group": "よい性格・気質",
+    "word": "confidence",
+    "meaning": "[名] 1自信 2(in 〜)(〜に対する)信頼(*共に〈不可算〉)",
+    "exEn": "\"1 have great confidence 2 have great confidence in my staff\"",
+    "exJa": "\"1 大いに自信がある 2 職員を全面的に信頼している\""
+  },
+  {
+    "no": 824,
+    "group": "よい性格・気質",
+    "word": "courage",
+    "meaning": "[名] 勇気〈不可算〉",
+    "exEn": "have the courage to say no",
+    "exJa": "断る勇気を持つ"
+  },
+  {
+    "no": 825,
+    "group": "悪い性格・状態",
+    "word": "rude",
+    "meaning": "[形] 無礼な,不作法な",
+    "exEn": "a rude man",
+    "exJa": "無礼な男"
+  },
+  {
+    "no": 826,
+    "group": "悪い性格・状態",
+    "word": "lazy",
+    "meaning": "[形] (やる気がなく)怠惰な,いい加減な",
+    "exEn": "a lazy student",
+    "exJa": "怠惰な学生"
+  },
+  {
+    "no": 827,
+    "group": "悪い性格・状態",
+    "word": "ugly",
+    "meaning": "[形] 醜い,不格好な",
+    "exEn": "an ugly concrete wall",
+    "exJa": "醜いコンクリートの壁"
+  },
+  {
+    "no": 828,
+    "group": "悪い性格・状態",
+    "word": "silly",
+    "meaning": "[形] ばかな",
+    "exEn": "ask silly questions",
+    "exJa": "ばかな質問をする"
+  },
+  {
+    "no": 829,
+    "group": "悪い性格・状態",
+    "word": "nervous",
+    "meaning": "[形] 緊張して,神経質な",
+    "exEn": "get nervous before the exam",
+    "exJa": "試験前に緊張する"
+  },
+  {
+    "no": 830,
+    "group": "悪い性格・状態",
+    "word": "selfish",
+    "meaning": "[形] 利己的な,自分勝手な",
+    "exEn": "Don't be so selfish!",
+    "exJa": "そんなに自分勝手なことをしてはだめだよ."
+  },
+  {
+    "no": 831,
+    "group": "特徴・性質",
+    "word": "character",
+    "meaning": "[名] 1個性,特徴 2登場人物 3(表意)文字",
+    "exEn": "\"1 have a strong character 2 the main character of this novel 3 Chinese characters\"",
+    "exJa": "\"1 個性が強い 2 この小説の主人公(主な登場人物) 3 漢字\""
+  },
+  {
+    "no": 832,
+    "group": "特徴・性質",
+    "word": "characteristic",
+    "meaning": "[名] 特徴〈可算〉",
+    "exEn": "the main characteristics of large cities",
+    "exJa": "大都会の主な特徴"
+  },
+  {
+    "no": 833,
+    "group": "特徴・性質",
+    "word": "feature",
+    "meaning": "[名] 1特徴 2特集記事(ともに〈可算〉)",
+    "exEn": "\"1 a special feature of summer 2 a feature on anime\"",
+    "exJa": "\"1 夏の風物詩(著しい特徴の1つ) 2 アニメに関する特集記事\""
+  },
+  {
+    "no": 834,
+    "group": "特徴・性質",
+    "word": "quality",
+    "meaning": "[名] 質〈不可算〉,(−s)(人間の)資質",
+    "exEn": "improve the quality of life",
+    "exJa": "生活の質を向上させる"
+  },
+  {
+    "no": 835,
+    "group": "特徴・性質",
+    "word": "advantage",
+    "meaning": "[名] (over 〜)(〜に対する)利点",
+    "exEn": "AI has advantages over humans.",
+    "exJa": "AI は人間にない利点を持つ."
+  },
+  {
+    "no": 836,
+    "group": "特徴・性質",
+    "word": "fault",
+    "meaning": "[名] 1(ちょっとした)欠点〈可算〉 2(one's −)責任〈不可算〉",
+    "exEn": "\"1 point out his faults 2 That is my fault.\"",
+    "exJa": "\"1 彼の欠点を指摘する 2 それは私の責任です.\""
+  },
+  {
+    "no": 837,
+    "group": "正確な",
+    "word": "correct",
+    "meaning": "[形] 1正確な,正しい [他] 2〜を訂正する,矯正する",
+    "exEn": "\"1 the correct spelling of my name 2 correct my pronunciation\"",
+    "exJa": "\"1 私の名前の正しいつづり 2 発音を矯正する\""
+  },
+  {
+    "no": 838,
+    "group": "正確な",
+    "word": "ideal",
+    "meaning": "[形] 理想的な,申し分のない",
+    "exEn": "an ideal spot for camping",
+    "exJa": "キャンプにはうってつけの場所"
+  },
+  {
+    "no": 839,
+    "group": "正確な",
+    "word": "fair",
+    "meaning": "[形] 1公正な,公平な [名] 2品評会,見本市",
+    "exEn": "\"1 That's not fair! 2 a book fair\"",
+    "exJa": "\"1 それは不公平だ. 2 書籍見本市\""
+  },
+  {
+    "no": 840,
+    "group": "正確な",
+    "word": "appropriate",
+    "meaning": "[形] 適切な",
+    "exEn": "clothes appropriate for interviews",
+    "exJa": "面接に適切な服"
+  },
+  {
+    "no": 841,
+    "group": "正確な",
+    "word": "proper",
+    "meaning": "[形] 適切な",
+    "exEn": "the proper use of chopsticks",
+    "exJa": "箸の正しい使い方"
+  },
+  {
+    "no": 842,
+    "group": "正確な",
+    "word": "accurate",
+    "meaning": "[形] 正確な",
+    "exEn": "an accurate map",
+    "exJa": "正確な地図"
+  },
+  {
+    "no": 843,
+    "group": "正確な",
+    "word": "precise",
+    "meaning": "[形] 正確な,精密な",
+    "exEn": "precise information about the rocket",
+    "exJa": "そのロケットに関する正確な(詳細な)情報"
+  },
+  {
+    "no": 844,
+    "group": "正確な",
+    "word": "exactly",
+    "meaning": "[副] 1正確に 2〈会話で〉そのとおり",
+    "exEn": "\"1 Where exactly do you live? 2 Is that what Ann said? ― Exactly.\"",
+    "exJa": "\"1 正確にはどこに住んでいるの. 2 それはアンが言ったことですか.― そのとおりです.\""
+  },
+  {
+    "no": 845,
+    "group": "主要な・重要な",
+    "word": "elementary",
+    "meaning": "[形] 初歩的な",
+    "exEn": "go to elementary school",
+    "exJa": "小学校に通う"
+  },
+  {
+    "no": 846,
+    "group": "主要な・重要な",
+    "word": "major",
+    "meaning": "[形] 1主要な [自] 2(in 〜)(〜を)専攻する",
+    "exEn": "\"1 a major cause of tooth decay 2 major in Western history\"",
+    "exJa": "\"1 虫歯の主な原因 2 西洋史を専攻する\""
+  },
+  {
+    "no": 847,
+    "group": "主要な・重要な",
+    "word": "significant",
+    "meaning": "[形] 1重要な 2(数量,増減,相違などが)かなりの",
+    "exEn": "\"1 a significant change in society 2 a significant increase in sales\"",
+    "exJa": "\"1 社会の重大な変化 2 売り上げのかなりの増加\""
+  },
+  {
+    "no": 848,
+    "group": "主要な・重要な",
+    "word": "matter",
+    "meaning": "[自] 1重要である [名] 2問題 3(修飾語を伴い)物質",
+    "exEn": "\"1 It does not matter what he said. 2 What's the matter? 3 waste matter\"",
+    "exJa": "\"1 彼が何と言ったかなど重要ではない. 2 どうしたの?(何が問題なの?) 3廃棄物\""
+  },
+  {
+    "no": 849,
+    "group": "明るい・快適な",
+    "word": "bright",
+    "meaning": "[形] 1明るい 2(主に子どもや若者が)賢い",
+    "exEn": "\"1 The moon is bright tonight. 2 a bright child\"",
+    "exJa": "\"1 今夜は月が明るい. 2 聡明な子ども\""
+  },
+  {
+    "no": 850,
+    "group": "明るい・快適な",
+    "word": "comfortable",
+    "meaning": "[形] 1(物が)快適な 2(人が)心地よい",
+    "exEn": "\"1 a comfortable chair 2 I feel comfortable in that café.\"",
+    "exJa": "\"1 快適な椅子 2 あのカフェは居心地がよい.\""
+  },
+  {
+    "no": 851,
+    "group": "明るい・快適な",
+    "word": "pleasant",
+    "meaning": "[形] (人にとって)楽しい,心地よい",
+    "exEn": "I find it pleasant to talk with her.",
+    "exJa": "彼女と話すのは楽しいと感じる."
+  },
+  {
+    "no": 852,
+    "group": "明るい・快適な",
+    "word": "convenient",
+    "meaning": "[形] 1都合がよい 2近くて便利な",
+    "exEn": "\"1 This pen is convenient to use. 2 My house is convenient to the station.\"",
+    "exJa": "\"1 このペンは使いやすい(使うのに都合がよい). 2 私の家は駅から近くて便利だ.\""
+  },
+  {
+    "no": 853,
+    "group": "誤った・ひどい",
+    "word": "false",
+    "meaning": "[形] 誤った",
+    "exEn": "false information about Japan",
+    "exJa": "日本についての誤った情報"
+  },
+  {
+    "no": 854,
+    "group": "誤った・ひどい",
+    "word": "terrible",
+    "meaning": "[形] ひどい",
+    "exEn": "His handwriting is terrible.",
+    "exJa": "彼の字はひどい."
+  },
+  {
+    "no": 855,
+    "group": "誤った・ひどい",
+    "word": "awful",
+    "meaning": "[形] ひどい,不快な",
+    "exEn": "the awful smell of that cheese",
+    "exJa": "そのチーズのひどい臭い"
+  },
+  {
+    "no": 856,
+    "group": "様々な・複雑な",
+    "word": "differ",
+    "meaning": "[自] 異なる",
+    "exEn": "His tastes in music differ from mine.",
+    "exJa": "彼の音楽の趣味は私の(趣味)と異なる."
+  },
+  {
+    "no": 857,
+    "group": "様々な・複雑な",
+    "word": "vary",
+    "meaning": "[自] 様々だ,変わる",
+    "exEn": "Eating habits vary from country to country.",
+    "exJa": "食習慣は国によって様々だ."
+  },
+  {
+    "no": 858,
+    "group": "様々な・複雑な",
+    "word": "various",
+    "meaning": "[形] 様々な",
+    "exEn": "\"various ideas〈可算〉 various kinds of information〈不可算〉\"",
+    "exJa": "\"様々な考え 様々な情報\""
+  },
+  {
+    "no": 859,
+    "group": "様々な・複雑な",
+    "word": "diverse",
+    "meaning": "[形] 多様な",
+    "exEn": "diverse cultures",
+    "exJa": "多様な文化"
+  },
+  {
+    "no": 860,
+    "group": "様々な・複雑な",
+    "word": "complex",
+    "meaning": "[形] 1複雑な [名] 2複合ビル",
+    "exEn": "\"1 The human brain is highly complex. 2 a 10-screen cinema complex\"",
+    "exJa": "\"1 人間の脳はとても複雑だ. 2 10スクリーンのシネマコンプレックス\""
+  },
+  {
+    "no": 861,
+    "group": "様々な・複雑な",
+    "word": "complicated",
+    "meaning": "[形] 複雑な",
+    "exEn": "a complicated voting system",
+    "exJa": "複雑な投票システム"
+  },
+  {
+    "no": 862,
+    "group": "似ている・等しい",
+    "word": "similar",
+    "meaning": "[形] (to 〜)(〜に)似た",
+    "exEn": "My looks are similar to my mother's.",
+    "exJa": "私の顔は母親のに似ている."
+  },
+  {
+    "no": 863,
+    "group": "似ている・等しい",
+    "word": "alike",
+    "meaning": "[形]  1似ている [副]  2(A and B −)(AもBも)同様に",
+    "exEn": "\"1 The twins are very alike. 2 Children and parents alike can enjoy this drama.\"",
+    "exJa": "\"1 その双子はとてもよく似ている. 2 このドラマは親子共々(子どもも親も同様に)楽しめる.\""
+  },
+  {
+    "no": 864,
+    "group": "似ている・等しい",
+    "word": "equal",
+    "meaning": "[形] (to 〜)(〜に)等しい,平等な",
+    "exEn": "equal rights for women",
+    "exJa": "女性のための等しい権利"
+  },
+  {
+    "no": 865,
+    "group": "見事な・役立つ",
+    "word": "amazing",
+    "meaning": "[形] 見事な",
+    "exEn": "That is amazing!",
+    "exJa": "それはすごいね!"
+  },
+  {
+    "no": 866,
+    "group": "見事な・役立つ",
+    "word": "useful",
+    "meaning": "[形] 役に立つ",
+    "exEn": "This app is useful for learning English.",
+    "exJa": "このアプリは英語学習に役立つ."
+  },
+  {
+    "no": 867,
+    "group": "見事な・役立つ",
+    "word": "practical",
+    "meaning": "[形] (人,知識などが)実際的な,(発明,道具などが)実用的な",
+    "exEn": "have a lot of practical experience",
+    "exJa": "多くの実践経験を持つ"
+  },
+  {
+    "no": 868,
+    "group": "見事な・役立つ",
+    "word": "flexible",
+    "meaning": "[形] 柔軟な",
+    "exEn": "He is flexible in his thinking.",
+    "exJa": "彼は思考が柔軟だ."
+  },
+  {
+    "no": 869,
+    "group": "物事の形態",
+    "word": "thin",
+    "meaning": "[形] 1薄い 2(病的に)やせた ",
+    "exEn": "\"1 a thin jacket 2 a thin, unhealthy child\"",
+    "exJa": "\"1 薄い上着 2 やせていて不健康な子ども\""
+  },
+  {
+    "no": 870,
+    "group": "物事の形態",
+    "word": "tight",
+    "meaning": "[形] 1引き締まった,きつい 2(予定や状況などが)厳しい",
+    "exEn": "\"1 This coat is too tight for me. 2 work to a tight schedule\"",
+    "exJa": "\"1 このコートは私にはきつすぎる. 2 ハード(厳しい)スケジュールで働く\""
+  },
+  {
+    "no": 871,
+    "group": "物事の形態",
+    "word": "loose",
+    "meaning": "[形] ゆるい",
+    "exEn": "wear loose clothes",
+    "exJa": "だぼっとした(ゆるい)服を着ている"
+  },
+  {
+    "no": 872,
+    "group": "物事の形態",
+    "word": "empty",
+    "meaning": "[形] 空の,中身のない",
+    "exEn": "an empty bottle",
+    "exJa": "空き瓶"
+  },
+  {
+    "no": 873,
+    "group": "知られている",
+    "word": "famous",
+    "meaning": "[形] 有名な",
+    "exEn": "Kyoto is famous for its temples.",
+    "exJa": "京都は寺で有名だ."
+  },
+  {
+    "no": 874,
+    "group": "知られている",
+    "word": "familiar",
+    "meaning": "[形] 1知られている 2(人が)(よく)知っている",
+    "exEn": "\"1 His name is familiar to everyone. 2 I am quite familiar with this town.\"",
+    "exJa": "\"1 彼の名前はみんなに知られている. 2 私はこの町をよく知っている.\""
+  },
+  {
+    "no": 875,
+    "group": "知られている",
+    "word": "common",
+    "meaning": "[形] 1普及した,普通の 2(主に名詞の前で)共通の",
+    "exEn": "\"1 E-books are becoming common. 2 English is a common language for us.\"",
+    "exJa": "\"1 電子書籍は普及しつつある. 2 英語は私たちの共通言語だ.\""
+  },
+  {
+    "no": 876,
+    "group": "知られている",
+    "word": "popular",
+    "meaning": "[形] 人気がある",
+    "exEn": "This restaurant is popular among customers with children.",
+    "exJa": "このレストランは子連れ客に人気がある."
+  },
+  {
+    "no": 877,
+    "group": "珍しい・平凡な",
+    "word": "strange",
+    "meaning": "[形] 1変な 2(町・人など)見知らぬ",
+    "exEn": "\"1 strange noises 2 A strange woman came up to us.\"",
+    "exJa": "\"1 変な音 2 見知らぬ女性が私たちに近づいてきた.\""
+  },
+  {
+    "no": 878,
+    "group": "珍しい・平凡な",
+    "word": "unusual",
+    "meaning": "[形] 珍しい",
+    "exEn": "unusual watermelons",
+    "exJa": "珍しいスイカ"
+  },
+  {
+    "no": 879,
+    "group": "珍しい・平凡な",
+    "word": "ordinary",
+    "meaning": "[形] 平凡な,普通の",
+    "exEn": "the lives of ordinary people",
+    "exJa": "庶民(普通の人々)の生活"
+  },
+  {
+    "no": 880,
+    "group": "珍しい・平凡な",
+    "word": "typical",
+    "meaning": "[形] 典型的な",
+    "exEn": "a typical Japanese-style breakfast",
+    "exJa": "典型的な日本(式)の朝食"
+  },
+  {
+    "no": 881,
+    "group": "珍しい・平凡な",
+    "word": "regular",
+    "meaning": "[形] 規則的な,いつもの",
+    "exEn": "keep regular hours",
+    "exJa": "規則正しい生活をする"
+  },
+  {
+    "no": 882,
+    "group": "物事を特定する",
+    "word": "personal",
+    "meaning": "[形] 個人の",
+    "exEn": "personal information",
+    "exJa": "個人情報"
+  },
+  {
+    "no": 883,
+    "group": "物事を特定する",
+    "word": "general",
+    "meaning": "[形] 一般的な,全体の",
+    "exEn": "the general public",
+    "exJa": "一般大衆"
+  },
+  {
+    "no": 884,
+    "group": "物事を特定する",
+    "word": "original",
+    "meaning": "[形] 1元の 2独創的な",
+    "exEn": "\"1 change our original plans 2 original artworks\"",
+    "exJa": "\"1 私たちの当初の予定を変更する 2 独創的な芸術作品\""
+  },
+  {
+    "no": 885,
+    "group": "物事を特定する",
+    "word": "single",
+    "meaning": "[形] 11つの 2独身の",
+    "exEn": "\"1 I did not miss a single word. 2 Ben is single.\"",
+    "exJa": "\"1 ただのひと言(1つの言葉)も聞き逃さなかった. 2 ベンは独身です.\""
+  },
+  {
+    "no": 886,
+    "group": "物事を特定する",
+    "word": "specific",
+    "meaning": "[形] 1特定の 2明確な,具体的な",
+    "exEn": "\"1 a specific age group 2 a specific purpose\"",
+    "exJa": "\"1 ある特定の年齢のグループ 2 ある明確な目的\""
+  },
+  {
+    "no": 887,
+    "group": "物事を特定する",
+    "word": "unique",
+    "meaning": "[形] 1(to 〜)(〜に)特有の 2独特の",
+    "exEn": "\"1 This custom is unique to Japan. 2 Her voice is totally unique.\"",
+    "exJa": "\"1 この習慣は日本特有のものだ. 2 彼女の声はとても独特だ.\""
+  },
+  {
+    "no": 888,
+    "group": "増える・減る",
+    "word": "increase",
+    "meaning": "[自] 1増える [他] 2〜を増やす [名] 3(in 〜)(〜の)増加",
+    "exEn": "\"1 increase by 30% 2 increase my vocabulary 3 an increase in land prices\"",
+    "exJa": "\"1 30%増える 2 語彙を増やす 3 地価の上昇(増加)\""
+  },
+  {
+    "no": 889,
+    "group": "増える・減る",
+    "word": "decrease",
+    "meaning": "[自] 1 減少する [他] 2 〜を減らす [名] 3(in 〜)(〜の)減少",
+    "exEn": "\"1 Our country's population is decreasing. 2 decrease stress 3 a decrease in sales\"",
+    "exJa": "\"1 我が国の人口は減少しつつある. 2 ストレスを減らす 3 売り上げの減少\""
+  },
+  {
+    "no": 890,
+    "group": "増える・減る",
+    "word": "reduce",
+    "meaning": "[他] 〜を減らす",
+    "exEn": "reduce the amount of garbage",
+    "exJa": "生ゴミ(の量)を減らす"
+  },
+  {
+    "no": 891,
+    "group": "増える・減る",
+    "word": "add",
+    "meaning": "[他] 1〜を加える [自] 2(to 〜)(〜を)増やす",
+    "exEn": "\"1 add some milk to the coffee 2 His words added to her fear.\"",
+    "exJa": "\"1 コーヒーにミルクを加える 2 彼の言葉で彼女の恐怖は増した.\""
+  },
+  {
+    "no": 892,
+    "group": "数字・測定",
+    "word": "figure",
+    "meaning": "[名] 1 数字 2 人物 3 図",
+    "exEn": "\"1 a list of figures 2 a key figure 3 See Figure 1.\"",
+    "exJa": "\"1 数字の一覧 2 鍵を握る人物 3 図1を見なさい.\""
+  },
+  {
+    "no": 893,
+    "group": "数字・測定",
+    "word": "average",
+    "meaning": "[名] 1平均 [形] 2平均的な",
+    "exEn": "\"1My grades are slightly above average. 2 an average office worker\"",
+    "exJa": "\"1 私の成績は平均よりちょっと上です. 2 平均的なサラリーマン\""
+  },
+  {
+    "no": 894,
+    "group": "数字・測定",
+    "word": "balance",
+    "meaning": "[名] 1バランス 2残高 [他] 3〜のバランスをとる",
+    "exEn": "\"1 maintain a balance between work and play 2 check my bank balance 3 balance career and family\"",
+    "exJa": "\"1 勉強と遊びを両立させる(バランスを保つ) 2 銀行の預金残高を確認する 3 仕事と家庭を両立する(バランスをとる)\""
+  },
+  {
+    "no": 895,
+    "group": "数字・測定",
+    "word": "count",
+    "meaning": "\"[他] 1〜を数える [自] 2重要である 3(on 〜)(〜を)当てにする\"",
+    "exEn": "\"1 count the money 2 First impressions really count. 3 I'm counting on you.\"",
+    "exJa": "\"1 お金を数える 2 第一印象は本当に重要だ. 3(君を)当てにしているよ.\""
+  },
+  {
+    "no": 896,
+    "group": "数字・測定",
+    "word": "weigh",
+    "meaning": "[自] 1〜の重さがある [他] 2〜を(比較)検討する",
+    "exEn": "\"1 weigh 70 kilograms 2 weigh one plan against another\"",
+    "exJa": "\"1 体重が70キロである 2 ある計画をほかのと比べて検討する\""
+  },
+  {
+    "no": 897,
+    "group": "数字・測定",
+    "word": "measure",
+    "meaning": "[他] 1〜を測る [名] 2(−s)手段",
+    "exEn": "\"1 measure the size of a box 2 take drastic measures against illegal drugs\"",
+    "exJa": "\"1 箱のサイズを測る 2 違法薬物に対して徹底的な手段を取る\""
+  },
+  {
+    "no": 898,
+    "group": "数字・測定",
+    "word": "divide",
+    "meaning": "[他] 〜を分割する",
+    "exEn": "divide the students into two groups",
+    "exJa": "その学生を2つのグループに分ける"
+  },
+  {
+    "no": 899,
+    "group": "数字・測定",
+    "word": "amount",
+    "meaning": "[名] 1量 [自] 2(to 〜)(合計が)〜に達する",
+    "exEn": "\"1 the amount of traffic 2 My debts amount to $200.\"",
+    "exJa": "\"1 交通量 2 私の借金は合計200ドルになる.\""
+  },
+  {
+    "no": 900,
+    "group": "割合・過不足",
+    "word": "rate",
+    "meaning": "[名] 1割合,速さ 2(ホテルなどの)料金",
+    "exEn": "\"1 the declining birth rate[birthrate] 2 Our hotel offers special rates for children.\"",
+    "exJa": "\"1 少子化(下がりつつある出生率) 2 私どものホテルではお子様に特別料金が適用されます.\""
+  },
+  {
+    "no": 901,
+    "group": "割合・過不足",
+    "word": "quarter",
+    "meaning": "[名] 4分の1 ,15分,25セント",
+    "exEn": "three quarters of the pizza",
+    "exJa": "そのピザの4分の3"
+  },
+  {
+    "no": 902,
+    "group": "割合・過不足",
+    "word": "lack",
+    "meaning": "[名] 1((a) − of 〜)(〜の)不足 [他] 2〜を欠いている",
+    "exEn": "\"1 lack of sleep 2 He lacks confidence.\"",
+    "exJa": "\"1 睡眠不足 2 彼は自信がない(自信を欠いている).\""
+  },
+  {
+    "no": 903,
+    "group": "割合・過不足",
+    "word": "extra",
+    "meaning": "[形] 余分な,追加の",
+    "exEn": "an extra charge",
+    "exJa": "追加料金"
+  },
+  {
+    "no": 904,
+    "group": "割合・過不足",
+    "word": "account",
+    "meaning": "[自] (for 〜)1(割合を)占める 2(〜の原因を)説明する [名] 3口座",
+    "exEn": "\"1 Young people account for 70% of the group. 2 Stress accounts for his failure. 3 open a bank account\"",
+    "exJa": "\"1 若者がその集団の70%を占める. 2 ストレスが彼の失敗の原因だ. 3 銀行口座を開く\""
+  },
+  {
+    "no": 905,
+    "group": "約束する・登録する",
+    "word": "promise",
+    "meaning": "[名] 1約束 [他] 2〜を約束する",
+    "exEn": "\"1 make a promise to meet at noon 2 promise her a new car\"",
+    "exJa": "\"1 正午に会う約束をする 2 彼女に新車をあげることを約束する\""
+  },
+  {
+    "no": 906,
+    "group": "約束する・登録する",
+    "word": "appointment",
+    "meaning": "[名] 1(病院などの)予約 2(役職などの)任命",
+    "exEn": "\"1 I have a doctor's appointment. 2 the appointment of a new principal\"",
+    "exJa": "\"1 医者の予約がある. 2 新しい校長の任命\""
+  },
+  {
+    "no": 907,
+    "group": "約束する・登録する",
+    "word": "reservation",
+    "meaning": "[名] 予約",
+    "exEn": "make a reservation for dinner ",
+    "exJa": "夕食の予約をする"
+  },
+  {
+    "no": 908,
+    "group": "約束する・登録する",
+    "word": "book",
+    "meaning": "[他] 〜を予約する",
+    "exEn": "book a hotel room[×a hotel] ",
+    "exJa": "ホテル(の部屋)を予約する"
+  },
+  {
+    "no": 909,
+    "group": "約束する・登録する",
+    "word": "register",
+    "meaning": "[他] 1〜を登録する [自] 2(for 〜)(授業などに)登録する",
+    "exEn": "\"1 Koyasan is registered as a World Heritage Site. 2 register for classes\"",
+    "exJa": "\"1 高野山は世界遺産に登録されている. 2 授業の登録をする\""
+  },
+  {
+    "no": 910,
+    "group": "準備する・操作する",
+    "word": "ready",
+    "meaning": "[形] 1用意ができている 2(be 〜to do)進んで〜する",
+    "exEn": "\"1 I'm not ready yet. 2 be ready to help others\"",
+    "exJa": "\"1 まだ準備ができていません. 2 進んで他人の手伝いをする\""
+  },
+  {
+    "no": 911,
+    "group": "準備する・操作する",
+    "word": "prepare",
+    "meaning": "[他] 1〜の準備をする [自] 2準備をする",
+    "exEn": "\"1 prepare a meal 2 prepare for a powerful typhoon\"",
+    "exJa": "\"1 食事の準備をする 2 大型台風に備える\""
+  },
+  {
+    "no": 912,
+    "group": "準備する・操作する",
+    "word": "operate",
+    "meaning": "[他] 1(機械など)を操作する [自] 2手術する",
+    "exEn": "\"1 operate a crane 2 operate on his nose\"",
+    "exJa": "\"1 クレーンを操作する 2 彼の鼻を手術する\""
+  },
+  {
+    "no": 913,
+    "group": "準備する・操作する",
+    "word": "perform",
+    "meaning": "[他] 1〜を遂行する 2〜を演じる,演奏する",
+    "exEn": "\"1 perform difficult tasks 2 perform three plays\"",
+    "exJa": "\"1 困難な仕事を遂行する 2 3つの劇を演じる\""
+  },
+  {
+    "no": 914,
+    "group": "適応する・調和する",
+    "word": "adjust",
+    "meaning": "[自] 1(to 〜)(〜に)慣れる [他] 2 〜を(微)調整する",
+    "exEn": "\"1 adjust to a new school routine 2 adjust my belt\"",
+    "exJa": "\"1 新しい日々の学校生活に慣れる 2 ベルトを調整する\""
+  },
+  {
+    "no": 915,
+    "group": "適応する・調和する",
+    "word": "apply",
+    "meaning": "[自] 1(to 〜)(〜に)当てはまる 2(for 〜)(〜に)申し込む [他] 3 〜を当てはめる,応用する",
+    "exEn": "\"1 That rule applies to students. 2 apply for a passport 3 apply the technology to self-driving cars\"",
+    "exJa": "\"1 その規則は学生に適用される. 2 パスポートを申請する 3 自動運転車にその技術を応用する\""
+  },
+  {
+    "no": 916,
+    "group": "適応する・調和する",
+    "word": "suit",
+    "meaning": "[他] 1(人)に適している,好都合だ 2(服装,色が人)に似合う",
+    "exEn": "\"1 What time suits you best? 2 That tie suits you.\"",
+    "exJa": "\"1 何時が(あなたに)ご都合がいいですか. 2 そのネクタイは君に似合う.\""
+  },
+  {
+    "no": 917,
+    "group": "適応する・調和する",
+    "word": "match",
+    "meaning": "[他] 〜と調和する",
+    "exEn": "That tie matches your shirt.",
+    "exJa": "そのネクタイは君のシャツによく合っている."
+  },
+  {
+    "no": 918,
+    "group": "適応する・調和する",
+    "word": "fit",
+    "meaning": "[他] (サイズが人)に合う",
+    "exEn": "This dress fits you very well.",
+    "exJa": "このワンピースは(サイズが)君にぴったりだ."
+  },
+  {
+    "no": 919,
+    "group": "適応する・調和する",
+    "word": "tidy",
+    "meaning": "[形] 1(主に〈英〉)きちんとした,整然とした [他] 2〜を整頓する",
+    "exEn": "\"1 keep the office tidy 2 Tidy your room.\"",
+    "exJa": "\"1 事務所をきちんとしておく 2 部屋を整頓しなさい.\""
+  },
+  {
+    "no": 920,
+    "group": "年月・時代",
+    "word": "history",
+    "meaning": "[名] 歴史",
+    "exEn": "have a history of a thousand years",
+    "exJa": "1,000年の歴史がある"
+  },
+  {
+    "no": 921,
+    "group": "年月・時代",
+    "word": "period",
+    "meaning": "[名] 1時代 2期間 3(学校の)時限",
+    "exEn": "\"1 the Edo period 2 the period between 1943 and 1945 3 The first period on Tuesday is PE.\"",
+    "exJa": "\"1 江戸時代 2 1943年から1945年までの期間 3 火曜日の1時間目は体育だ.\""
+  },
+  {
+    "no": 922,
+    "group": "年月・時代",
+    "word": "century",
+    "meaning": "[名] 世紀",
+    "exEn": "in the 21st century",
+    "exJa": "21世紀に"
+  },
+  {
+    "no": 923,
+    "group": "時",
+    "word": "minute",
+    "meaning": "[名] 1(時間の)分 2(a −)ちょっとの間",
+    "exEn": "\"1 The station is a ten-minute walk. 2 Wait a minute.\"",
+    "exJa": "\"1(その)駅まで歩いて10分です. 2 ちょっと待ってください.\""
+  },
+  {
+    "no": 924,
+    "group": "時",
+    "word": "leisure",
+    "meaning": "[名] 余暇〈不可算〉",
+    "exEn": "enjoy my leisure (time)",
+    "exJa": "余暇を楽しむ"
+  },
+  {
+    "no": 925,
+    "group": "時",
+    "word": "generation",
+    "meaning": "[名] 1世代 2生み出すこと",
+    "exEn": "\"1 a generation gap 2 the generation of electricity\"",
+    "exJa": "\"1 ジェネレーションギャップ(世代間格差) 2 発電(電気を生み出すこと)\""
+  },
+  {
+    "no": 926,
+    "group": "時",
+    "word": "anniversary",
+    "meaning": "[名] 記念日",
+    "exEn": "celebrate our wedding anniversary",
+    "exJa": "私たちの結婚記念日を祝う"
+  },
+  {
+    "no": 927,
+    "group": "時",
+    "word": "save",
+    "meaning": "[他] 1(時間,手間)を省く 2〜を貯金する 3(命など)を救う",
+    "exEn": "\"1 This will save you a lot of trouble. 2 save a little bit every month 3 save his life\"",
+    "exJa": "\"1 これはあなたの多くの手間を省く. 2 毎月少しずつ貯金する 3 彼の命を救う\""
+  },
+  {
+    "no": 928,
+    "group": "時",
+    "word": "delay",
+    "meaning": "[他] 1〜を遅らせる [名] 2遅延,延期",
+    "exEn": "\"1 Our bus was delayed two hours. 2 reply without delay\"",
+    "exJa": "\"1 私たちが乗ったバスが2時間遅れた. 2 すぐに(遅れることなく)返事をする\""
+  },
+  {
+    "no": 929,
+    "group": "時",
+    "word": "recently",
+    "meaning": "[副] 最近,近頃",
+    "exEn": "I have moved to this city just recently.",
+    "exJa": "つい最近この市に引っ越して来ました."
+  },
+  {
+    "no": 930,
+    "group": "時",
+    "word": "latest",
+    "meaning": "[形] (the −)最新の",
+    "exEn": "the latest issue of the magazine",
+    "exJa": "その雑誌の最新号"
+  },
+  {
+    "no": 931,
+    "group": "時",
+    "word": "modern",
+    "meaning": "[形] 1現代の 2近代的な",
+    "exEn": "\"1 in modern society 2 a bright, modern office\"",
+    "exJa": "\"1 現代社会では 2 明るく近代的なオフィス\""
+  },
+  {
+    "no": 932,
+    "group": "時",
+    "word": "ancient",
+    "meaning": "[形] 古代の",
+    "exEn": "an ancient city",
+    "exJa": "古代都市"
+  },
+  {
+    "no": 933,
+    "group": "時",
+    "word": "previous",
+    "meaning": "[形] (時間,順序で)前の,以前の",
+    "exEn": "the previous morning",
+    "exJa": "(ある日の)前日の朝(前の朝)"
+  },
+  {
+    "no": 934,
+    "group": "光景・風景",
+    "word": "sight",
+    "meaning": "[名] 1光景〈可算〉 2見えること〈不可算〉",
+    "exEn": "\"1 Snow is a rare sight in this area. 2 There was no one in sight.\"",
+    "exJa": "\"1 雪はこの地域では珍しい光景です. 2 誰一人見えなかった(視界にいなかった).\""
+  },
+  {
+    "no": 935,
+    "group": "光景・風景",
+    "word": "view",
+    "meaning": "[名] 1眺め〈可算〉 2見方〈不可算〉",
+    "exEn": "\"1 enjoy the night view of Hakodate 2 look at things from a different point of view\"",
+    "exJa": "\"1 函館の夜景(夜の景色)を楽しむ 2 視点を変えて物事を見る(異なる視点から見る)\""
+  },
+  {
+    "no": 936,
+    "group": "光景・風景",
+    "word": "landscape",
+    "meaning": "[名] 風景〈可算〉",
+    "exEn": "the beautiful landscape of Scotland",
+    "exJa": "スコットランドの美しい風景"
+  },
+  {
+    "no": 937,
+    "group": "光景・風景",
+    "word": "scene",
+    "meaning": "[名] 1(劇,小説などの)場面 2(事故)現場(*共に〈可算〉)",
+    "exEn": "\"1 the opening scene of the drama 2 rush to the scene\"",
+    "exJa": "\"1 そのドラマの冒頭の場面 2 現場に急行する\""
+  },
+  {
+    "no": 938,
+    "group": "光景・風景",
+    "word": "scenery",
+    "meaning": "[名] (自然の)景色〈不可算〉",
+    "exEn": "the scenery of the Alps",
+    "exJa": "アルプスの景色"
+  },
+  {
+    "no": 939,
+    "group": "通路・行・列",
+    "word": "aisle",
+    "meaning": "[名] 通路",
+    "exEn": "sit in an aisle seat",
+    "exJa": "通路側の席に座る"
+  },
+  {
+    "no": 940,
+    "group": "通路・行・列",
+    "word": "track",
+    "meaning": "[名] 1足跡,小道 2(鉄道の)線路,〈米〉プラットホーム",
+    "exEn": "\"1 keep track of my schedule 2 leave from Track No. 5\"",
+    "exJa": "\"1 スケジュール管理をする(スケジュールの経過を追う) 2 5番線から発車する\""
+  },
+  {
+    "no": 941,
+    "group": "通路・行・列",
+    "word": "line",
+    "meaning": "[名] 1列 2行,線 3セリフ",
+    "exEn": "\"1 stand in line 2 cut along the dotted line 3 practice my lines\"",
+    "exJa": "\"1 列に並ぶ 2 点線に沿って切る 3 セリフを練習する\""
+  },
+  {
+    "no": 942,
+    "group": "通路・行・列",
+    "word": "row",
+    "meaning": "[名] 列",
+    "exEn": "sit in the second row",
+    "exJa": "2列目に座る"
+  },
+  {
+    "no": 943,
+    "group": "通路・行・列",
+    "word": "narrow",
+    "meaning": "[形] 狭い",
+    "exEn": "a narrow street",
+    "exJa": "狭い通り"
+  },
+  {
+    "no": 944,
+    "group": "場所・空間",
+    "word": "room",
+    "meaning": "[名] 1部屋 2余地,空間〈不可算〉",
+    "exEn": "\"1 book a single room for two nights 2 have room for dessert\"",
+    "exJa": "\"1 シングルルームを2泊予約する 2 デザートは別腹だ(デザートのための余地はある)\""
+  },
+  {
+    "no": 945,
+    "group": "場所・空間",
+    "word": "yard",
+    "meaning": "[名] 1(主に〈米〉)庭 2〈単位〉ヤード(=約0.9 m)",
+    "exEn": "\"1 play in the back yard 2 drive a golf ball over 300 yards\"",
+    "exJa": "\"1 裏庭で遊ぶ 2 300ヤード以上ゴルフボールを飛ばす\""
+  },
+  {
+    "no": 946,
+    "group": "場所・空間",
+    "word": "block",
+    "meaning": "[名] 1区画 [他] 2〜を遮る",
+    "exEn": "\"1 Walk two blocks along this street. 2 The tall building blocked our view of the sea.\"",
+    "exJa": "\"1 この道を2つ先の交差点まで行ってください(2区画歩いてください). 2 その高い建物のせいで海が見えなかった(海の眺めを遮った).\""
+  },
+  {
+    "no": 947,
+    "group": "場所・空間",
+    "word": "site",
+    "meaning": "[名] 1用地 2現場,場所",
+    "exEn": "\"1 a dam site 2 a construction site\"",
+    "exJa": "\"1 ダムの用地 2 建設現場\""
+  },
+  {
+    "no": 948,
+    "group": "場所・空間",
+    "word": "facility",
+    "meaning": "[名] 施設",
+    "exEn": "indoor sports facilities",
+    "exJa": "室内スポーツ施設"
+  },
+  {
+    "no": 949,
+    "group": "場所・空間",
+    "word": "construction",
+    "meaning": "[名] 建設〈不可算〉",
+    "exEn": "Our new house is under construction.",
+    "exJa": "私たちの新居は建設中です."
+  },
+  {
+    "no": 950,
+    "group": "場所・空間",
+    "word": "background",
+    "meaning": "[名] 1背景 2経歴,生い立ち",
+    "exEn": "\"1 Classical music was playing in the background. 2 people from different backgrounds\"",
+    "exJa": "\"1 BGM (背景)にクラシック音楽が流れていた. 2 様々な経歴の人々\""
+  },
+  {
+    "no": 951,
+    "group": "場所・空間",
+    "word": "bottom",
+    "meaning": "[名] 1底 2一番下",
+    "exEn": "\"1 the bottom of the sea 2 Look at the bottom of page 10.\"",
+    "exJa": "\"1 海底 2 10ページの下を見てください.\""
+  },
+  {
+    "no": 952,
+    "group": "高さ・距離・方向",
+    "word": "height",
+    "meaning": "[名] 1 高さ 2(−s)高い所",
+    "exEn": "\"1 line up in order of height 2 I'm scared of heights.\"",
+    "exJa": "\"1 身長順に並ぶ 2 私は高所恐怖症です.\""
+  },
+  {
+    "no": 953,
+    "group": "高さ・距離・方向",
+    "word": "distance",
+    "meaning": "[名] 距離〈可算〉",
+    "exEn": "walk a long distance",
+    "exJa": "長距離を歩く"
+  },
+  {
+    "no": 954,
+    "group": "高さ・距離・方向",
+    "word": "direction",
+    "meaning": "[名] 1方向,方角 2(−s)道順,使用法,指示",
+    "exEn": "\"1 walk in the opposite direction 2 ask for directions\"",
+    "exJa": "\"1 反対の方向に歩く 2 道順を尋ねる\""
+  },
+  {
+    "no": 955,
+    "group": "機会・状況",
+    "word": "case",
+    "meaning": "[名] 1 場合 2(the −)事実 3(犯罪)事件",
+    "exEn": "\"1 In that case, I'm not going. 2 This is also the case with humans. 3 a murder case\"",
+    "exJa": "\"1 それなら(その場合),私は行きません. 2 これは人間にも当てはまる(人間にとっても事実である). 3 殺人事件\""
+  },
+  {
+    "no": 956,
+    "group": "機会・状況",
+    "word": "event",
+    "meaning": "[名] 1(重要な,珍しい)出来事 2催し",
+    "exEn": "\"1 Marriage is an important event in life. 2 hold a big event\"",
+    "exJa": "\"1 結婚は人生の重要な出来事だ. 2 大きなイベントを開催する\""
+  },
+  {
+    "no": 957,
+    "group": "機会・状況",
+    "word": "situation",
+    "meaning": "[名] 状況",
+    "exEn": "the economic situation in Russia",
+    "exJa": "ロシアの経済(状況)"
+  },
+  {
+    "no": 958,
+    "group": "機会・状況",
+    "word": "condition",
+    "meaning": "[名] 1状態 2(通例 −s)(周囲の)状況,条件",
+    "exEn": "\"1 be in good condition 2 work under bad conditions\"",
+    "exJa": "\"1 調子がよい(よい状態で) 2 悪条件の下で働く\""
+  },
+  {
+    "no": 959,
+    "group": "機会・状況",
+    "word": "chance",
+    "meaning": "[名] 1(to do)(〜する)機会 2(of 〜 / that S V)(〜の/〜という)可能性",
+    "exEn": "\"1 a chance to try again 2 There is little chance of his winning.\"",
+    "exJa": "\"1 再度挑戦する機会 2 彼が勝つ可能性はほとんどない.\""
+  },
+  {
+    "no": 960,
+    "group": "機会・状況",
+    "word": "opportunity",
+    "meaning": "[名] (よい)機会,好機",
+    "exEn": "have an opportunity to speak English",
+    "exJa": "英語を話す機会がある"
+  },
+  {
+    "no": 961,
+    "group": "機会・状況",
+    "word": "emergency",
+    "meaning": "[名] 緊急事態",
+    "exEn": "deal with emergencies",
+    "exJa": "緊急事態に対処する"
+  },
+  {
+    "no": 962,
+    "group": "深刻な・厳しい",
+    "word": "serious",
+    "meaning": "[形] 1深刻な 2(人が)真剣な",
+    "exEn": "\"1 a serious accident 2 be serious about finding a job\"",
+    "exJa": "\"1 深刻な事故 2 職探しに真剣である\""
+  },
+  {
+    "no": 963,
+    "group": "深刻な・厳しい",
+    "word": "strict",
+    "meaning": "[形] 厳しい",
+    "exEn": "a strict teacher",
+    "exJa": "厳しい先生"
+  },
+  {
+    "no": 964,
+    "group": "深刻な・厳しい",
+    "word": "risky",
+    "meaning": "[形] 危険な,危うい",
+    "exEn": "a risky decision",
+    "exJa": "危険を伴う決断"
+  },
+  {
+    "no": 965,
+    "group": "原因・結果",
+    "word": "due",
+    "meaning": "[形] 1(− to( 名詞))(名詞)が原因で 2締め切りの 3到着[出産]予定の",
+    "exEn": "\"1 The game was cancelled due to rain. 2 The report is due by Monday. 3 The train is due to arrive at 9:00.\"",
+    "exJa": "\"1 雨のため試合は中止になった. 2 報告書は月曜日が締め切りだ. 3 電車は9時に到着予定です.\""
+  },
+  {
+    "no": 966,
+    "group": "原因・結果",
+    "word": "result",
+    "meaning": "[名] 1結果 [自] 2(in 〜)結果として(〜に)なる 3(from 〜)(〜の)結果として生じる",
+    "exEn": "\"1 as a result of the forest fire 2 The project resulted in success. 3 Serious damage resulted from the earthquake.\"",
+    "exJa": "\"1 山火事の結果として 2 その事業は結果として成功した. 3 その地震の結果,深刻な損害が生じた.\""
+  },
+  {
+    "no": 967,
+    "group": "原因・結果",
+    "word": "cause",
+    "meaning": "[他] 1〜を引き起こす [名] 2原因",
+    "exEn": "\"1 cause trouble 2 the cause of the war\"",
+    "exJa": "\"1 面倒を引き起こす 2 その戦争の原因\""
+  },
+  {
+    "no": 968,
+    "group": "原因・結果",
+    "word": "blame",
+    "meaning": "[他] 〜に責任があるとする",
+    "exEn": "blame the brakes for the accident",
+    "exJa": "その事故の原因はブレーキにあるとする"
+  },
+  {
+    "no": 969,
+    "group": "原因・結果",
+    "word": "responsible",
+    "meaning": "[形] 責任がある",
+    "exEn": "I am responsible for walking our dog.",
+    "exJa": "私には犬を散歩させる責任がある."
+  },
+  {
+    "no": 970,
+    "group": "影響",
+    "word": "effect",
+    "meaning": "[名] 効果,影響",
+    "exEn": "have a good effect on the brain",
+    "exJa": "脳に良い影響を与える"
+  },
+  {
+    "no": 971,
+    "group": "影響",
+    "word": "influence",
+    "meaning": "[他] 1〜に影響を及ぼす [名] 2影響(力)",
+    "exEn": "\"1 influence my way of thinking 2 have a strong influence on children\"",
+    "exJa": "\"1 私の考え方に影響を及ぼす 2 子どもたちに強い影響を及ぼす\""
+  },
+  {
+    "no": 972,
+    "group": "影響",
+    "word": "impact",
+    "meaning": "[名] 1(on 〜)(〜への)影響 2(物体間の)衝撃",
+    "exEn": "\"1 an impact on the tourist industry 2 the impact of the explosion\"",
+    "exJa": "\"1 観光業への影響 2 その爆発の衝撃\""
+  },
+  {
+    "no": 973,
+    "group": "影響",
+    "word": "affect",
+    "meaning": "[他] 〜に影響を与える",
+    "exEn": "affect your skin",
+    "exJa": "肌に影響を与える"
+  },
+  {
+    "no": 974,
+    "group": "手段・目的",
+    "word": "purpose",
+    "meaning": "[名] 目的",
+    "exEn": "the purpose of my visit",
+    "exJa": "私の訪問の目的"
+  },
+  {
+    "no": 975,
+    "group": "手段・目的",
+    "word": "means",
+    "meaning": "[名] 手段〈単複同形〉",
+    "exEn": "a means of communication",
+    "exJa": "意思疎通の手段"
+  },
+  {
+    "no": 976,
+    "group": "程度",
+    "word": "right",
+    "meaning": "[副] 1(場所や時の副詞(句)を修飾して)ちょうど [形] 2正しい 3右の [名] 4(to 〜)(〜の)権利",
+    "exEn": "\"1 right in front of me 2 You are right. 3 my right hand 4 the right to vote\"",
+    "exJa": "\"1 私のちょうど目の前で 2 君が正しいよ. 3 私の右手 4 投票権\""
+  },
+  {
+    "no": 977,
+    "group": "程度",
+    "word": "partly",
+    "meaning": "[副] ある程度,部分的に",
+    "exEn": "That is partly true.",
+    "exJa": "それはある程度正しい."
+  },
+  {
+    "no": 978,
+    "group": "程度",
+    "word": "extremely",
+    "meaning": "[副] 極度に,非常に",
+    "exEn": "It's extremely hot outside.",
+    "exJa": "外はひどく暑い."
+  },
+  {
+    "no": 979,
+    "group": "程度",
+    "word": "complete",
+    "meaning": "[形] 1完全な,まったくの [他] 2〜を完成させる",
+    "exEn": "\"1 a complete stranger 2 complete the project\"",
+    "exJa": "\"1 見ず知らずの人(まったく知らない人) 2 そのプロジェクトを完成させる\""
+  },
+  {
+    "no": 980,
+    "group": "程度",
+    "word": "moderate",
+    "meaning": "[形] 適度な",
+    "exEn": "get moderate exercise",
+    "exJa": "適度な運動をする"
+  },
+  {
+    "no": 981,
+    "group": "程度",
+    "word": "extent",
+    "meaning": "[名] 程度",
+    "exEn": "You are right to some extent.",
+    "exJa": "君はある程度正しい."
+  },
+  {
+    "no": 982,
+    "group": "可能性",
+    "word": "likely",
+    "meaning": "[形] 〜しそうだ,可能性が高い",
+    "exEn": "It is likely to rain today.",
+    "exJa": "今日は雨が降りそうだ."
+  },
+  {
+    "no": 983,
+    "group": "可能性",
+    "word": "certain",
+    "meaning": "[形] 1 確かな 2(名詞の前で)ある〜",
+    "exEn": "\"1 He is certain to become a star player. 2 visit a certain country\"",
+    "exJa": "\"1 彼はきっとスター選手になるよ. 2 ある[×確かな]国を訪れる\""
+  },
+  {
+    "no": 984,
+    "group": "可能性",
+    "word": "probably",
+    "meaning": "[副] おそらく",
+    "exEn": "It will probably snow this afternoon.",
+    "exJa": "午後はおそらく雪だろう."
+  },
+  {
+    "no": 985,
+    "group": "可能性",
+    "word": "possibly",
+    "meaning": "[副] 1ひょっとすると 2(cannot −)どうしても(〜できない)",
+    "exEn": "\"1 It will take two weeks, or possibly longer. 2 I cannot possibly solve this problem.\"",
+    "exJa": "\"1 2週間,ひょっとするとそれ以上かかるかもしれない. 2 この問題がどうしても解けない.\""
+  },
+  {
+    "no": 986,
+    "group": "副詞",
+    "word": "hardly",
+    "meaning": "[副] 1(程度)ほとんど〜ない 2(頻度)(− ever)めったに〜ない",
+    "exEn": "\"1 I can hardly read his writing. 2 He hardly ever smiles.\"",
+    "exJa": "\"1 彼の文字はほとんど読めない. 2 彼はめったに笑わない.\""
+  },
+  {
+    "no": 987,
+    "group": "副詞",
+    "word": "actually",
+    "meaning": "[副] 1実は 2実際に",
+    "exEn": "\"1 Jim may seem happy, but actually he's sad. 2 Ken looks younger than he actually is.\"",
+    "exJa": "\"1 ジムは楽しそうに見えるかもしれないが,本当は悲しんでいる. 2 ケンは実際より若く見える.\""
+  },
+  {
+    "no": 988,
+    "group": "副詞",
+    "word": "indeed",
+    "meaning": "[副] (強調として)実際に,本当に",
+    "exEn": "He is indeed a kind person.",
+    "exJa": "彼は本当に親切な人です."
+  },
+  {
+    "no": 989,
+    "group": "副詞",
+    "word": "gradually",
+    "meaning": "[副] 徐々に",
+    "exEn": "My grades are gradually going up.",
+    "exJa": "成績が徐々に上がっている."
+  },
+  {
+    "no": 990,
+    "group": "副詞",
+    "word": "suddenly",
+    "meaning": "[副] 突然",
+    "exEn": "Suddenly, it began to snow.",
+    "exJa": "突然,雪が降り出した."
+  },
+  {
+    "no": 991,
+    "group": "副詞",
+    "word": "therefore",
+    "meaning": "[副] それゆえに",
+    "exEn": "\"Teachers are only human, and therefore they make mistakes.\"",
+    "exJa": "教師もただの人間だ.それゆえ,ミスをする."
+  },
+  {
+    "no": 992,
+    "group": "副詞",
+    "word": "instead",
+    "meaning": "[副] 1その代わりに 2(of 〜)(〜の)代わりに,(〜)せずに",
+    "exEn": "\"1 If you can't drink coffee, how about tea instead? 2 take the stairs instead of the elevator\"",
+    "exJa": "\"1 もしコーヒーが飲めないなら,その代わりに紅茶はいかがですか. 2 エレベーターの代わりに階段を使う\""
+  },
+  {
+    "no": 993,
+    "group": "副詞",
+    "word": "moreover",
+    "meaning": "[副] その上",
+    "exEn": "Smoking is bad for you.  Moreover, it costs a lot.",
+    "exJa": "喫煙は体に悪い.その上,お金がかかる."
+  },
+  {
+    "no": 994,
+    "group": "副詞",
+    "word": "otherwise",
+    "meaning": "[副] さもなければ",
+    "exEn": "Hurry up! Otherwise you'll be late. (=If you don't hurry up, you'll be late.)",
+    "exJa": "急げ!さもないと遅れるぞ."
+  },
+  {
+    "no": 995,
+    "group": "前置詞",
+    "word": "besides",
+    "meaning": "[前] 1〜に加えて [副] 2 おまけに",
+    "exEn": "\"1 learn another foreign language besides English 2 It's too late to go out ; besides, it's snowing.\"",
+    "exJa": "\"1 英語以外の(英語に加えて)外国語を勉強する 2 外出するには遅すぎるし,おまけに,雪が降っている.\""
+  },
+  {
+    "no": 996,
+    "group": "前置詞",
+    "word": "except",
+    "meaning": "[前] 〜を除いて",
+    "exEn": "Everybody was asleep except him.",
+    "exJa": "彼以外は皆眠っていた."
+  },
+  {
+    "no": 997,
+    "group": "前置詞",
+    "word": "according to",
+    "meaning": "[前] (調査,人の話など)によれば",
+    "exEn": "according to the study",
+    "exJa": "その研究によると"
+  },
+  {
+    "no": 998,
+    "group": "接続詞",
+    "word": "though",
+    "meaning": "[接] 1〜だけれども [副] 2でも,けれども",
+    "exEn": "\"1 Though I was hungry, I did not eat it. 2 I was hungry. I did not eat it, though.\"",
+    "exJa": "\"1 お腹が減っていたが,それを食べなかった. 2 お腹が減っていた.けれども,それを食べなかった.\""
+  },
+  {
+    "no": 999,
+    "group": "接続詞",
+    "word": "although",
+    "meaning": "[接] 〜だけれども",
+    "exEn": "Although it was raining, I went fishing in the nearby river.",
+    "exJa": "雨が降っていたが,私は近くの川へ釣りに出かけた."
+  },
+  {
+    "no": 1000,
+    "group": "接続詞",
+    "word": "whether",
+    "meaning": "[接] 1〜かどうか 2〜であれ...であれ",
+    "exEn": "\"1 I will ask him whether he is coming tonight or not. 2 Whether it rains or not, the rugby match will be held.\"",
+    "exJa": "\"1 彼に今晩来るのかどうか尋ねるよ. 2 雨が降っても降らなくても,そのラグビーの試合は行われる.\" このコードの単語のセットをここに張り付けた単語のセットと置き換えてほしい。それ以外は何もしないで。このまま問題を増やしたいだけだから。"
+  }
 ];
 
 const QWERTY=[["q","w","e","r","t","y","u","i","o","p"],["a","s","d","f","g","h","j","k","l"],["z","x","c","v","b","n","m"]];
