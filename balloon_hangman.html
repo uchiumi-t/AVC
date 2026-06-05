@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balloon Hangman Quiz</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#0d0d1f;display:flex;align-items:center;justify-content:center;font-family:'Segoe UI',sans-serif}
+#app{width:100%;max-width:calc(100vh * 16/9);aspect-ratio:16/9;max-height:100vh;background:#1a1a2e;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;position:relative;user-select:none}
+#top{display:flex;flex:1;min-height:0}
+#balloon-area{width:28%;display:flex;align-items:center;justify-content:center;padding:0.5rem}
+#question-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0.8rem 1.5rem;gap:0.6rem}
+#group-label{font-size:clamp(11px,1.6vw,17px);color:#888;letter-spacing:0.05em}
+#meaning{font-size:clamp(17px,2.8vw,30px);color:#e0d8ff;font-weight:500;text-align:center;line-height:1.5}
+#word-display{display:flex;gap:clamp(5px,1vw,14px);flex-wrap:wrap;justify-content:center;margin-top:0.4rem}
+.letter-slot{display:flex;flex-direction:column;align-items:center;gap:4px}
+.letter-char{font-size:clamp(20px,3.5vw,40px);font-weight:600;color:#fff;min-width:1ch;text-align:center;min-height:1.2em}
+.letter-line{width:clamp(20px,3.5vw,40px);height:2px;background:#888;border-radius:1px}
+#miss-count{font-size:clamp(12px,1.6vw,18px);color:#f87;margin-top:0.2rem}
+#bottom{height:46%;background:#12122a;display:flex;align-items:center;justify-content:center;padding:0.4rem 0.8rem}
+#keyboard{display:grid;gap:clamp(4px,0.8vw,9px)}
+.kb-row{display:flex;gap:clamp(4px,0.8vw,9px);justify-content:center}
+.kb-key{width:clamp(30px,4.5vw,54px);height:clamp(30px,4.5vw,54px);border-radius:7px;background:#2a2a4a;border:1px solid #444;color:#ddd;font-size:clamp(13px,1.9vw,22px);font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.1s,transform 0.1s;touch-action:manipulation}
+.kb-key:hover{background:#3a3a6a}
+.kb-key:active{transform:scale(0.93)}
+.kb-key.used-correct{background:#1a5c3a;border-color:#2a8c5a;color:#6f6}
+.kb-key.used-wrong{background:#4a1a1a;border-color:#8c2a2a;color:#f88;text-decoration:line-through}
+#result-area{display:none;flex-direction:column;align-items:center;justify-content:center;gap:0.8rem;padding:0.5rem 1.5rem;width:100%;height:100%}
+#result-example-en{font-size:clamp(16px,2.4vw,28px);color:#adf;text-align:center;font-style:italic;line-height:1.5}
+#result-example-ja{font-size:clamp(15px,2.2vw,26px);color:#ccc;text-align:center;line-height:1.5}
+#next-btn{margin-top:0.5rem;padding:0.6em 2.5em;background:#4a3aaa;border:none;border-radius:8px;color:#fff;font-size:clamp(14px,2vw,22px);cursor:pointer;transition:background 0.15s;touch-action:manipulation}
+#next-btn:hover{background:#6a5aca}
+#next-btn:active{transform:scale(0.96)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top">
+    <div id="balloon-area">
+      <svg id="game-svg" viewBox="0 0 200 280" style="width:100%;height:100%">
+        <defs>
+          <radialGradient id="bg" cx="40%" cy="35%">
+            <stop offset="0%" stop-color="#2a2a5a"/>
+            <stop offset="100%" stop-color="#0d0d1f"/>
+          </radialGradient>
+        </defs>
+        <rect width="200" height="280" fill="url(#bg)" rx="8"/>
+        <line id="nail-line" x1="100" y1="20" x2="100" y2="20" stroke="#ccc" stroke-width="3" stroke-linecap="round"/>
+        <circle id="nail-head" cx="100" cy="20" r="5" fill="#999"/>
+        <g id="balloon-group" transform="translate(100,210)">
+          <ellipse id="balloon-body" rx="38" ry="46" fill="#ff6b6b"/>
+          <ellipse cx="-12" cy="-18" rx="9" ry="6" fill="#ff9999" opacity="0.5"/>
+          <line x1="0" y1="46" x2="0" y2="58" stroke="#ddd" stroke-width="1.5"/>
+          <path d="M-6,58 Q0,62 6,58" fill="none" stroke="#ddd" stroke-width="1.5"/>
+        </g>
+        <text id="balloon-text" x="100" y="225" text-anchor="middle" font-size="11" fill="#fff" opacity="0" font-family="'Segoe UI',sans-serif"></text>
+      </svg>
+    </div>
+    <div id="question-area">
+      <div id="group-label"></div>
+      <div id="meaning"></div>
+      <div id="word-display"></div>
+      <div id="miss-count"></div>
+    </div>
+  </div>
+  <div id="bottom">
+    <div id="keyboard">
+      <div class="kb-row" id="row1"></div>
+      <div class="kb-row" id="row2"></div>
+      <div class="kb-row" id="row3"></div>
+    </div>
+    <div id="result-area">
+      <div id="result-example-en"></div>
+      <div id="result-example-ja"></div>
+      <button id="next-btn">次へ →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  {no:1001,group:"話す",word:"mention",meaning:"〜について言及する",exEn:"You had better not mention it.",exJa:"それには触れないほうがいい．"},
+  {no:1002,group:"話す",word:"refer",meaning:"（〜に）言及する / （〜を）示す",exEn:"refer to my childhood",exJa:"私の子どもの頃について触れる"},
+  {no:1003,group:"話す",word:"remark",meaning:"〜と発言する / 発言",exEn:"remark that the pot is very old",exJa:"そのつぼはとても古いものだと言う"},
+  {no:1004,group:"話す",word:"whisper",meaning:"ささやき声 / ささやく",exEn:"talk in a whisper",exJa:"小声で話す"},
+  {no:1005,group:"答える・反応する",word:"react",meaning:"（〜に）反応する",exEn:"react angrily to the news",exJa:"その知らせに怒りの反応を示す"},
+  {no:1006,group:"答える・反応する",word:"reply",meaning:"（〜に）返事をする / 返事",exEn:"reply to his email",exJa:"彼のEメールに返事をする"},
+  {no:1007,group:"答える・反応する",word:"respond",meaning:"返答する / 対応する",exEn:"respond to questions",exJa:"質問に回答する"},
+  {no:1008,group:"提案・提出・採用・交渉",word:"propose",meaning:"〜を提案する",exEn:"propose a new project",exJa:"新しい計画を提案する"},
+  {no:1009,group:"提案・提出・採用・交渉",word:"submit",meaning:"〜を提出する / 服従する",exEn:"submit my homework",exJa:"宿題を提出する"},
+];
+
+const QWERTY=[["q","w","e","r","t","y","u","i","o","p"],["a","s","d","f","g","h","j","k","l"],["z","x","c","v","b","n","m"]];
+const MAX_MISS=6;
+const NAIL_Y_START=25, BALLOON_Y_START=210, BALLOON_Y_END=72;
+
+let current=null, guessed=new Set(), misses=0, done=false, usedIndices=[];
+
+function getNext(){
+  if(usedIndices.length===WORDS.length) usedIndices=[];
+  let pool=WORDS.map((_,i)=>i).filter(i=>!usedIndices.includes(i));
+  let idx=pool[Math.floor(Math.random()*pool.length)];
+  usedIndices.push(idx);
+  return WORDS[idx];
+}
+
+function buildKeyboard(){
+  QWERTY.forEach((row,ri)=>{
+    let el=document.getElementById("row"+(ri+1));
+    el.innerHTML="";
+    row.forEach(k=>{
+      let btn=document.createElement("button");
+      btn.className="kb-key";
+      btn.id="key-"+k;
+      btn.textContent=k.toUpperCase();
+      btn.onclick=()=>guess(k);
+      el.appendChild(btn);
+    });
+  });
+}
+
+function renderWord(){
+  let wd=document.getElementById("word-display");
+  wd.innerHTML="";
+  current.word.split("").forEach(c=>{
+    let slot=document.createElement("div");
+    slot.className="letter-slot";
+    let ch=document.createElement("div");
+    ch.className="letter-char";
+    ch.textContent=(guessed.has(c)||c==="-"||c==="'")?c.toUpperCase():"";
+    let ln=document.createElement("div");
+    ln.className="letter-line";
+    slot.appendChild(ch);
+    slot.appendChild(ln);
+    wd.appendChild(slot);
+  });
+}
+
+function updateBalloon(){
+  let ratio=misses/MAX_MISS;
+  let nailY=NAIL_Y_START+ratio*(BALLOON_Y_END-NAIL_Y_START-10);
+  let balloonY=BALLOON_Y_START+(BALLOON_Y_END-BALLOON_Y_START)*ratio;
+  document.getElementById("nail-line").setAttribute("y2",nailY);
+  document.getElementById("balloon-group").setAttribute("transform","translate(100,"+balloonY+")");
+}
+
+function beep(){
+  try{
+    let ctx=new(window.AudioContext||window.webkitAudioContext)();
+    let o=ctx.createOscillator();let g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.frequency.value=180;g.gain.setValueAtTime(0.3,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.18);
+    o.start();o.stop(ctx.currentTime+0.18);
+  }catch(e){}
+}
+
+function cheerSound(){
+  try{
+    let ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [523,659,784,1047].forEach((f,i)=>{
+      let o=ctx.createOscillator();let g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=f;g.gain.setValueAtTime(0.2,ctx.currentTime+i*0.08);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.08+0.2);
+      o.start(ctx.currentTime+i*0.08);o.stop(ctx.currentTime+i*0.08+0.2);
+    });
+  }catch(e){}
+}
+
+function popSound(){
+  try{
+    let ctx=new(window.AudioContext||window.webkitAudioContext)();
+    let o=ctx.createOscillator();let g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type="sawtooth";o.frequency.value=120;
+    g.gain.setValueAtTime(0.4,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.25);
+    o.start();o.stop(ctx.currentTime+0.25);
+  }catch(e){}
+}
+
+function animateBalloonPop(){
+  document.getElementById("balloon-body").setAttribute("fill","#888");
+  let bt=document.getElementById("balloon-text");
+  bt.setAttribute("opacity","1");
+  bt.textContent=current.word.toUpperCase();
+}
+
+function animateBalloonFly(){
+  let grp=document.getElementById("balloon-group");
+  let startY=BALLOON_Y_END;
+  let t=0;
+  let iv=setInterval(()=>{
+    t+=4;
+    grp.setAttribute("transform","translate(100,"+(startY-t)+")");
+    if(startY-t<-60) clearInterval(iv);
+  },16);
+}
+
+function showResult(cleared){
+  document.getElementById("keyboard").style.display="none";
+  let ra=document.getElementById("result-area");
+  ra.style.display="flex";
+  document.getElementById("result-example-en").textContent=current.exEn;
+  document.getElementById("result-example-ja").textContent=current.exJa;
+  if(cleared){cheerSound();animateBalloonFly();}
+  else{popSound();animateBalloonPop();}
+}
+
+function checkWin(){
+  return current.word.split("").every(c=>guessed.has(c)||c==="-"||c==="'");
+}
+
+function guess(c){
+  if(done||guessed.has(c)) return;
+  guessed.add(c);
+  let key=document.getElementById("key-"+c);
+  if(current.word.includes(c)){
+    if(key) key.classList.add("used-correct");
+    renderWord();
+    if(checkWin()){done=true;renderWord();showResult(true);}
+  } else {
+    misses++;
+    if(key) key.classList.add("used-wrong");
+    beep();
+    updateBalloon();
+    document.getElementById("miss-count").textContent="ミス: "+misses+" / "+MAX_MISS;
+    if(misses>=MAX_MISS){done=true;guessed=new Set(current.word.split(""));renderWord();showResult(false);}
+  }
+}
+
+function startGame(){
+  current=getNext();
+  guessed=new Set();
+  misses=0;
+  done=false;
+  document.getElementById("group-label").textContent=current.group+"  No."+current.no;
+  document.getElementById("meaning").textContent=current.meaning;
+  document.getElementById("miss-count").textContent="";
+  document.getElementById("keyboard").style.display="grid";
+  document.getElementById("result-area").style.display="none";
+  document.getElementById("nail-line").setAttribute("y2",NAIL_Y_START);
+  document.getElementById("balloon-group").setAttribute("transform","translate(100,"+BALLOON_Y_START+")");
+  document.getElementById("balloon-body").setAttribute("fill","#ff6b6b");
+  document.getElementById("balloon-text").setAttribute("opacity","0");
+  QWERTY.flat().forEach(k=>{
+    let el=document.getElementById("key-"+k);
+    if(el) el.className="kb-key";
+  });
+  renderWord();
+}
+
+document.getElementById("next-btn").onclick=startGame;
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&done){startGame();return;}
+  let c=e.key.toLowerCase();
+  if(/^[a-z]$/.test(c)) guess(c);
+});
+
+buildKeyboard();
+startGame();
+</script>
+</body>
+</html>
