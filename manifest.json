@@ -1,12 +1,12 @@
 {
-  "name": "英語学習アプリ集",
-  "short_name": "英語アプリ",
+  "name": "AVCのアプリ",
+  "short_name": "AVCのアプリ",
   "description": "英語学習ツールまとめ",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#faf7f2",
-  "theme_color": "#c0392b",
+  "theme_color": "#1a3a5c",
   "lang": "ja",
   "icons": [
     {
