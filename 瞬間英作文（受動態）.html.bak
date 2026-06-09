@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>受動態・瞬間英作文 Pro (Expanded)</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text-dim: #6a6a8a;
+    --accent: #00ff7f;
+    --accent2: #4af0c0;
+    --btn-primary: #2a2aff;
+    --btn-secondary: #1a1a25;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg); color: var(--text);
+    height: 100vh; width: 100vw;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  /* HUD */
+  #hud-sw { position: fixed; top: 18px; left: 22px; display: flex; align-items: center; gap: 10px; z-index: 1000; opacity: 0; transition: .3s; }
+  #hud-sw.visible { opacity: 1; }
+  #sw-time { font-family: 'JetBrains Mono'; font-size: 1.25rem; color: var(--accent2); font-weight: 700; }
+  .sw-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent2); animation: blink 1s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  #hud-fs { position: fixed; top: 18px; right: 22px; z-index: 1000; opacity: 0; transition: .3s; }
+  #hud-fs.visible { opacity: 1; }
+  #fs-btn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); width: 45px; height: 45px; border-radius: 10px; cursor: pointer; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; }
+
+  #hud-counter { position: fixed; bottom: 22px; right: 28px; text-align: right; opacity: 0; transition: .3s; }
+  #hud-counter.visible { opacity: 1; }
+  #counter-num { font-family: 'Bebas Neue'; font-size: 4rem; color: var(--text-dim); line-height: 1; }
+  #counter-num.bump { color: var(--accent); transform: scale(1.2); }
+
+  /* Layout */
+  .page { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .hidden { display: none !important; }
+  #drill-inner { width: 96vw; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+
+  /* Text Maximize */
+  #jp-text, #en-text { width: 100%; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+  #en-text { color: var(--accent); margin-top: 15px; visibility: hidden; }
+  .divider { width: 80px; height: 2px; background: var(--border); margin: 3vh 0; }
+
+  /* Settings UI */
+  .inner-settings { max-width: 600px; width: 100%; text-align: center; }
+  .section-label { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--text-dim); text-align: left; margin: 25px 0 10px 10px; letter-spacing: 2px; }
+  .check-group { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .check-pill { position: relative; }
+  .check-pill input { position: absolute; opacity: 0; cursor: pointer; }
+  .check-pill label { display: block; padding: 12px 24px; border: 1px solid var(--border); border-radius: 50px; cursor: pointer; color: var(--text-dim); transition: 0.2s; }
+  .check-pill input:checked + label { border-color: var(--accent); color: var(--accent); background: rgba(0,255,127,0.1); font-weight: 700; }
+  
+  /* Control Buttons */
+  .bulk-controls { margin: 20px 0; display: flex; justify-content: center; gap: 15px; }
+  .btn-mini { background: var(--btn-secondary); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-family: 'JetBrains Mono'; transition: 0.2s; }
+  .btn-mini:hover { border-color: var(--text-dim); color: var(--text); }
+
+  .btn-start { padding: 20px 60px; border-radius: 15px; border: none; background: var(--btn-primary); color: #fff; font-weight: 700; cursor: pointer; font-size: 1.2rem; margin-top: 20px; }
+
+  .drill-hint { font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--text-dim); margin-top: 6vh; letter-spacing: 2px; opacity: 0.6; }
+
+  /* ── Mobile / Touch ── */
+  #jp-text, #en-text {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  /* スワイプヒント */
+  #swipe-hint {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    opacity: 0; pointer-events: none; transition: opacity .4s; z-index: 20;
+  }
+  #swipe-hint.show { opacity: 1; }
+  .hint-arrow {
+    width: 28px; height: 28px;
+    border-left: 2px solid var(--text-dim); border-top: 2px solid var(--text-dim);
+    transform: rotate(225deg);
+    animation: swipe-bounce .9s ease-in-out infinite;
+  }
+  .hint-label { font-family: 'JetBrains Mono'; font-size: .65rem; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
+  @keyframes swipe-bounce { 0%,100%{transform:rotate(225deg) translateY(0)} 50%{transform:rotate(225deg) translateY(-6px)} }
+
+  /* スマホ向けレイアウト */
+  @media (max-width: 600px) {
+    body { overflow: auto; height: auto; min-height: 100vh; }
+    .inner-settings { padding: 20px 16px; }
+    h1 { font-size: 2.8rem !important; }
+    .check-pill label { padding: 10px 18px; font-size: .9rem; }
+    .btn-start { padding: 16px 40px; font-size: 1rem; }
+    #hud-sw { top: 12px; left: 14px; }
+    #sw-time { font-size: 1rem; }
+    #hud-counter { bottom: 14px; right: 16px; }
+    #counter-num { font-size: 2.5rem; }
+    #hud-fs { top: 12px; right: 14px; }
+    .drill-hint { font-size: .68rem; margin-top: 3vh; }
+  }
+</style>
+</head>
+<body>
+
+<div id="hud-sw"><div class="sw-dot"></div><span id="sw-time">00:00</span></div>
+<div id="hud-fs"><button id="fs-btn" onclick="toggleFullscreen()">⛶</button></div>
+<div id="hud-counter"><div id="counter-num">0</div></div>
+
+<div id="page-settings" class="page">
+  <div class="inner-settings">
+    <h1 style="font-family:'Bebas Neue'; font-size: 4rem; letter-spacing: 4px; margin-bottom: 10px;">PASSIVE<span> TRAINING</span></h1>
+    
+    <div class="bulk-controls">
+      <button class="btn-mini" onclick="toggleAll(true)">SELECT ALL</button>
+      <button class="btn-mini" onclick="toggleAll(false)">DESELECT ALL</button>
+    </div>
+
+    <div class="section-label">TENSE / 時制</div>
+    <div class="check-group">
+      <div class="check-pill"><input type="checkbox" id="t1" class="opt-tense" value="present"><label for="t1">現在形</label></div>
+      <div class="check-pill"><input type="checkbox" id="t1-past" class="opt-tense" value="past"><label for="t1-past">過去形</label></div>
+      <div class="check-pill"><input type="checkbox" id="t2" class="opt-tense" value="present_continuous"><label for="t2">現在進行形</label></div>
+      <div class="check-pill"><input type="checkbox" id="t2-past" class="opt-tense" value="past_continuous"><label for="t2-past">過去進行形</label></div>
+      <div class="check-pill"><input type="checkbox" id="t3" class="opt-tense" value="future"><label for="t3">未来形</label></div>
+      <div class="check-pill"><input type="checkbox" id="t4" class="opt-tense" value="perfect"><label for="t4">完了形</label></div>
+    </div>
+    
+    <div class="section-label">FORM / 文タイプ</div>
+    <div class="check-group">
+      <div class="check-pill"><input type="checkbox" id="f1" class="opt-form" value="Affirmative"><label for="f1">肯定文</label></div>
+      <div class="check-pill"><input type="checkbox" id="f2" class="opt-form" value="Negative"><label for="f2">否定文</label></div>
+      <div class="check-pill"><input type="checkbox" id="f3" class="opt-form" value="Question"><label for="f3">疑問文</label></div>
+    </div>
+    
+    <button class="btn-start" onclick="start()">START</button>
+  </div>
+</div>
+
+<div id="page-drill" class="page hidden">
+  <div id="swipe-hint"><div class="hint-arrow"></div><div class="hint-label">Swipe up</div></div>
+  <div id="drill-inner">
+    <div id="mode-display" style="font-family:'JetBrains Mono'; font-size:1rem; color:var(--accent2); margin-bottom:15px;"></div>
+    <div id="jp-text">LOADING...</div>
+    <div class="divider"></div>
+    <div id="en-text">ANSWER</div>
+    <div class="drill-hint" id="drill-hint-text">[ ENTER ] or タップ &nbsp;/&nbsp; SHOW → NEXT</div>
+    <button onclick="location.reload()" style="background:none; border:none; color:var(--text-dim); cursor:pointer; text-decoration:underline; margin-top:40px; font-size:0.9rem;">QUIT</button>
+  </div>
+</div>
+
+<script>
+// --- シナリオデータ ---
+const scenarios = [
+    { subject_en: "The room", subject_jp: "その部屋", verb_pp: "cleaned", be: "is", have: "has", base_jp: "掃除され", time_pres_en: "every day", time_pres_jp: "毎日", time_past_en: "yesterday", time_past_jp: "昨日", time_fut_en: "tomorrow", time_fut_jp: "明日" },
+    { subject_en: "The car", subject_jp: "その車", verb_pp: "repaired", be: "is", have: "has", base_jp: "修理され", time_pres_en: "here", time_pres_jp: "ここで", time_past_en: "last week", time_past_jp: "先週", time_fut_en: "next week", time_fut_jp: "来週" },
+    { subject_en: "Dinner", subject_jp: "夕食", verb_pp: "prepared", be: "is", have: "has", base_jp: "準備され", time_pres_en: "always", time_pres_jp: "いつも", time_past_en: "then", time_past_jp: "その時", time_fut_en: "soon", time_fut_jp: "すぐに" },
+    { subject_en: "These walls", subject_jp: "これらの壁", verb_pp: "painted", be: "are", have: "have", base_jp: "塗装され", time_pres_en: "every five years", time_pres_jp: "5年ごとに", time_past_en: "yesterday", time_past_jp: "昨日", time_fut_en: "tomorrow", time_fut_jp: "明日" },
+    { subject_en: "The dishes", subject_jp: "それらのお皿", verb_pp: "washed", be: "are", have: "have", base_jp: "洗われ", time_pres_en: "every night", time_pres_jp: "毎晩", time_past_en: "an hour ago", time_past_jp: "1時間前", time_fut_en: "later", time_fut_jp: "あとで" }
+];
+
+let selectedTenses = [], selectedForms = [], isAnswerShowing = false, currentEN = '', sentenceCount = 0, swSec = 0, swTick = null;
+
+function toggleAll(state) {
+    document.querySelectorAll('.opt-tense, .opt-form').forEach(el => el.checked = state);
+}
+
+function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+function lowerSubject(str) {
+    const lowers = { "The room": "the room", "The car": "the car", "Dinner": "dinner", "These walls": "these walls", "The dishes": "the dishes" };
+    return lowers[str] || str;
+}
+
+function fitText() {
+    if (document.getElementById('page-drill').classList.contains('hidden')) return;
+    const containerW = window.innerWidth * 0.96;
+    const targets = [{el: document.getElementById('jp-text'), show: true}, {el: document.getElementById('en-text'), show: isAnswerShowing}];
+
+    targets.forEach(item => {
+        const el = item.el;
+        if (!item.show) { el.style.visibility = 'hidden'; return; }
+        el.style.visibility = 'visible';
+        
+        let size = 450; 
+        el.style.fontSize = size + 'px';
+        
+        while (el.scrollWidth > containerW && size > 30) {
+            size -= (el.scrollWidth - containerW > 100) ? 10 : 2;
+            el.style.fontSize = size + 'px';
+        }
+        const maxH = window.innerHeight * 0.45;
+        while (el.offsetHeight > maxH && size > 30) {
+            size -= 2;
+            el.style.fontSize = size + 'px';
+        }
+    });
+}
+
+function start() {
+    selectedTenses = Array.from(document.querySelectorAll('.opt-tense:checked')).map(e => e.value);
+    selectedForms = Array.from(document.querySelectorAll('.opt-form:checked')).map(e => e.value);
+    if (!selectedTenses.length || !selectedForms.length) return alert("項目を選択してください");
+    
+    document.getElementById('page-settings').classList.add('hidden');
+    document.getElementById('page-drill').classList.remove('hidden');
+    ['hud-sw', 'hud-fs', 'hud-counter'].forEach(id => document.getElementById(id).classList.add('visible'));
+    
+    swTick = setInterval(() => { swSec++; renderSw(); }, 1000);
+    makeQuestion();
+}
+
+function renderSw() {
+    let m = String(Math.floor(swSec / 60)).padStart(2, '0'), s = String(swSec % 60).padStart(2, '0');
+    document.getElementById('sw-time').textContent = `${m}:${s}`;
+}
+
+function makeQuestion() {
+    const tense = selectedTenses[Math.floor(Math.random() * selectedTenses.length)];
+    const form = selectedForms[Math.floor(Math.random() * selectedForms.length)];
+    const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
+    
+    let jp = "", en = "";
+    const s = sc.subject_en;
+    const sj = sc.subject_jp;
+    const v = sc.verb_pp;
+    const be = sc.be;
+    const was_were = (be === "is") ? "was" : "were";
+    const have = sc.have;
+    const sLow = lowerSubject(s);
+
+    if (form === 'Affirmative') {
+        switch(tense) {
+            case 'present':
+                jp = `${sj}は${sc.time_pres_jp}${sc.base_jp}ます。`;
+                en = (sc.time_pres_en === "always") ? `${s} ${be} always ${v}.` : `${s} ${be} ${v} ${sc.time_pres_en}.`;
+                break;
+            case 'past':
+                jp = `${sj}は${sc.time_past_jp}${sc.base_jp}ました。`;
+                en = `${s} ${was_were} ${v} ${sc.time_past_en}.`;
+                break;
+            case 'present_continuous':
+                jp = `今、${sj}は${sc.base_jp}ているところです。`;
+                en = `${s} ${be} being ${v} now.`;
+                break;
+            case 'past_continuous':
+                jp = `その時、${sj}は${sc.base_jp}ているところでした。`;
+                en = `${s} ${was_were} being ${v} then.`;
+                break;
+            case 'future':
+                jp = `${sj}は${sc.time_fut_jp}${sc.base_jp}るでしょう。`;
+                en = `${s} will be ${v} ${sc.time_fut_en}.`;
+                break;
+            case 'perfect':
+                jp = `${sj}はすでに${sc.base_jp}ました。`;
+                en = `${s} ${have} already been ${v}.`;
+                break;
+        }
+    } else if (form === 'Negative') {
+        switch(tense) {
+            case 'present':
+                jp = `${sj}は${sc.time_pres_jp}${sc.base_jp}ません。`;
+                en = (sc.time_pres_en === "always") ? `${s} ${be} not always ${v}.` : `${s} ${be} not ${v} ${sc.time_pres_en}.`;
+                break;
+            case 'past':
+                jp = `${sj}は${sc.time_past_jp}${sc.base_jp}ませんでした。`;
+                en = `${s} ${was_were} not ${v} ${sc.time_past_en}.`;
+                break;
+            case 'present_continuous':
+                jp = `今、${sj}は${sc.base_jp}ているところではありません。`;
+                en = `${s} ${be} not being ${v} now.`;
+                break;
+            case 'past_continuous':
+                jp = `その時、${sj}は${sc.base_jp}ているところではありませんでした。`;
+                en = `${s} ${was_were} not being ${v} then.`;
+                break;
+            case 'future':
+                jp = `${sj}は${sc.time_fut_jp}${sc.base_jp}ないでしょう。`;
+                en = `${s} will not be ${v} ${sc.time_fut_en}.`;
+                break;
+            case 'perfect':
+                jp = `${sj}はまだ${sc.base_jp}ていません。`;
+                en = `${s} ${have} not been ${v} yet.`;
+                break;
+        }
+    } else if (form === 'Question') {
+        switch(tense) {
+            case 'present':
+                jp = `${sj}は${sc.time_pres_jp}${sc.base_jp}ますか？`;
+                en = (sc.time_pres_en === "always") ? `${capitalize(be)} ${sLow} always ${v}?` : `${capitalize(be)} ${sLow} ${v} ${sc.time_pres_en}?`;
+                break;
+            case 'past':
+                jp = `${sj}は${sc.time_past_jp}${sc.base_jp}ましたか？`;
+                en = `${capitalize(was_were)} ${sLow} ${v} ${sc.time_past_en}?`;
+                break;
+            case 'present_continuous':
+                jp = `今、${sj}は${sc.base_jp}ていますか？`;
+                en = `${capitalize(be)} ${sLow} being ${v} now?`;
+                break;
+            case 'past_continuous':
+                jp = `その時、${sj}は${sc.base_jp}ていましたか？`;
+                en = `${capitalize(was_were)} ${sLow} being ${v} then?`;
+                break;
+            case 'future':
+                jp = `${sj}は${sc.time_fut_jp}${sc.base_jp}るでしょうか？`;
+                en = `Will ${sLow} be ${v} ${sc.time_fut_en}?`;
+                break;
+            case 'perfect':
+                jp = `${sj}はもう${sc.base_jp}ましたか？`;
+                en = `${capitalize(have)} ${sLow} been ${v} yet?`;
+                break;
+        }
+    }
+
+    const labels = { present:'現在', past:'過去', present_continuous:'現在進行', past_continuous:'過去進行', future:'未来', perfect:'完了', Affirmative:'肯定', Negative:'否定', Question:'疑問' };
+    document.getElementById('mode-display').innerText = `${labels[tense]} / ${labels[form]}`;
+    document.getElementById('jp-text').innerText = jp;
+    document.getElementById('en-text').innerText = en;
+    currentEN = en; isAnswerShowing = false;
+    fitText();
+}
+
+function handleEnter() {
+    if (document.getElementById('page-drill').classList.contains('hidden')) return;
+    if (!isAnswerShowing) {
+        isAnswerShowing = true;
+        sentenceCount++;
+        const c = document.getElementById('counter-num');
+        c.innerText = sentenceCount;
+        c.classList.add('bump'); setTimeout(()=>c.classList.remove('bump'), 200);
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(currentEN); u.lang = 'en-US'; speechSynthesis.speak(u);
+        fitText();
+    } else {
+        makeQuestion();
+    }
+}
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+            document.getElementById('fs-btn').blur();
+            setTimeout(fitText, 100);
+        });
+    } else { document.exitFullscreen(); }
+}
+
+window.addEventListener('resize', () => setTimeout(fitText, 50));
+document.addEventListener('fullscreenchange', () => setTimeout(fitText, 50));
+window.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleEnter(); });
+
+// ══ Touch / Click support ══
+(function() {
+  var drillInner = document.getElementById('drill-inner');
+  var swHint = document.getElementById('swipe-hint');
+  var startY = 0, startX = 0;
+  var SWIPE_THRESHOLD = 40;
+  var isTouchDevice = false;
+  var hintShown = false;
+
+  function isOnDrillPage() {
+    return !document.getElementById('page-drill').classList.contains('hidden');
+  }
+
+  // クリック（PCでテキスト部分クリックでも進める）
+  drillInner.addEventListener('click', function(e) {
+    if (!isOnDrillPage()) return;
+    if (e.target.closest('button')) return;
+    handleEnter();
+  });
+
+  // タッチ開始
+  drillInner.addEventListener('touchstart', function(e) {
+    if (e.target.closest('button')) return;
+    isTouchDevice = true;
+    startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+
+  // タッチ終了 → スワイプ or タップ判定
+  drillInner.addEventListener('touchend', function(e) {
+    if (!isOnDrillPage()) return;
+    if (e.target.closest('button')) return;
+    var dy = startY - e.changedTouches[0].clientY;
+    var dx = Math.abs(startX - e.changedTouches[0].clientX);
+    if (Math.abs(dy) > SWIPE_THRESHOLD && Math.abs(dy) > dx) {
+      handleEnter();
+    } else if (Math.abs(dy) < 15 && dx < 15) {
+      handleEnter();
+    }
+  }, { passive: true });
+
+  // スワイプヒント（初回のみ）
+  function showSwipeHint() {
+    if (hintShown || !isTouchDevice) return;
+    hintShown = true;
+    swHint.classList.add('show');
+    setTimeout(function() { swHint.classList.remove('show'); }, 2200);
+  }
+
+  // start() 後にヒント表示するため makeQuestion をラップ
+  var origMakeQuestion = window.makeQuestion || makeQuestion;
+  // start関数の後でmakeQuestionが呼ばれるので、startをラップ
+  var origStart = window.start;
+  window.start = function() {
+    origStart();
+    setTimeout(function() { if (!hintShown) showSwipeHint(); }, 800);
+  };
+
+  // タッチデバイス判定後にヒント文言を切り替え
+  drillInner.addEventListener('touchstart', function() {
+    var hint = document.getElementById('drill-hint-text');
+    if (hint) hint.textContent = 'タップ or スワイプ で回答表示 / もう一度で次の問題';
+  }, { once: true, passive: true });
+})();
+
+</script>
+</body>
+</html>

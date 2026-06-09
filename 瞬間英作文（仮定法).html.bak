@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>仮定法・瞬間英作文 Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text-dim: #6a6a8a;
+    --accent: #e67e22; /* 仮定法はオレンジアクセント */
+    --accent2: #ff9f43;
+    --btn-primary: #2980b9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg); color: var(--text);
+    height: 100vh; width: 100vw;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  /* HUD */
+  #hud-sw { position: fixed; top: 18px; left: 22px; display: flex; align-items: center; gap: 10px; z-index: 1000; opacity: 0; transition: .3s; }
+  #hud-sw.visible { opacity: 1; }
+  #sw-time { font-family: 'JetBrains Mono'; font-size: 1.25rem; color: var(--accent2); font-weight: 700; }
+  .sw-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent2); animation: blink 1s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  #hud-fs { position: fixed; top: 18px; right: 22px; z-index: 1000; opacity: 0; transition: .3s; }
+  #hud-fs.visible { opacity: 1; }
+  #fs-btn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); width: 45px; height: 45px; border-radius: 10px; cursor: pointer; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; }
+
+  #hud-counter { position: fixed; bottom: 22px; right: 28px; text-align: right; opacity: 0; transition: .3s; }
+  #hud-counter.visible { opacity: 1; }
+  #counter-num { font-family: 'Bebas Neue'; font-size: 4rem; color: var(--text-dim); line-height: 1; }
+  #counter-num.bump { color: var(--accent); transform: scale(1.2); }
+
+  /* Layout */
+  .page { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+  .hidden { display: none !important; }
+  #drill-inner { width: 96vw; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+
+  /* Text Maximize Logic */
+  #jp-text, #en-text { width: 100%; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+  #en-text { color: var(--accent); margin-top: 15px; visibility: hidden; }
+  .divider { width: 80px; height: 2px; background: var(--border); margin: 3vh 0; }
+
+  /* UI Elements */
+  .inner-container { max-width: 700px; width: 100%; text-align: center; padding: 20px; }
+  .mode-select-btns { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
+  .btn-mode { flex: 1; padding: 25px; border-radius: 15px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text); font-size: 1.2rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+  .btn-mode:hover { border-color: var(--accent); background: rgba(230,126,34,0.1); }
+
+  .section-label { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--text-dim); text-align: left; margin: 25px 0 10px 10px; letter-spacing: 2px; }
+  .check-group { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .check-pill { position: relative; }
+  .check-pill input { position: absolute; opacity: 0; cursor: pointer; }
+  .check-pill label { display: block; padding: 12px 24px; border: 1px solid var(--border); border-radius: 50px; cursor: pointer; color: var(--text-dim); transition: 0.2s; }
+  .check-pill input:checked + label { border-color: var(--accent); color: var(--accent); background: rgba(230,126,34,0.1); font-weight: 700; }
+  
+  .btn-start { padding: 20px 60px; border-radius: 15px; border: none; background: var(--btn-primary); color: #fff; font-weight: 700; cursor: pointer; font-size: 1.2rem; margin-top: 40px; }
+  .drill-hint { font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--text-dim); margin-top: 6vh; letter-spacing: 2px; opacity: 0.6; }
+
+  /* ── Mobile / Touch ── */
+  #jp-text, #en-text {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  /* スワイプヒント */
+  #swipe-hint {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    opacity: 0; pointer-events: none; transition: opacity .4s; z-index: 20;
+  }
+  #swipe-hint.show { opacity: 1; }
+  .hint-arrow {
+    width: 28px; height: 28px;
+    border-left: 2px solid var(--text-dim); border-top: 2px solid var(--text-dim);
+    transform: rotate(225deg);
+    animation: swipe-bounce .9s ease-in-out infinite;
+  }
+  .hint-label { font-family: 'JetBrains Mono'; font-size: .65rem; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
+  @keyframes swipe-bounce { 0%,100%{transform:rotate(225deg) translateY(0)} 50%{transform:rotate(225deg) translateY(-6px)} }
+
+  /* スマホ向けレイアウト */
+  @media (max-width: 600px) {
+    body { overflow: auto; height: auto; min-height: 100vh; }
+    .inner-container { padding: 20px 16px; }
+    h1 { font-size: 3rem !important; }
+    .btn-mode { padding: 18px 12px; font-size: 1rem; }
+    .check-pill label { padding: 10px 16px; font-size: .9rem; }
+    .btn-start { padding: 16px 40px; font-size: 1rem; margin-top: 28px; }
+    #hud-sw { top: 12px; left: 14px; }
+    #sw-time { font-size: 1rem; }
+    #hud-counter { bottom: 14px; right: 16px; }
+    #counter-num { font-size: 2.5rem; }
+    #hud-fs { top: 12px; right: 14px; }
+    .drill-hint { font-size: .68rem; margin-top: 3vh; }
+  }
+</style>
+</head>
+<body>
+
+<div id="hud-sw"><div class="sw-dot"></div><span id="sw-time">00:00</span></div>
+<div id="hud-fs"><button id="fs-btn" onclick="toggleFullscreen()">⛶</button></div>
+<div id="hud-counter"><div id="counter-num">0</div></div>
+
+<div id="page-top" class="page">
+  <div class="inner-container">
+    <h1 style="font-family:'Bebas Neue'; font-size: 4.5rem; letter-spacing: 4px; color: var(--accent);">SUBJUNCTIVE</h1>
+    <p style="color:var(--text-dim); margin-bottom: 30px;">仮定法 瞬間英作文トレーニング</p>
+    <div class="mode-select-btns">
+      <button class="btn-mode" onclick="openSettings('If')">IF 節<br><span style="font-size:0.8rem; opacity:0.6;">Conditional</span></button>
+      <button class="btn-mode" onclick="openSettings('Wish')">I WISH<br><span style="font-size:0.8rem; opacity:0.6;">Desire</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="page-settings" class="page hidden">
+  <div class="inner-container">
+    <h2 id="mode-title" style="font-family:'Bebas Neue'; font-size: 2.5rem; color: var(--accent);">SETTINGS</h2>
+    <div class="section-label">SELECT TENSES</div>
+    <div class="check-group" id="tense-group"></div>
+    <button class="btn-start" onclick="start()">START DRILL</button>
+    <div style="margin-top:20px;"><button onclick="location.reload()" style="background:none; border:none; color:var(--text-dim); cursor:pointer; text-decoration:underline;">BACK</button></div>
+  </div>
+</div>
+
+<div id="page-drill" class="page hidden">
+  <div id="swipe-hint"><div class="hint-arrow"></div><div class="hint-label">Swipe up</div></div>
+  <div id="drill-inner">
+    <div id="mode-display" style="font-family:'JetBrains Mono'; font-size:1rem; color:var(--accent2); margin-bottom:15px;"></div>
+    <div id="jp-text">LOADING...</div>
+    <div class="divider"></div>
+    <div id="en-text">ANSWER</div>
+    <div class="drill-hint" id="drill-hint-text">[ ENTER ] or タップ &nbsp;/&nbsp; SHOW → NEXT</div>
+    <button onclick="location.reload()" style="background:none; border:none; color:var(--text-dim); cursor:pointer; text-decoration:underline; margin-top:40px; font-size:0.9rem;">QUIT</button>
+  </div>
+</div>
+
+<script>
+// --- データ定義 (元コードの資産) ---
+const subjects = [
+    { en: "I", jp_ga: "私が", jp_wa: "私は", was: "was" },
+    { en: "You", jp_ga: "あなたが", jp_wa: "あなたは", was: "were" },
+    { en: "He", jp_ga: "彼が", jp_wa: "彼は", was: "was" },
+    { en: "She", jp_ga: "彼女が", jp_wa: "彼女は", was: "was" },
+    { en: "It", jp_ga: "それが", jp_wa: "それは", was: "was" },
+    { en: "We", jp_ga: "私たちが", jp_wa: "私たちは", was: "were" },
+    { en: "They", jp_ga: "彼らが", jp_wa: "彼らは", was: "were" }
+];
+
+const conditions = [
+    { id: "be_rich", jp_past: "金持ちなら", jp_wish_past: "金持ちであれば", jp_pp: "金持ちだったら", jp_fut_were: "金持ちになるようなことがあれば", jp_fut_should: "金持ちになれば", en_past_be: true, en_pp: "had been rich", inf: "be rich" },
+    { id: "be_free", jp_past: "自由なら", jp_wish_past: "自由であれば", jp_pp: "自由だったら", jp_fut_were: "自由になるようなことがあれば", jp_fut_should: "自由になれば", en_past_be: true, en_pp: "had been free", inf: "be free" },
+    { id: "know", jp_past: "やり方を知っていれば", jp_wish_past: "やり方を知っていれば", jp_pp: "やり方を知っていたら", jp_fut_were: "やり方を知るようなことがあれば", jp_fut_should: "やり方を知れば", en_past_be: false, en_past: "knew how to do it", en_pp: "had known how to do it", inf: "know how to do it", notForIt: true }
+];
+
+const results = [
+    { id: "abroad", jp_pres: "海外に行くのに", jp_past: "海外に行ったのに", en_pres: "would go abroad", en_past: "would have gone abroad" },
+    { id: "help", jp_pres: "あなたを助けるのに", jp_past: "あなたを助けたのに", en_pres: "would help you", en_past: "would have helped you", needsNotYou: true },
+    { id: "with", jp_pres: "あなたと行くのに", jp_past: "あなたと行ったのに", en_pres: "would go with you", en_past: "would have gone with you", needsNotYou: true }
+];
+
+const config = {
+    'If': [
+        { val: 'past', label: '仮定法過去 (今)' },
+        { val: 'p_perf', label: '仮定法過去完了 (あの時)' },
+        { val: 'mixed', label: '混合 (あの時→今)' },
+        { val: 'were_to', label: '未来 (were to)' },
+        { val: 'should', label: '未来 (should)' }
+    ],
+    'Wish': [
+        { val: 'wish_past', label: 'wish + 仮定法過去 (今)' },
+        { val: 'wish_p_perf', label: 'wish + 仮定法過去完了 (あの時)' }
+    ]
+};
+
+let currentMode = '', selectedTenses = [], isAnswerShowing = false, currentEN = '', sentenceCount = 0, swSec = 0, swTick = null;
+
+function fmtSub(subEn) { return subEn === "I" ? "I" : subEn.toLowerCase(); }
+
+// 文字サイズ自動調整（ウィンドウ表示対応版）
+function fitText() {
+    if (document.getElementById('page-drill').classList.contains('hidden')) return;
+    const containerW = window.innerWidth * 0.96;
+    const targets = [{el: document.getElementById('jp-text'), show: true}, {el: document.getElementById('en-text'), show: isAnswerShowing}];
+
+    targets.forEach(item => {
+        const el = item.el;
+        if (!item.show) { el.style.visibility = 'hidden'; return; }
+        el.style.visibility = 'visible';
+        let size = 450; 
+        el.style.fontSize = size + 'px';
+        while (el.scrollWidth > containerW && size > 30) {
+            size -= (el.scrollWidth - containerW > 100) ? 10 : 2;
+            el.style.fontSize = size + 'px';
+        }
+        const maxH = window.innerHeight * 0.45;
+        while (el.offsetHeight > maxH && size > 30) {
+            size -= 2; el.style.fontSize = size + 'px';
+        }
+    });
+}
+
+function openSettings(mode) {
+    currentMode = mode;
+    document.getElementById('page-top').classList.add('hidden');
+    document.getElementById('page-settings').classList.remove('hidden');
+    const group = document.getElementById('tense-group');
+    group.innerHTML = '';
+    config[mode].forEach((t, i) => {
+        group.innerHTML += `
+          <div class="check-pill">
+            <input type="checkbox" id="t${i}" class="opt-tense" value="${t.val}">
+            <label for="t${i}">${t.label}</label>
+          </div>`;
+    });
+}
+
+function start() {
+    selectedTenses = Array.from(document.querySelectorAll('.opt-tense:checked')).map(e => e.value);
+    if (!selectedTenses.length) return alert("練習したい項目にチェックを入れてください");
+    
+    document.getElementById('page-settings').classList.add('hidden');
+    document.getElementById('page-drill').classList.remove('hidden');
+    ['hud-sw', 'hud-fs', 'hud-counter'].forEach(id => document.getElementById(id).classList.add('visible'));
+    
+    swTick = setInterval(() => { swSec++; renderSw(); }, 1000);
+    makeQuestion();
+}
+
+function renderSw() {
+    let m = String(Math.floor(swSec / 60)).padStart(2, '0'), s = String(swSec % 60).padStart(2, '0');
+    document.getElementById('sw-time').textContent = `${m}:${s}`;
+}
+
+function makeQuestion() {
+    const tense = selectedTenses[Math.floor(Math.random() * selectedTenses.length)];
+    const sub = subjects[Math.floor(Math.random() * subjects.length)]; 
+    let filteredConds = conditions;
+    if (sub.en === "It") filteredConds = conditions.filter(c => !c.notForIt);
+    const cond = filteredConds[Math.floor(Math.random() * filteredConds.length)];
+    let filteredResults = results;
+    if (sub.en === "You") filteredResults = results.filter(r => !r.needsNotYou);
+    const res = filteredResults[Math.floor(Math.random() * filteredResults.length)];
+    
+    let jp = "", en = "";
+    const sLow = fmtSub(sub.en);
+    const bePast = sub.was;
+    const condPastEn = cond.en_past_be ? `${bePast} ${cond.inf.replace('be ', '')}` : cond.en_past;
+
+    if (currentMode === 'If') {
+        switch(tense) {
+            case 'past':
+                jp = `もし(今)${sub.jp_ga}${cond.jp_past}、${sub.jp_wa}${res.jp_pres}。`;
+                en = `If ${sLow} ${condPastEn}, ${sLow} ${res.en_pres}.`;
+                break;
+            case 'p_perf':
+                jp = `もし(あの時)${sub.jp_ga}${cond.jp_pp}、${sub.jp_wa}${res.jp_past}。`;
+                en = `If ${sLow} ${cond.en_pp}, ${sLow} ${res.en_past}.`;
+                break;
+            case 'mixed':
+                jp = `もし(あの時)${sub.jp_ga}${cond.jp_pp}、(今)${sub.jp_wa}${res.jp_pres}。`;
+                en = `If ${sLow} ${cond.en_pp}, ${sLow} ${res.en_pres}.`;
+                break;
+            case 'were_to':
+                jp = `万一${sub.jp_ga}${cond.jp_fut_were}、${sub.jp_wa}${res.jp_pres}。`;
+                en = `If ${sLow} were to ${cond.inf}, ${sLow} ${res.en_pres}.`;
+                break;
+            case 'should':
+                jp = `万一${sub.jp_ga}${cond.jp_fut_should}、${sub.jp_wa}${res.jp_pres}。`;
+                en = `If ${sLow} should ${cond.inf}, ${sLow} ${res.en_pres}.`;
+                break;
+        }
+    } else {
+        switch(tense) {
+            case 'wish_past':
+                jp = `(今)${sub.jp_ga}${cond.jp_wish_past}いいのに、と私は思う。`;
+                en = `I wish ${sLow} ${condPastEn}.`;
+                break;
+            case 'wish_p_perf':
+                jp = `(あの時)${sub.jp_ga}${cond.jp_pp}よかったのに、と私は思う。`;
+                en = `I wish ${sLow} ${cond.en_pp}.`;
+                break;
+        }
+    }
+
+    const labels = { past:'If(過去)', p_perf:'If(過完)', mixed:'混合時制', were_to:'Were to', should:'Should', wish_past:'Wish(現在)', wish_p_perf:'Wish(過去)' };
+    document.getElementById('mode-display').innerText = `${currentMode.toUpperCase()} / ${labels[tense]}`;
+    document.getElementById('jp-text').innerText = jp;
+    document.getElementById('en-text').innerText = en;
+    currentEN = en; isAnswerShowing = false;
+    fitText();
+}
+
+function handleEnter() {
+    if (document.getElementById('page-drill').classList.contains('hidden')) return;
+    if (!isAnswerShowing) {
+        isAnswerShowing = true;
+        sentenceCount++;
+        const c = document.getElementById('counter-num');
+        c.innerText = sentenceCount;
+        c.classList.add('bump'); setTimeout(()=>c.classList.remove('bump'), 200);
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(currentEN); u.lang = 'en-US'; speechSynthesis.speak(u);
+        fitText();
+    } else {
+        makeQuestion();
+    }
+}
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+            document.getElementById('fs-btn').blur();
+            setTimeout(fitText, 100);
+        });
+    } else { document.exitFullscreen(); }
+}
+
+window.addEventListener('resize', () => setTimeout(fitText, 50));
+document.addEventListener('fullscreenchange', () => setTimeout(fitText, 50));
+window.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleEnter(); });
+
+// ══ Touch / Click support ══
+(function() {
+  var drillInner = document.getElementById('drill-inner');
+  var swHint = document.getElementById('swipe-hint');
+  var startY = 0, startX = 0;
+  var SWIPE_THRESHOLD = 40;
+  var isTouchDevice = false;
+  var hintShown = false;
+
+  function isOnDrillPage() {
+    return !document.getElementById('page-drill').classList.contains('hidden');
+  }
+
+  // クリック（PCでテキスト部分クリックでも進める）
+  drillInner.addEventListener('click', function(e) {
+    if (!isOnDrillPage()) return;
+    if (e.target.closest('button')) return;
+    handleEnter();
+  });
+
+  // タッチ開始
+  drillInner.addEventListener('touchstart', function(e) {
+    if (e.target.closest('button')) return;
+    isTouchDevice = true;
+    startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+
+  // タッチ終了 → スワイプ or タップ判定
+  drillInner.addEventListener('touchend', function(e) {
+    if (!isOnDrillPage()) return;
+    if (e.target.closest('button')) return;
+    var dy = startY - e.changedTouches[0].clientY;
+    var dx = Math.abs(startX - e.changedTouches[0].clientX);
+    if (Math.abs(dy) > SWIPE_THRESHOLD && Math.abs(dy) > dx) {
+      handleEnter();
+    } else if (Math.abs(dy) < 15 && dx < 15) {
+      handleEnter();
+    }
+  }, { passive: true });
+
+  // スワイプヒント（初回のみ）
+  function showSwipeHint() {
+    if (hintShown || !isTouchDevice) return;
+    hintShown = true;
+    swHint.classList.add('show');
+    setTimeout(function() { swHint.classList.remove('show'); }, 2200);
+  }
+
+  var origStart = window.start;
+  window.start = function() {
+    origStart();
+    setTimeout(function() { if (!hintShown) showSwipeHint(); }, 800);
+  };
+
+  // タッチデバイス判定後にヒント文言を切り替え
+  drillInner.addEventListener('touchstart', function() {
+    var hint = document.getElementById('drill-hint-text');
+    if (hint) hint.textContent = 'タップ or スワイプ で回答表示 / もう一度で次の問題';
+  }, { once: true, passive: true });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接頭辞・語根マスタークイズ（解説＆復習付き）</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            background-color: #f0fdf4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 90vh;
+        }
+
+        .quiz-container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 90%;
+            max-width: 850px;
+            text-align: center;
+        }
+
+        .progress-box {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.4rem;
+            color: #666;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .round-status {
+            color: #b45309;
+            background-color: #fef3c7;
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .question-title {
+            font-size: 2rem;
+            color: #047857;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .part-display {
+            font-size: 5.5rem;
+            font-weight: bold;
+            color: #065f46;
+            margin: 20px 0;
+            background: #e6fbf1;
+            padding: 15px 0;
+            border-radius: 12px;
+            letter-spacing: 1px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .option-btn {
+            font-size: 2rem;
+            padding: 18px;
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            background-color: white;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            font-weight: bold;
+            text-align: left;
+            padding-left: 40px;
+        }
+
+        .option-btn:hover {
+            background-color: #f8fafc;
+            transform: scale(1.01);
+        }
+
+        .option-btn.correct {
+            background-color: #10b981 !important;
+            color: white;
+            border-color: #059669;
+        }
+
+        .option-btn.wrong {
+            background-color: #ef4444 !important;
+            color: white;
+            border-color: #dc2626;
+            opacity: 0.7;
+        }
+
+        /* 解説エリアのスタイル */
+        .explanation-box {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #eff6ff;
+            border-left: 8px solid #3b82f6;
+            border-radius: 8px;
+            text-align: left;
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .exp-title {
+            font-size: 1.2rem;
+            color: #1d4ed8;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .exp-body {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .btn-next {
+            font-size: 1.8rem;
+            padding: 15px 40px;
+            margin-top: 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #3b82f6;
+            color: white;
+            font-weight: bold;
+            display: none;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-next:hover { background-color: #2563eb; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="progress-box">
+        <span id="progress">1 / 23</span>
+        <span id="round-status" class="round-status" style="display:none;">復習ラウンド</span>
+    </div>
+    
+    <div class="question-title" id="question-title">この接頭辞の意味は？</div>
+    <div class="part-display" id="part-display">--</div>
+
+    <div class="options-container" id="options-container"></div>
+
+    <div class="explanation-box" id="explanation-box">
+        <div class="exp-title">💡 語源から広がる英単語</div>
+        <div class="exp-body" id="explanation-content"></div>
+    </div>
+
+    <button class="btn-next" id="btn-next" onclick="nextQuestion()">次の問題へ</button>
+</div>
+
+<script>
+// ベースとなる全パーツデータと、それぞれの組み合わせ解説
+const allParts = [
+    { text: "pre-", meaning: "前に", type: "接頭辞", exp: "pre- (前に) ＋ cept (取る) ＝ precept（処世訓、教え）" },
+    { text: "de-", meaning: "離れて、下に", type: "接頭辞", exp: "de- (離れて) ＋ tain (保つ) ＝ detain（拘留する）" },
+    { text: "inter-", meaning: "間に", type: "接頭辞", exp: "inter- (間に) ＋ mit (送る) ＝ intermittent（断続的な）" },
+    { text: "ob-", meaning: "〜に対して", type: "接頭辞", exp: "ob- (〜に対して) ＋ fer (運ぶ) ＝ offer（提供する）" },
+    { text: "in- (insist)", meaning: "〜の中に、上に", type: "接頭辞", exp: "in- (上に) ＋ sist (立つ) ＝ insist（主張する）" },
+    { text: "mono-", meaning: "1つの", type: "接頭辞", exp: "mono- (1つの) ＋ graph (書く) ＝ monograph（研究論文）" },
+    { text: "epi-", meaning: "〜の上に", type: "接頭辞", exp: "epi- (の上に) ＋ log(y) (言葉) ＝ epilogue（結末、結びの言葉）" },
+    { text: "ad-", meaning: "〜に向かって", type: "接頭辞", exp: "ad- (〜に向かって) ＋ spect (見る) ＝ aspect（側面）" },
+    { text: "un-", meaning: "〜でない", type: "接頭辞", exp: "un- (でない) ＋ com- (共に) ＋ ply (折る) ＝ uncomplicated（複雑でない）" },
+    { text: "com-", meaning: "共に", type: "接頭辞", exp: "un- (でない) ＋ com- (共に) ＋ ply (折る) ＝ uncomplicated（複雑でない）" },
+    { text: "non-", meaning: "〜でない", type: "接頭辞", exp: "non- (でない) ＋ ex- (外に) ＋ tend (伸ばす) ＝ nonextended（延長されていない）" },
+    { text: "ex-", meaning: "外に", type: "接頭辞", exp: "non- (でない) ＋ ex- (外に) ＋ tend (伸ばす) ＝ nonextended（延長されていない）" },
+    { text: "re-", meaning: "再び", type: "接頭辞", exp: "re- (再び) ＋ pro- (前に) ＋ duct (導く) ＝ reproduction（複製品）" },
+    { text: "pro-", meaning: "前に", type: "接頭辞", exp: "re- (再び) ＋ pro- (前に) ＋ duct (導く) ＝ reproduction（複製品）" },
+    { text: "in- (indisposed)", meaning: "〜でない", type: "接頭辞", exp: "in- (でない) ＋ dis- (離れて) ＋ pose (置く) ＝ indisposed（気が向かない）" },
+    { text: "dis-", meaning: "離れて", type: "接頭辞", exp: "in- (でない) ＋ dis- (離れて) ＋ pose (置く) ＝ indisposed（気が向かない）" },
+    { text: "over-", meaning: "越えて", type: "接頭辞", exp: "over- (越えて) ＋ sub- (下に) ＋ fic(t) (作る) ＝ oversufficient（過剰の）" },
+    { text: "sub-", meaning: "下に", type: "接頭辞", exp: "over- (越えて) ＋ sub- (下に) ＋ fic(t) (作る) ＝ oversufficient（過剰の）" },
+    { text: "mis-", meaning: "誤った", type: "接頭辞", exp: "mis- (誤った) ＋ trans- (越えて) ＋ scribe (書く) ＝ mistranscribe（誤って書き写す）" },
+    { text: "trans-", meaning: "越えて", type: "接頭辞", exp: "mis- (誤った) ＋ trans- (越えて) ＋ scribe (書く) ＝ mistranscribe（誤って書き写す）" },
+    { text: "cept", meaning: "取る", type: "語根", exp: "pre- (前に) ＋ cept (取る) ＝ precept（処世訓、教え）" },
+    { text: "tain", meaning: "持つ、保つ", type: "語根", exp: "de- (離れて) ＋ tain (保つ) ＝ detain（拘留する）" },
+    { text: "mit", meaning: "送る、投げる", type: "語根", exp: "inter- (間に) ＋ mit (送る) ＝ intermittent（断続的な）" },
+    { text: "fer", meaning: "運ぶ", type: "語根", exp: "ob- (〜に対して) ＋ fer (運ぶ) ＝ offer（提供する）" },
+    { text: "sist", meaning: "立つ", type: "語根", exp: "in- (上に) ＋ sist (立つ) ＝ insist（主張する）" },
+    { text: "graph", meaning: "書く", type: "語根", exp: "mono- (1つの) ＋ graph (書く) ＝ monograph（研究論文）" },
+    { text: "log(y)", meaning: "言葉、学問", type: "語根", exp: "epi- (の上に) ＋ log(y) (言葉) ＝ epilogue（結末、結びの言葉）" },
+    { text: "spect", meaning: "見る", type: "語根", exp: "ad- (〜に向かって) ＋ spect (見る) ＝ aspect（側面）" },
+    { text: "ply", meaning: "折る", type: "語根", exp: "un- (でない) ＋ com- (共に) ＋ ply (折る) ＝ uncomplicated（複雑でない）" },
+    { text: "tend", meaning: "伸ばす、引く", type: "語根", exp: "non- (でない) ＋ ex- (外に) ＋ tend (伸ばす) ＝ nonextended（延長されていない）" },
+    { text: "duct (duce)", meaning: "導く", type: "語根", exp: "re- (再び) ＋ pro- (前に) ＋ duct (導く) ＝ reproduction（複製品）" },
+    { text: "pose", meaning: "置く", type: "語根", exp: "in- (でない) ＋ dis- (離れて) ＋ pose (置く) ＝ indisposed（気が向かない）" },
+    { text: "fic(t)", meaning: "作る、なす", type: "語根", exp: "over- (越えて) ＋ sub- (下に) ＋ fic(t) (作る) ＝ oversufficient（過剰の）" },
+    { text: "scribe", meaning: "書く", type: "語根", exp: "mis- (誤った) ＋ trans- (越えて) ＋ scribe (書く) ＝ mistranscribe（誤って書き写す）" }
+];
+
+let currentRoundQuestions = []; // 今回のラウンドで解く問題
+let wrongQuestions = [];        // 間違えた問題をためる配列
+let quizIndex = 0;
+let hasAnswered = false;
+let isReviewRound = false;     // 現在、復習モードかどうか
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// 最初のゲーム開始処理
+function initGame() {
+    currentRoundQuestions = [...allParts];
+    shuffle(currentRoundQuestions);
+    wrongQuestions = [];
+    quizIndex = 0;
+    isReviewRound = false;
+    document.getElementById('round-status').style.display = 'none';
+    loadQuestion();
+}
+
+function loadQuestion() {
+    hasAnswered = false;
+    const current = currentRoundQuestions[quizIndex];
+    
+    // UIアップデート
+    document.getElementById('progress').innerText = `${quizIndex + 1} / ${currentRoundQuestions.length}`;
+    document.getElementById('question-title').innerText = `この【${current.type}】の意味は？`;
+    
+    let displayText = current.text;
+    if(displayText.includes(" (")) {
+        displayText = displayText.split(" (")[0];
+    }
+    document.getElementById('part-display').innerText = displayText;
+    document.getElementById('btn-next').style.display = 'none';
+    document.getElementById('explanation-box').style.display = 'none';
+
+    // 選択肢（正解1 + 不正解2）
+    const choices = [current.meaning];
+    const otherMeanings = allParts.map(p => p.meaning).filter(m => m !== current.meaning);
+    const uniqueOtherMeanings = [...new Set(otherMeanings)];
+    shuffle(uniqueOtherMeanings);
+    choices.push(uniqueOtherMeanings[0], uniqueOtherMeanings[1]);
+    shuffle(choices);
+
+    // 選択肢配置
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+    const labels = ["A", "B", "C"];
+    choices.forEach((choice, index) => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.innerHTML = `<strong>${labels[index]} :</strong> &nbsp;${choice}`;
+        button.onclick = () => selectOption(button, choice, current);
+        container.appendChild(button);
+    });
+}
+
+function selectOption(selectedBtn, chosenMeaning, currentItem) {
+    if (hasAnswered) return;
+    hasAnswered = true;
+
+    const isCorrect = (chosenMeaning === currentItem.meaning);
+    
+    // 間違えた場合は「間違えた問題リスト」へ（重複して入らないようにチェック）
+    if (!isCorrect) {
+        if (!wrongQuestions.some(q => q.text === currentItem.text)) {
+            wrongQuestions.push(currentItem);
+        }
+    }
+
+    const buttons = document.querySelectorAll('.option-btn');
+    buttons.forEach(btn => {
+        if (btn.innerText.includes(currentItem.meaning)) {
+            btn.classList.add('correct');
+        } else if (btn === selectedBtn && !isCorrect) {
+            btn.classList.add('wrong');
+        }
+    });
+
+    // 解説を表示
+    document.getElementById('explanation-content').innerText = currentItem.exp;
+    document.getElementById('explanation-box').style.display = 'block';
+
+    document.getElementById('btn-next').style.display = 'inline-block';
+}
+
+function nextQuestion() {
+    quizIndex++;
+    
+    if (quizIndex < currentRoundQuestions.length) {
+        loadQuestion();
+    } else {
+        // 現在のラウンドが終了したとき
+        if (wrongQuestions.length > 0) {
+            alert(`これですべての問題が終了しました！\n間違えた問題が ${wrongQuestions.length} 問あります。復習ラウンドを開始します！`);
+            
+            // 復習ラウンドの準備
+            currentRoundQuestions = [...wrongQuestions];
+            shuffle(currentRoundQuestions);
+            wrongQuestions = []; // リセット
+            quizIndex = 0;
+            isReviewRound = true;
+            
+            document.getElementById('round-status').style.display = 'inline';
+            loadQuestion();
+        } else {
+            // 間違えた問題がゼロになったら完全クリア
+            if (isReviewRound) {
+                alert('素晴らしい！間違えた問題をすべてクリアしました！最初の画面に戻ります。');
+            } else {
+                alert('全問正解！素晴らしいです！最初からやり直します。');
+            }
+            initGame();
+        }
+    }
+}
+
+// クイズ開始
+initGame();
+</script>
+
+</body>
+</html>

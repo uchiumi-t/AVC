@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="英語アプリ">
+  <meta name="theme-color" content="#c0392b">
+  <link rel="apple-touch-icon" href="icon-192.png">
     <meta charset="UTF-8">
     <title>WORD DEFENDER - AVC presents</title>
     <style>
@@ -332,6 +340,15 @@
     }
     function checkUfoSnd() { if(!enemies.some(e => e.isUfo)) stopUfoSound(); }
     function stopUfoSound() { clearInterval(ufoSndInterval); ufoSndInterval = null; }
+</script>
+<script>
+  // PWA: Service Worker 登録
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .catch(err => console.warn('SW registration failed:', err));
+    });
+  }
 </script>
 </body>
 </html>

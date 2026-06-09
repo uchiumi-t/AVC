@@ -1,8 +1,16 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="英語アプリ">
+  <meta name="theme-color" content="#c0392b">
+  <link rel="apple-touch-icon" href="icon-192.png">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>仮定法・瞬間英作文 Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -92,7 +100,12 @@
 
   /* スマホ向けレイアウト */
   @media (max-width: 600px) {
-    body { overflow: auto; height: auto; min-height: 100vh; }
+    body { overflow: auto; height: auto; min-height: 100vh;
+    min-height: 100dvh;    /* iPhone ノッチ・ホームバー対応 */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right); }
     .inner-container { padding: 20px 16px; }
     h1 { font-size: 3rem !important; }
     .btn-mode { padding: 18px 12px; font-size: 1rem; }
@@ -392,6 +405,15 @@ window.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleEnter()
     if (hint) hint.textContent = 'タップ or スワイプ で回答表示 / もう一度で次の問題';
   }, { once: true, passive: true });
 })();
+</script>
+<script>
+  // PWA: Service Worker 登録
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .catch(err => console.warn('SW registration failed:', err));
+    });
+  }
 </script>
 </body>
 </html>

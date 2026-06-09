@@ -1,16 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="英語アプリ">
-  <meta name="theme-color" content="#c0392b">
-  <link rel="apple-touch-icon" href="icon-192.png">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ドラゴンイングリッシュ</title>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=Lora:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
 <style>
@@ -32,11 +24,6 @@
 
   html, body {
     min-height: 100vh;
-    min-height: 100dvh;    /* iPhone ノッチ・ホームバー対応 */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
     background: var(--cream);
     color: var(--ink);
     font-family: 'Zen Kaku Gothic New', sans-serif;
@@ -1063,15 +1050,6 @@ document.addEventListener('keydown', e => {
     else if (e.key === 'Escape') synth.cancel();
   }
 });
-</script>
-<script>
-  // PWA: Service Worker 登録
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .catch(err => console.warn('SW registration failed:', err));
-    });
-  }
 </script>
 </body>
 </html>
