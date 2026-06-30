@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大学入試必須！動名詞・不定詞・両方とる動詞 クイズ</title>
+    <style>
+        /* デフォルトでダークモード */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #1a1e24;
+            color: #f8f9fa;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        .container {
+            background-color: #242b35;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 1150px;
+            padding: 30px;
+            box-sizing: border-box;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        /* 全画面表示用のスタイル変更（PC・大画面用） */
+        body.fullscreen-mode {
+            padding: 0;
+            background-color: #111418;
+        }
+        body.fullscreen-mode .container {
+            max-width: 96vw;
+            width: 96vw;
+            height: 92vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px 60px;
+        }
+        body.fullscreen-mode #quiz-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        body.fullscreen-mode .question-box {
+            font-size: 3.5rem;
+            padding: 60px 20px;
+            min-height: 200px;
+        }
+        body.fullscreen-mode h1 {
+            font-size: 2.2rem;
+        }
+        body.fullscreen-mode .progress {
+            font-size: 1.4rem;
+        }
+        body.fullscreen-mode button {
+            font-size: 1.4rem;
+            padding: 22px 10px;
+        }
+
+        /* 右上の全画面切り替えボタン */
+        .fs-toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #34495e;
+            color: #ecf0f1;
+            border: 1px solid #4f6f8f;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            font-weight: normal;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            width: auto;
+            z-index: 10;
+        }
+        .fs-toggle-btn:hover {
+            background-color: #4f6f8f;
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            color: #3498db;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            padding-right: 120px;
+            text-align: left;
+        }
+        .progress {
+            text-align: right;
+            font-size: 1rem;
+            color: #95a5a6;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        /* 問題文ボックス：PCでは絶対に1行、巨大文字 */
+        .question-box {
+            background-color: #1c222a;
+            padding: 45px 20px;
+            border-radius: 12px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px solid #2c3e50;
+            color: #ffffff;
+            
+            white-space: nowrap !important; 
+            word-break: keep-all !important;
+            overflow-x: auto;
+        }
+        
+        /* 原形表示の注記スタイル */
+        .question-box .verb-note {
+            display: inline-block;
+            color: #a0aec0;
+            font-weight: normal;
+            font-size: 0.55em;
+            margin-left: 25px;
+            vertical-align: middle;
+        }
+        
+        /* 選択肢ボタンのコンテナ（PCは3列並び） */
+        .btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        button {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            border: 2px solid #34495e;
+            padding: 18px 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        button:hover:not(:disabled):not(.fs-toggle-btn) {
+            background-color: #34495e;
+            border-color: #3498db;
+            color: #3498db;
+        }
+        button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+        button:disabled {
+            cursor: not-allowed;
+        }
+        
+        .feedback {
+            padding: 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .correct {
+            background-color: #1b4332;
+            color: #75e6da;
+            border: 1px solid #2d6a4f;
+        }
+        .incorrect {
+            background-color: #4a121a;
+            color: #ffbcc4;
+            border: 1px solid #5c1e29;
+        }
+        
+        .explanation {
+            font-weight: normal;
+            font-size: 0.95rem;
+            margin-top: 8px;
+            color: #e0e0e0;
+            line-height: 1.5;
+            white-space: normal;
+        }
+        
+        .next-btn {
+            grid-column: span 3;
+            width: 100%;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            font-size: 1.2rem;
+            padding: 16px;
+        }
+        .next-btn:hover {
+            background-color: #2ecc71;
+        }
+        
+        .result-screen {
+            text-align: center;
+            display: none;
+        }
+        .score {
+            font-size: 3.5rem;
+            color: #e74c3c;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .restart-btn {
+            width: 100%;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.2rem;
+        }
+        .restart-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .info-tip {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #5f758e;
+            margin-top: 15px;
+        }
+
+        /* ==========================================================
+           スマートフォン・タブレット用のレスポンシブ調整 (画面幅768px以下)
+           ========================================================== */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 20px 15px;
+                position: relative;
+            }
+            h1 {
+                font-size: 1.2rem;
+                padding-right: 100px;
+                margin-bottom: 10px;
+            }
+            .fs-toggle-btn {
+                top: 15px;
+                right: 15px;
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+            .progress {
+                font-size: 0.9rem;
+                margin-bottom: 10px;
+            }
+            
+            /* スマホ時ははみ出さないよう適切なサイズに縮小し、綺麗に包む */
+            .question-box {
+                font-size: 1.5rem; /* スマホで手元で見るのに最適な大きさに */
+                padding: 25px 15px;
+                min-height: 90px;
+                margin-bottom: 20px;
+                flex-direction: column; /* 英文と(原形)を上下に分ける */
+                
+                white-space: normal !important; /* スマホ画面からはみ出さないよう自動調整 */
+                word-break: break-word !important;
+            }
+            .question-box .verb-note {
+                margin-left: 0;
+                margin-top: 8px; /* スマホ時は英文の下に綺麗に配置 */
+                font-size: 0.65em;
+            }
+            
+            /* ボタンを押しやすいよう縦並びに変更 */
+            .btn-container {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            button {
+                padding: 14px 10px;
+                font-size: 1rem;
+            }
+            button br {
+                display: none; /* スマホ時はボタン内の改行を消してスマートに */
+            }
+            button small {
+                font-size: 0.75rem !important;
+                margin-left: 8px;
+            }
+            
+            .next-btn {
+                grid-column: span 1;
+                font-size: 1.1rem;
+                padding: 14px;
+            }
+            .info-tip {
+                display: none; /* キーボードのないスマホではキー操作の案内を非表示に */
+            }
+            .feedback {
+                padding: 14px;
+                margin-bottom: 15px;
+            }
+            .explanation {
+                font-size: 0.85rem;
+            }
+            .score {
+                font-size: 2.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 全画面トグルボタン -->
+    <button class="fs-toggle-btn" onclick="toggleFullScreen()" id="fs-btn">全画面表示 ⛶</button>
+
+    <!-- クイズ画面 -->
+    <div id="quiz-screen">
+        <h1>動名詞・不定詞 攻略クイズ</h1>
+        <div class="progress" id="progress">1 / 15</div>
+        <div class="question-box" id="question">Loading...</div>
+        
+        <div class="btn-container">
+            <button id="btn-ing" onclick="checkAnswer('ing')">① 〜ing<br><small style="font-weight:normal;opacity:0.8;font-size:0.8rem;">(動名詞のみ)</small></button>
+            <button id="btn-to" onclick="checkAnswer('to')">② to do<br><small style="font-weight:normal;opacity:0.8;font-size:0.8rem;">(不定詞のみ)</small></button>
+            <button id="btn-both" onclick="checkAnswer('both')">③ どちらでもOK<br><small style="font-weight:normal;opacity:0.8;font-size:0.8rem;">(意味不変)</small></button>
+        </div>
+
+        <div id="feedback" class="feedback">
+            <div id="result-text" style="font-size: 1.2rem;"></div>
+            <div id="explanation-text" class="explanation"></div>
+        </div>
+
+        <button id="next-btn" class="next-btn" style="display: none;" onclick="nextQuestion()">次の問題へ 👉</button>
+        <div class="info-tip">[Space] キーで解答表示 / 次の問題へ移動できます</div>
+    </div>
+
+    <!-- 結果画面 -->
+    <div id="result-screen" class="result-screen">
+        <h1 style="text-align: center; padding-right: 0;">クイズ修了！🎉</h1>
+        <p style="font-size: 1.1rem;">あなたのスコアは...</p>
+        <div class="score" id="final-score">0 / 0</div>
+        <p id="evaluation-comment" style="font-weight: bold; color: #bdc3c7; font-size: 1.1rem; margin-bottom: 25px; padding: 0 10px;"></p>
+        <button id="restart-btn" class="restart-btn" onclick="resetQuiz()">もう一度挑戦する 🔄</button>
+    </div>
+</div>
+
+<script>
+let isAnswered = false;
+let isFinished = false;
+
+// 全画面表示の切り替え
+function toggleFullScreen() {
+    const body = document.body;
+    const btn = document.getElementById("fs-btn");
+    
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+            body.classList.add("fullscreen-mode");
+            btn.innerText = "元に戻す ✕";
+        }).catch(err => {
+            body.classList.add("fullscreen-mode");
+            btn.innerText = "元に戻す ✕";
+        });
+    } else {
+        document.exitFullscreen();
+        body.classList.remove("fullscreen-mode");
+        btn.innerText = "全画面表示 ⛶";
+    }
+}
+
+document.addEventListener('fullscreenchange', () => {
+    const body = document.body;
+    const btn = document.getElementById("fs-btn");
+    if (!document.fullscreenElement) {
+        body.classList.remove("fullscreen-mode");
+        btn.innerText = "全画面表示 ⛶";
+    }
+});
+
+// 動詞を過去形に変換する関数
+function getPastTense(verb) {
+    if (verb === "put off") return "put off";
+    if (verb.endsWith("e")) return verb + "d";
+    if (verb.endsWith("y") && !/[aeiou]y$/.test(verb)) return verb.slice(0, -1) + "ied";
+    if (verb === "admit" || verb === "stop" || verb === "prefer") {
+        return verb + verb.slice(-1) + "ed";
+    }
+    if (verb === "quit") return "quit";
+    if (verb === "begin") return "began";
+    return verb + "ed";
+}
+
+// 34単語すべての問題データ
+const quizData = [
+    // 【動名詞のみ (ing)】14語
+    { verb: "admit", ans: "ing", exp: "「認める」は、すでにやってしまった過去の事実を認めるため動名詞をとります。" },
+    { verb: "consider", ans: "ing", exp: "「よく考える」は、頭の中で具体的なイメージを思い浮かべて検討するため動名詞になります。" },
+    { verb: "enjoy", ans: "ing", exp: "「楽しむ」は、今実際に行っていることを表すため動名詞が後ろに続きます。" },
+    { verb: "finish", ans: "ing", exp: "「終える」は、今まで現実にやっていたことをストップさせるので動名詞をとります。" },
+    { verb: "mind", ans: "ing", exp: "「嫌がる、気にする」は、目の前のリアルな状況を意識するため動名詞をとります。" },
+    { verb: "put off", ans: "ing", exp: "「延期する（＝postpone）」は、今やっている・予定している現実を動かすため動名詞です。" },
+    { verb: "practice", ans: "ing", exp: "「練習する」は、実際に何度も動作を繰り返す生々しいイメージなので動名詞をとります。" },
+    { verb: "stop", ans: "ing", exp: "「〜するのをやめる」は動名詞。※「〜するために立ち止まる」の時はto do（副詞的用法）になります。" },
+    { verb: "avoid", ans: "ing", exp: "「避ける」は、現実にある不快な事態やドタバタから逃れるイメージで動名詞をとります。" },
+    { verb: "deny", ans: "ing", exp: "「否定する」は、過去に「やった」とされる事実を打ち消すため動名詞をとります。" },
+    { verb: "escape", ans: "ing", exp: "「逃げる」は、今そこにある危機や現実から脱出する意味合いから動名詞をとります。" },
+    { verb: "miss", ans: "ing", exp: "「〜し損ねる、いなくて寂しく思う」は、現実の機会や対象を意識するため動名詞をとります。" },
+    { verb: "quit", ans: "ing", exp: "「やめる」は、それまで続けていた現実の行動をすっぱりと断ち切るため動名詞をとります。" },
+    { verb: "suggest", ans: "ing", exp: "「提案する」は、具体的なアイデアや行動のプランを頭に浮かべて提示するため動名詞になります。" },
+
+    // 【不定詞のみ (to)】13語
+    { verb: "agree", ans: "to", exp: "「同意する」は、これから提示された内容や未来の行動に賛同するため不定詞をとります。" },
+    { verb: "decide", ans: "to", exp: "「決定する」は、これから先の未来の行動を決めるため不定詞が続きます。" },
+    { verb: "fail", ans: "to", exp: "fail to doで「〜し損ねる、〜できない」。入試重要熟語としても超頻出です。" },
+    { verb: "learn", ans: "to", exp: "「（練習して）〜できるようになる」は、未来の到達目標に向かうため不定詞をとります。" },
+    { verb: "plan", ans: "to", exp: "「計画する」は、これからの予定を組み立てる（未来志向）ので不定詞をとります。" },
+    { verb: "promise", ans: "to", exp: "「約束する」は、これから先の未来に実行することを約束するので不定詞をとります。" },
+    { verb: "wish", ans: "to", exp: "「願い」は、まだ実現していない未来への強い希望を表すため不定詞がふさわしいです。" },
+    { verb: "attempt", ans: "to", exp: "「試みる、〜しようとする」は、これから先の困難な目標に向かっていくため不定詞をとります。" },
+    { verb: "expect", ans: "to", exp: "「予期する、期待する」は、未来に起こることを待ち望むため不定詞をとります。" },
+    { verb: "hope", ans: "to", exp: "「望む」は、これからの希望（未来の出来事）に向かう矢印のイメージで不定詞をとります。" },
+    { verb: "offer", ans: "to", exp: "「〜しようと申し出る」は、これから自分が進んで行う未来の行動を提示するため不定詞になります。" },
+    { verb: "pretend", ans: "to", exp: "「〜するふりをする」は、実際の状態とは異なる未来や仮想の行動を演じるため不定詞をとります。" },
+    { verb: "refuse", ans: "to", exp: "「拒む」は、これから求められる行動（未来のこと）を突っぱねるため不定詞が続きます。" },
+
+    // 【両方OK（意味変化なし）】7語
+    { verb: "like", ans: "both", exp: "「好き」を表すlikeは、後ろに動名詞・不定詞のどちらが来ても意味はほぼ変わりません。" },
+    { verb: "love", ans: "both", exp: "「大好き」を表すloveも、後ろに動名詞・不定詞のどちらを置いても同じ意味になります。" },
+    { verb: "prefer", ans: "both", exp: "「〜のほうを好む」のpreferも、ingとto doの両方を目的語に選べます。" },
+    { verb: "hate", ans: "both", exp: "「嫌う」を意味するhateも、感情の対象として動名詞・不定詞のどちらでも受けられます。" },
+    { verb: "start", ans: "both", exp: "「開始」を表すstartは、後ろにingが来てもto doが来ても意味に違いはありません。" },
+    { verb: "begin", ans: "both", exp: "「開始」を表すbeginも、startと同様にどちらの形式も自由に選べます。" },
+    { verb: "continue", ans: "both", exp: "「継続」を表すcontinueも、後に続くのが動名詞でも不定詞でも同じニュアンスになります。" }
+];
+
+let currentQuestions = [];
+let currentIndex = 0;
+let score = 0;
+const totalQuestions = 15;
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function initQuiz() {
+    currentQuestions = shuffle([...quizData]).slice(0, totalQuestions);
+    currentIndex = 0;
+    score = 0;
+    isFinished = false;
+    
+    document.getElementById("quiz-screen").style.display = "block";
+    document.getElementById("result-screen").style.display = "none";
+    showQuestion();
+}
+
+function showQuestion() {
+    isAnswered = false;
+    const q = currentQuestions[currentIndex];
+    const pastVerb = getPastTense(q.verb);
+    
+    document.getElementById("progress").innerText = `${currentIndex + 1} / ${totalQuestions}`;
+    
+    if (q.verb === "put off") {
+        document.getElementById("question").innerHTML = `<span>They <strong>${pastVerb}</strong> [ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ] the meeting.</span><span class="verb-note">(原形: ${q.verb})</span>`;
+    } else {
+        document.getElementById("question").innerHTML = `<span>She <strong>${pastVerb}</strong> [ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ] the piano.</span><span class="verb-note">(原形: ${q.verb})</span>`;
+    }
+    
+    const btnIds = ["btn-ing", "btn-to", "btn-both"];
+    btnIds.forEach(id => {
+        const btn = document.getElementById(id);
+        btn.disabled = false;
+        btn.style.backgroundColor = "#2c3e50";
+        btn.style.color = "#ecf0f1";
+        btn.style.borderColor = "#34495e";
+    });
+    
+    document.getElementById("feedback").style.display = "none";
+    document.getElementById("next-btn").style.display = "none";
+}
+
+function checkAnswer(userChoice) {
+    if (isAnswered) return;
+    isAnswered = true;
+    
+    const q = currentQuestions[currentIndex];
+    const feedback = document.getElementById("feedback");
+    const resultText = document.getElementById("result-text");
+    const expText = document.getElementById("explanation-text");
+    
+    const btnIds = ["btn-ing", "btn-to", "btn-both"];
+    btnIds.forEach(id => document.getElementById(id).disabled = true);
+    
+    feedback.style.display = "block";
+    
+    let correctText = "";
+    if (q.ans === "ing") correctText = "① 〜ing";
+    if (q.ans === "to") correctText = "② to do";
+    if (q.ans === "both") correctText = "③ どちらでもOK";
+
+    if (userChoice) {
+        const selectedBtn = document.getElementById(`btn-${userChoice}`);
+        if (userChoice === q.ans) {
+            score++;
+            feedback.className = "feedback correct";
+            resultText.innerText = "⭕️ 正解！";
+            selectedBtn.style.backgroundColor = "#27ae60";
+            selectedBtn.style.borderColor = "#2ecc71";
+        } else {
+            feedback.className = "feedback incorrect";
+            resultText.innerText = `❌ 不正解... （正解: ${correctText}）`;
+            selectedBtn.style.backgroundColor = "#c0392b";
+            selectedBtn.style.borderColor = "#e74c3c";
+            
+            const correctBtn = document.getElementById(`btn-${q.ans}`);
+            correctBtn.style.borderColor = "#2ecc71";
+            correctBtn.style.backgroundColor = "#1b4332";
+        }
+    } else {
+        feedback.className = "feedback correct";
+        feedback.style.backgroundColor = "#2c3e50";
+        feedback.style.color = "#ecf0f1";
+        feedback.style.border = "1px solid #34495e";
+        resultText.innerText = `💡 正解: ${correctText}`;
+        
+        const correctBtn = document.getElementById(`btn-${q.ans}`);
+        correctBtn.style.borderColor = "#2ecc71";
+        correctBtn.style.backgroundColor = "#1b4332";
+    }
+    
+    expText.innerText = `【${q.verb}】${q.exp}`;
+    document.getElementById("next-btn").style.display = "block";
+    
+    document.activeElement.blur();
+}
+
+function nextQuestion() {
+    currentIndex++;
+    if (currentIndex < totalQuestions) {
+        showQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    isFinished = true;
+    document.getElementById("quiz-screen").style.display = "none";
+    document.getElementById("result-screen").style.display = "block";
+    document.getElementById("final-score").innerText = `${score} / ${totalQuestions}`;
+    
+    let comment = "";
+    if (score === totalQuestions) comment = "神レベル！満点です！語法問題は完全に武器になりました。";
+    else if (score >= 12) comment = "素晴らしい！高得点です。間違えた動詞のイメージ（未来か現実か）を再確認しておきましょう。";
+    else if (score >= 8) comment = "合格ラインまであと少し！解説を読んで動詞ごとのクセを頭に染み込ませよう。";
+    else comment = "まずは確実に『動名詞しかとらない動詞』から1つずつ覚えていこう！";
+    
+    document.getElementById("evaluation-comment").innerText = comment;
+}
+
+function resetQuiz() {
+    initQuiz();
+}
+
+// PC用のキーボード操作
+window.addEventListener("keydown", function(event) {
+    if (event.key === " " || event.keyCode === 32) {
+        event.preventDefault();
+        
+        if (isFinished) {
+            resetQuiz();
+        } else if (!isAnswered) {
+            checkAnswer(null); 
+        } else {
+            nextQuestion();
+        }
+    }
+});
+
+initQuiz();
+</script>
+
+</body>
+</html>
