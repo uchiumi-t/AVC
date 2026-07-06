@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>紛らわしい自動詞・他動詞プレゼンクイズ</title>
+    <!-- Tailwind CSS for high-quality responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            overflow: hidden; /* Prevent body scroll to maintain app presentation feel */
+        }
+
+        /* Custom Fullscreen Adjustments */
+        #app:fullscreen {
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: none !important;
+            border-radius: 0px !important;
+            border: none !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: #0f172a;
+            padding: 2.5rem;
+        }
+
+        /* Fullscreen specific text size constraints to prevent horizontal scrolling or right-edge cropping */
+        #app:fullscreen .question-text-area {
+            /* Using dynamic viewport width with a safe upper limit to prevent clipping */
+            font-size: clamp(2rem, 3.5vw, 4.2rem) !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: clip;
+            word-break: keep-all;
+        }
+
+        /* Prevent double-tap zoom on mobile devices */
+        button {
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex items-center justify-center p-2 sm:p-4 md:p-8 overflow-x-hidden">
+
+    <!-- Main App Container -->
+    <div id="app" class="w-full max-w-5xl bg-slate-800 rounded-3xl shadow-2xl p-6 sm:p-8 md:p-12 border border-slate-700 relative flex flex-col justify-between min-h-[90vh] md:min-h-[80vh] transition-all duration-300 overflow-hidden">
+        
+        <!-- Top Navigation / Status Header -->
+        <div class="flex justify-between items-center mb-4 sm:mb-6">
+            <!-- Progress Bar inside container -->
+            <div class="w-3/4 bg-slate-700 h-3 rounded-full overflow-hidden">
+                <div id="progress" class="bg-blue-500 h-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            
+            <!-- Fullscreen trigger button -->
+            <button id="fullscreen-btn" class="p-3 bg-slate-700 hover:bg-slate-600 active:scale-95 rounded-xl transition-all border border-slate-600 focus:outline-none" title="全画面切り替え">
+                <svg id="fs-icon-enter" class="w-6 h-6 text-slate-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75v4.5m0-4.5h-4.5m4.5 0L15 9m5.25 11.25v-4.5m0 4.5-4.5 0L15 15" />
+                </svg>
+                <svg id="fs-icon-exit" class="w-6 h-6 text-slate-200 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25-5.25M15 9V4.5M15 9h4.5M15 9l5.25-5.25M15 15v4.5M15 15h4.5M15 15l5.25 5.25" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="flex-1 flex flex-col justify-center items-center text-center py-6 sm:py-8">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-black mb-4 text-blue-400 tracking-tight">Verb Master Quiz</h1>
+            <p class="text-lg sm:text-xl md:text-2xl text-slate-300 max-w-2xl mb-8 sm:mb-12 leading-relaxed">
+                自動詞・他動詞の使い分けをマスターしよう！<br>
+                <span class="text-sm sm:text-base text-slate-400">（全11問をシャッフルして出題します）</span>
+            </p>
+            <button onclick="quiz.start()" class="w-full sm:w-auto px-12 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-2xl text-2xl font-bold transition-all transform active:scale-95 shadow-xl shadow-blue-900/30">
+                クイズを開始する
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden flex-1 flex flex-col justify-between overflow-hidden">
+            
+            <!-- Meta information -->
+            <div class="flex justify-between items-center mb-2 border-b border-slate-700/50 pb-2">
+                <span id="question-number" class="text-blue-400 font-black text-lg sm:text-xl tracking-wider">QUESTION 01/11</span>
+                <span id="verb-type" class="text-xs sm:text-sm font-bold bg-slate-700 px-3 py-1 rounded-full text-slate-300"></span>
+            </div>
+            
+            <!-- Question Text Area (Responsively adjusts sizes, no horizontal scrollbars) -->
+            <div class="flex-1 flex items-center justify-center min-h-[120px] md:min-h-[160px] my-2 overflow-hidden">
+                <!-- Removed overflow-x-auto to eliminate the scrollbar. Uses responsive scale and word-break for regular view -->
+                <div id="question-text" class="question-text-area text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-center tracking-tight leading-normal w-full overflow-hidden break-words md:break-normal">
+                    <!-- Question string injected here dynamically -->
+                </div>
+            </div>
+
+            <!-- Choice Options Layout -->
+            <div id="options" class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 w-full max-w-4xl mx-auto my-2">
+                <!-- Dynamic choices populated here -->
+            </div>
+
+            <!-- FIXED BOTTOM CONTAINER: Pre-allocated heights to prevent any shifting of options or questions when answers appear -->
+            <div class="w-full mt-2 flex flex-col justify-between items-center min-h-[110px] sm:min-h-[130px] border-t border-slate-700/50 pt-2 sm:pt-4">
+                <!-- Feedback text container -->
+                <div class="h-8 sm:h-10 flex items-center justify-center w-full">
+                    <div id="feedback" class="text-2xl sm:text-3xl font-extrabold tracking-wider transition-all duration-200 invisible">
+                        CORRECT! ✨
+                    </div>
+                </div>
+
+                <!-- Next slide control button -->
+                <div class="h-12 sm:h-14 flex items-center justify-center w-full mt-1">
+                    <button id="next-btn" onclick="quiz.next()" class="invisible w-full sm:w-auto px-10 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-xl text-lg sm:text-xl font-bold transition-all transform active:scale-95 shadow-md">
+                        次の問題へ ➔
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden flex-1 flex flex-col justify-center items-center text-center py-6 sm:py-8">
+            <h2 class="text-4xl sm:text-5xl md:text-6xl font-black mb-4 text-emerald-400">Excellent Work!</h2>
+            <p class="text-lg sm:text-xl text-slate-400 mb-6 sm:mb-8">すべてのターゲット単語を学習しました！</p>
+            
+            <div class="bg-slate-900/50 border border-slate-700 rounded-3xl p-6 sm:p-8 mb-6 sm:mb-8 w-full max-w-md">
+                <div class="text-sm text-slate-400 uppercase tracking-widest font-bold mb-2">あなたのスコア</div>
+                <div class="text-6xl sm:text-7xl font-black text-blue-400" id="final-score">0/11</div>
+            </div>
+
+            <button onclick="location.reload()" class="w-full sm:w-auto px-10 py-4 bg-slate-700 hover:bg-slate-600 active:scale-95 rounded-xl text-xl font-bold transition-all shadow-lg">
+                もう一度挑戦する
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Definitive list of high frequency confusing transitive/intransitive English verbs (11 items)
+        const defaultQuestions = [
+            // Transitive Verbs (No preposition needed)
+            { q: "We discussed ( ) the new project.", a: "x (なし)", b: "about", correct: "x (なし)", word: "discuss", type: "他動詞（前置詞不要）" },
+            { q: "They finally reached ( ) the summit.", a: "to", b: "x (なし)", correct: "x (なし)", word: "reach", type: "他動詞（前置詞不要）" },
+            { q: "He is going to marry ( ) her.", a: "with", b: "x (なし)", correct: "x (なし)", word: "marry", type: "他動詞（前置詞不要）" },
+            { q: "She didn't mention ( ) the accident.", a: "x (なし)", b: "about", correct: "x (なし)", word: "mention", type: "他動詞（前置詞不要）" },
+            { q: "The typhoon is approaching ( ) Kyushu.", a: "to", b: "x (なし)", correct: "x (なし)", word: "approach", type: "他動詞（前置詞不要）" },
+            { q: "You resemble ( ) your father very much.", a: "x (なし)", b: "with", correct: "x (なし)", word: "resemble", type: "他動詞（前置詞不要）" },
+            { q: "I entered ( ) the room quietly.", a: "into", b: "x (なし)", correct: "x (なし)", word: "enter", type: "他動詞（前置詞不要）" },
+            
+            // Intransitive Verbs (Preposition required)
+            { q: "He apologized ( ) her for his mistake.", a: "x (なし)", b: "to", correct: "to", word: "apologize", type: "自動詞（前置詞が必要）" },
+            { q: "I totally agree ( ) your opinion.", a: "with", b: "x (なし)", correct: "with", word: "agree", type: "自動詞（前置詞が必要）" },
+            { q: "Does this book belong ( ) you?", a: "x (なし)", b: "to", correct: "to", word: "belong", type: "自動詞（前置詞が必要）" },
+            { q: "The train arrived ( ) the station late.", a: "at", b: "x (なし)", correct: "at", word: "arrive", type: "自動詞（前置詞が必要）" }
+        ];
+
+        class Quiz {
+            constructor() {
+                this.questions = [...defaultQuestions];
+                this.currentIndex = 0;
+                this.score = 0;
+                this.answered = false;
+            }
+
+            // Fisher-Yates Shuffle Algorithm to randomize questions
+            shuffleQuestions() {
+                for (let i = this.questions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this.questions[i], this.questions[j]] = [this.questions[j], this.questions[i]];
+                }
+            }
+
+            start() {
+                this.shuffleQuestions(); // Randomize on start
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('quiz-screen').classList.remove('hidden');
+                this.showQuestion();
+            }
+
+            showQuestion() {
+                this.answered = false;
+                const q = this.questions[this.currentIndex];
+                const qText = document.getElementById('question-text');
+                const qNum = document.getElementById('question-number');
+                const vType = document.getElementById('verb-type');
+                const optionsDiv = document.getElementById('options');
+                const feedback = document.getElementById('feedback');
+                const nextBtn = document.getElementById('next-btn');
+
+                // Apply style based on the current state to ensure text fits
+                this.applyResponsiveTypography();
+
+                // Dynamic styling for the placeholder to draw focus
+                const formattedQuestion = q.q.replace('( )', '<span class="text-blue-400 border-b-4 border-blue-400 px-3 mx-1 font-black">( &nbsp;&nbsp; )</span>');
+                qText.innerHTML = formattedQuestion;
+                
+                qNum.innerText = `QUESTION ${String(this.currentIndex + 1).padStart(2, '0')}/${this.questions.length}`;
+                vType.innerText = `Target: ${q.word}`;
+                
+                // Reset feedback & next button without altering dynamic spacing heights
+                feedback.className = 'text-2xl sm:text-3xl font-extrabold tracking-wider transition-all duration-200 invisible';
+                nextBtn.className = 'invisible w-full sm:w-auto px-10 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-xl text-lg sm:text-xl font-bold transition-all transform active:scale-95 shadow-md';
+
+                // Populate choices
+                optionsDiv.innerHTML = '';
+                [q.a, q.b].forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = "py-4 px-6 sm:py-5 sm:px-8 bg-slate-700 hover:bg-slate-600 rounded-2xl text-xl sm:text-2xl md:text-3xl font-black tracking-wide transition-all transform hover:scale-[1.01] active:scale-95 border-3 border-transparent shadow-md text-center flex items-center justify-center w-full";
+                    btn.innerText = opt;
+                    btn.onclick = () => this.checkAnswer(opt, btn);
+                    optionsDiv.appendChild(btn);
+                });
+
+                this.updateProgress();
+            }
+
+            // Adjust font limits based on presentation modes to prevent overflow
+            applyResponsiveTypography() {
+                const qText = document.getElementById('question-text');
+                if (document.fullscreenElement) {
+                    // Safe viewport sizing for fullscreen - no scrolling, fits completely
+                    qText.className = "question-text-area text-center font-black tracking-tight leading-none w-full overflow-hidden";
+                } else {
+                    // Safe standard responsive classes for normal container mode
+                    qText.className = "question-text-area text-2xl sm:text-3xl md:text-4xl lg:text-4.5xl font-black text-center tracking-tight leading-normal w-full overflow-hidden break-words md:break-normal";
+                    qText.style.fontSize = ""; // Reset custom styles to fall back on Tailwind classes
+                }
+            }
+
+            checkAnswer(selected, btn) {
+                if (this.answered) return;
+                this.answered = true;
+
+                const q = this.questions[this.currentIndex];
+                const feedback = document.getElementById('feedback');
+                const nextBtn = document.getElementById('next-btn');
+                const allBtns = document.querySelectorAll('#options button');
+
+                // Disable interaction to prevent multi-selection glitch
+                allBtns.forEach(b => {
+                    b.classList.remove('hover:bg-slate-600', 'hover:scale-[1.01]');
+                    b.disabled = true;
+                });
+
+                if (selected === q.correct) {
+                    this.score++;
+                    feedback.innerText = 'CORRECT! ✨';
+                    feedback.classList.remove('invisible');
+                    feedback.classList.add('text-green-400', 'visible');
+                    btn.classList.add('border-green-500', 'bg-green-950/40', 'text-green-300');
+                } else {
+                    const cleanCorrect = q.correct === 'x (なし)' ? 'None (なし)' : q.correct;
+                    feedback.innerText = `WRONG... (正解: ${cleanCorrect})`;
+                    feedback.classList.remove('invisible');
+                    feedback.classList.add('text-rose-400', 'visible');
+                    btn.classList.add('border-rose-500', 'bg-rose-950/40', 'text-rose-300');
+                    
+                    allBtns.forEach(b => {
+                        if (b.innerText === q.correct) {
+                            b.classList.add('border-green-500', 'bg-green-950/20');
+                        }
+                    });
+                }
+
+                nextBtn.classList.remove('invisible');
+                nextBtn.classList.add('visible');
+            }
+
+            next() {
+                this.currentIndex++;
+                if (this.currentIndex < this.questions.length) {
+                    this.showQuestion();
+                } else {
+                    this.showResult();
+                }
+            }
+
+            showResult() {
+                document.getElementById('quiz-screen').classList.add('hidden');
+                document.getElementById('result-screen').classList.remove('hidden');
+                document.getElementById('final-score').innerText = `${this.score}/${this.questions.length}`;
+            }
+
+            updateProgress() {
+                const percent = (this.currentIndex / this.questions.length) * 100;
+                document.getElementById('progress').style.width = `${percent}%`;
+            }
+        }
+
+        // Initialize App State
+        const quiz = new Quiz();
+
+        const fsBtn = document.getElementById('fullscreen-btn');
+        const appContainer = document.getElementById('app');
+        const enterIcon = document.getElementById('fs-icon-enter');
+        const exitIcon = document.getElementById('fs-icon-exit');
+
+        fsBtn.onclick = () => {
+            if (!document.fullscreenElement) {
+                appContainer.requestFullscreen()
+                    .then(() => {
+                        enterIcon.classList.add('hidden');
+                        exitIcon.classList.remove('hidden');
+                        quiz.applyResponsiveTypography();
+                    })
+                    .catch(err => {
+                        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+                    });
+            } else {
+                document.exitFullscreen()
+                    .then(() => {
+                        enterIcon.classList.remove('hidden');
+                        exitIcon.classList.add('hidden');
+                        quiz.applyResponsiveTypography();
+                    });
+            }
+        };
+
+        // Watch for escape key or window changes to align styles nicely
+        document.addEventListener('fullscreenchange', () => {
+            quiz.applyResponsiveTypography();
+            if (!document.fullscreenElement) {
+                enterIcon.classList.remove('hidden');
+                exitIcon.classList.add('hidden');
+            } else {
+                enterIcon.classList.add('hidden');
+                exitIcon.classList.remove('hidden');
+            }
+        });
+
+        // Handle resize events to recalculate fits dynamically
+        window.addEventListener('resize', () => {
+            quiz.applyResponsiveTypography();
+        });
+    </script>
+</body>
+</html>
