@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英文法クイズ（可算・不可算名詞）</title>
+    <style>
+        :root {
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --correct-color: #16a34a;
+            --incorrect-color: #dc2626;
+            --btn-border: #9ca3af;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+            transition: background-color 0.3s;
+        }
+
+        /* フルスクリーン時の背景調整 */
+        :-webkit-full-screen { background-color: var(--bg-color); }
+        :-ms-fullscreen { background-color: var(--bg-color); }
+        :fullscreen { background-color: var(--bg-color); }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 40px;
+            box-sizing: border-box;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 教室モニター用：出題形式の指示文 */
+        .instruction-text {
+            font-size: 26px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #1f2937;
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        /* 右上の全画面ボタン */
+        .fullscreen-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: #e5e7eb;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+        .fullscreen-btn:hover {
+            background: #d1d5db;
+        }
+
+        .progress {
+            font-size: 24px;
+            color: #6b7280;
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 44px;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 40px;
+            min-height: 130px; /* 問題文の長さによる軽微ながたつきも防止 */
+        }
+
+        /* ◯×ボタンのコンテナ */
+        .choices-container {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .choice-btn {
+            flex: 1;
+            background-color: #ffffff;
+            border: 6px solid var(--btn-border);
+            color: #000000;
+            font-size: 100px; /* 教室の後ろからでも見える大きさ */
+            font-weight: 900;
+            padding: 24px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        /* 解答前のホバー */
+        .choice-btn:not(:disabled):hover {
+            background-color: #f9fafb;
+            border-color: #4b5563;
+        }
+
+        /* 正解選択肢へのフィードバック（緑化） */
+        .choice-btn.highlight-correct {
+            background-color: #f0fdf4 !important;
+            border-color: var(--correct-color) !important;
+            color: var(--correct-color) !important;
+            box-shadow: 0 0 15px rgba(22, 163, 74, 0.2);
+        }
+
+        /* がたつき防止用の固定解説コンテナ */
+        #feedback-container {
+            min-height: 190px; /* 解説エリアの高さを予め確保 */
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .result-status {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .result-status.correct { color: var(--correct-color); }
+        .result-status.incorrect { color: var(--incorrect-color); }
+
+        .explanation {
+            font-size: 24px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        /* アクションボタン（次へ、再挑戦） */
+        .action-btn {
+            background-color: #1f2937;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            align-self: flex-end;
+            transition: background 0.2s;
+        }
+        .action-btn:hover { background-color: #374151; }
+        .action-btn:disabled { display: none; }
+
+        /* リザルト画面表示用 */
+        .summary-screen {
+            text-align: center;
+        }
+        .summary-score {
+            font-size: 60px;
+            font-weight: bold;
+            color: #1f2937;
+            margin: 20px 0;
+        }
+
+        /* ===== スマートフォン対応 ===== */
+        @media (max-width: 600px) {
+            body {
+                padding: 8px;
+            }
+
+            .quiz-container {
+                padding: 20px 16px;
+                border-radius: 12px;
+            }
+
+            /* 全画面ボタンは上部に固定表示せず、通常の並びに戻す */
+            .fullscreen-btn {
+                position: static;
+                display: block;
+                margin: 0 0 12px auto;
+                width: fit-content;
+            }
+
+            .instruction-text {
+                font-size: 16px;
+                padding: 10px 12px;
+                margin-bottom: 16px;
+                line-height: 1.4;
+            }
+
+            .progress {
+                font-size: 16px;
+                margin-bottom: 8px;
+            }
+
+            .question-text {
+                font-size: 24px;
+                margin-bottom: 20px;
+                min-height: 0;
+            }
+
+            .choices-container {
+                gap: 12px;
+                margin-bottom: 18px;
+            }
+
+            .choice-btn {
+                font-size: 48px;
+                border-width: 4px;
+                padding: 14px 0;
+                border-radius: 10px;
+            }
+
+            #feedback-container {
+                min-height: 0;
+                margin-bottom: 14px;
+            }
+
+            .result-status {
+                font-size: 22px;
+                margin-bottom: 6px;
+            }
+
+            .explanation {
+                font-size: 16px;
+                line-height: 1.5;
+            }
+
+            .action-btn {
+                font-size: 16px;
+                padding: 12px 22px;
+                width: 100%;
+            }
+
+            .summary-score {
+                font-size: 40px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .question-text {
+                font-size: 20px;
+            }
+
+            .choice-btn {
+                font-size: 38px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quizContainer">
+    <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()">全画面</button>
+    
+    <div id="game-view">
+        <div class="instruction-text">次の英文が文法的に正しければ〇、誤りなら×を選ぶ（スペースキー：解答表示 → 次の問題）</div>
+        <div class="progress" id="progressText">Question 1 / 10</div>
+        <div class="question-text" id="questionText">Loading...</div>
+        
+        <div class="choices-container">
+            <button class="choice-btn" id="btn-true" onclick="submitAnswer(true)">〇</button>
+            <button class="choice-btn" id="btn-false" onclick="submitAnswer(false)">×</button>
+        </div>
+
+        <!-- ここが固定高さを保ち、がたつきを防ぐエリア -->
+        <div id="feedback-container">
+            <div id="resultStatus" class="result-status"></div>
+            <div id="explanationText" class="explanation"></div>
+        </div>
+
+        <button class="action-btn" id="nextBtn" onclick="nextQuestion()" disabled>次へ</button>
+    </div>
+
+    <div id="summary-view" class="summary-screen" style="display: none;">
+        <h2>クイズ終了！</h2>
+        <div class="summary-score" id="finalScore">0 / 10</div>
+        <p style="font-size: 24px; color: #4b5563; margin-bottom: 30px;">お疲れ様でした。可算・不可算名詞のルールは身につきましたか？</p>
+        <button class="action-btn" style="align-self: center;" onclick="restartQuiz()">もう一度挑戦する</button>
+    </div>
+</div>
+
+<script>
+// 50問の完全データプール
+const allQuestions = [
+    { q: "Their family is all gathered here.", a: true, e: "familyは集合名詞。家族の「構成員全員」が個々に集まっている状態を指す場合、複数扱い（isではなくareが一般的ですが、一体として集まっている状態を表現してis表記でも文脈上間違いではない、あるいは文法書によって許容されますが、ここでは正しい文◯として扱います）" },
+    { q: "Our class are divided into three small groups.", a: true, e: "classは集合名詞。クラスの「一人ひとりの生徒」に意識が向いているため、複数扱いのareで正解です。" },
+    { q: "The company are arguing among themselves about the strategy.", a: true, e: "companyは集合名詞。「社内の人間たち」がそれぞれ議論し合っているため、複数扱い（are）で正解です。" },
+    { q: "The government is planning a new tax law.", a: true, e: "government（政府）という組織を一つのまとまり（単数）として扱っているため、isで正解です。" },
+    { q: "The population of Japan are decreasing rapidly.", a: false, e: "population（人口）は、数の大小を一つの塊として捉えるため常に単数扱いです。areではなく is decreasing とします。" },
+    { q: "The audience was moved to tears by the performance.", a: true, e: "audience（観客）を一塊の集合体として捉え、単数扱い（was）にしているため正しい文です。" },
+    { q: "The club has decided to change its rules.", a: true, e: "club（クラブ）という組織を一つの単数体として扱っているため、hasで正解です。" },
+    { q: "The team are wearing their new uniforms today.", a: true, e: "team（チーム）の「個々のメンバーたち」がそれぞれユニフォームを着ているため、複数扱い（are/their）で正解です。" },
+    { q: "A small group of students was waiting outside.", a: true, e: "「A group of 複数名詞」は単数扱い（was）でも複数扱い（were）でも受け取れますが、ここでは一塊としてwasで受けており正しいです。" },
+    { q: "The large crowd was cheering loudly.", a: true, e: "crowd（群衆）を一塊の集合として単数扱い（was）にしているため正しい文です。" },
+    { q: "All of the staff is well-trained.", a: false, e: "staffは集合名詞ですが、「All of the staff」とする場合は個々の職員を指すため複数扱いになります。isではなく are とします。" },
+    { q: "Many peoples visited the museum yesterday.", a: false, e: "「人々」という意味のpeopleはすでに複数形なので、-sをつけてpeoplesにすることはできません（民族を表す場合を除く）。Many peopleが正解。" },
+    { q: "The military is ready for any emergency.", a: true, e: "military（軍隊）を一塊の組織として単数扱い（is）にしているため正しいです。" },
+    { q: "The police is investigating the cause of the accident.", a: false, e: "police（警察）は常に複数扱いする特殊な集合名詞です。isではなく are investigating としなければなりません。" },
+    { q: "She bought many beautiful clothings at the mall.", a: false, e: "clothing（衣類全般）は不可算名詞（数えられない）なので、-sをつけたりmanyで修飾できません。much clothing や clothes とします。" },
+    { q: "Do you have many baggages to check in?", a: false, e: "baggage（手荷物）は不可算名詞です。manyや複数形の-sは使えません。much baggage や items of baggage と表現します。" },
+    { q: "He left his luggages at the hotel reception.", a: false, e: "luggage（旅行荷物）は不可算名詞のため、luggagesと複数形にすることはできません。his luggage が正解です。" },
+    { q: "The store sells expensive jewelries.", a: false, e: "jewelry（宝石類全般）は不可算名詞です。個々の宝石はjewel（可算）ですが、jewelryは複数形にできません。" },
+    { q: "The factory introduced new machineries.", a: false, e: "machinery（機械類全般）は不可算名詞です。-sをつけたmachineriesという形は存在しません。new machinery とします。" },
+    { q: "I love reading English poetries.", a: false, e: "poetry（詩というジャンル全般）は不可算名詞です。個々の詩を数える場合はpoems、そうでない場合はpoetryとします。" },
+    { q: "We need to buy a few new furnitures for the room. ", a: false, e: "furniture（家具全般）は不可算名詞です。a few や -s は使えません。some furniture や a few pieces of furniture とします。" },
+    { q: "I had a hot soup for breakfast this morning.", a: false, e: "soupは物質名詞（不可算名詞）なので、前に a をつけることはできません。had hot soup または a bowl of hot soup とします。" },
+    { q: "He has many moneys in his bank account.", a: false, e: "moneyは数えられない名詞（不可算名詞）です。manyや複数形の-sは使えず、much money や a lot of money と表現します。" },
+    { q: "Could you give me two waters, please?", a: false, e: "waterは物質名詞（不可算）です。注文時などで口語的に使われることはありますが、正確な文法としては two glasses of water などとします。" },
+    { q: "The air in the mountain is very clean.", a: true, e: "air（空気）は不可算名詞であり、単数として扱われているため正しい文です。" },
+    { q: "I need a paper to write down his phone number.", a: false, e: "「紙」という意味のpaperは不可算名詞です（a paperだと新聞や論文になります）。a piece of paper と表現する必要があります。" },
+    { q: "Aluminum is a very light metal.", a: true, e: "aluminum（アルミニウム）は物質名詞（不可算名詞）で、冠詞なしの単数扱いで正しく使われています。" },
+    { q: "We eat a lot of rices in Japan.", a: false, e: "rice（米）は粒が集まった物質名詞（不可算名詞）です。ricesと複数形にすることはできません。" },
+    { q: "Too much meat is not good for your health.", a: true, e: "meat（肉）は不可算名詞なので、muchで修飾し単数として扱うこの文は正しいです。" },
+    { q: "Could you pass me a sugar, please?", a: false, e: "sugar（砂糖）は物質名詞（不可算名詞）です。特定のその場の砂糖を指すなら pass me the sugar、または some sugar とします。" },
+    { q: "Wash your hands thoroughly with a soap.", a: false, e: "soap（石鹸）は物質名詞（不可算名詞）です。a を取るか、個数を表したいなら a bar of soap とします。" },
+    { q: "This bridge is made of high-quality steel.", a: true, e: "steel（鋼鉄）は材料を表す物質名詞（不可算名詞）なので、冠詞なしのこの形で正解です。" },
+    { q: "Wood is commonly used to build houses here.", a: true, e: "wood（木材）は材料を表す物質名詞（不可算名詞）であり、正しい用法です。" },
+    { q: "Thank you for giving me a good advice.", a: false, e: "advice（助言）は抽象名詞（不可算名詞）です。a をつけることはできません。good advice または a piece of good advice とします。" },
+    { q: "I found many useful informations on the internet.", a: false, e: "information（情報）は不可算名詞の代表格です。manyや-sは使えず、much information や a lot of information とします。" },
+    { q: "The storm caused heavy damages to the buildings.", a: false, e: "「損害」という意味のdamageは不可算名詞です。複数形の-sはつけず、heavy damage とします。" },
+    { q: "She received an excellent education in London.", a: true, e: "education（教育）は通常不可算ですが、「特定の性質を持った（excellentな）教育」を表す場合は a/an がつくことがあります。◯です。" },
+    { q: "He has a lot of experiences in sales.", a: false, e: "ビジネスなどの「経験・キャリア」という意味のexperienceは不可算名詞です。複数形の-sは不要で、a lot of experience とします。" },
+    { q: "We had a great fun at the amusement park.", a: false, e: "fun（楽しさ）は抽象名詞（不可算名詞）です。前に a をつけることはできません。We had great fun が正しいです。" },
+    { q: "Money cannot always buy happiness.", a: true, e: "happiness（幸福）は概念を表す抽象名詞（不可算名詞）なので、冠詞をつけず単数で扱うこの文は正しいです。" },
+    { q: "I have many homeworks to finish tonight.", a: false, e: "homework（宿題）は不可算名詞です。manyや-sは不可で、much homework や a lot of homework とします。" },
+    { q: "He has a wide knowledge of world history.", a: true, e: "knowledge（知識）は原則不可算ですが、have a ... knowledge of の形（特定の知識）では a がつく慣習があり、正しい文です。" },
+    { q: "Their love for each other is beautiful.", a: true, e: "love（愛）は抽象名詞（不可算名詞）なので、単数扱いのisで受けており正しいです。" },
+    { q: "The news about the accident were shocking.", a: false, e: "news（ニュース）は -s で終わっていますが、常に単数扱いされる抽象名詞です。were ではなく was shocking とします。" },
+    { q: "It is important to tell the truth in court.", a: true, e: "truth（真実）は抽象名詞です。「真実を言う」は tell the truth という決まった表現になり、正しいです。" },
+    { q: "We had a beautiful weather during our vacation.", a: false, e: "weather（天候）は不可算名詞です。a をつけることはできません。We had beautiful weather が正解です。" },
+    { q: "I have a lot of works to do today.", a: false, e: "「仕事・タスク」という意味のworkは不可算名詞です。worksにすると「作品」や「工場」という意味になってしまうため、a lot of work が正解。" },
+    { q: "There is no clear evidence to support his theory.", a: true, e: "evidence（証拠）は抽象名詞（不可算名詞）であり、単数として正しく扱われています。" },
+    { q: "Is there any room for one more person in the car?", a: true, e: "roomが「部屋（可算）」ではなく、「空間・余地」という意味で使われる場合は不可算名詞になります。この文は正しいです。" },
+    { q: "All the furniture in this room is old.", a: true, e: "furniture（家具）は不可算名詞なので、主語につく動詞は単数形の is で正解です。" }
+];
+
+let currentQuestions = [];
+let currentIdx = 0;
+let score = 0;
+
+// クイズの初期化（ランダムに10問を抽出）
+function initQuiz() {
+    // 配列のシャッフル
+    const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+    // 先頭の10問を今回の問題にする
+    currentQuestions = shuffled.slice(0, 10);
+    currentIdx = 0;
+    score = 0;
+    
+    document.getElementById('game-view').style.display = 'block';
+    document.getElementById('summary-view').style.display = 'none';
+    showQuestion();
+}
+
+// 問題の表示
+function showQuestion() {
+    const qData = currentQuestions[currentIdx];
+    
+    // UIの更新
+    document.getElementById('progressText').innerText = `Question ${currentIdx + 1} / 10`;
+    document.getElementById('questionText').innerText = qData.q;
+    
+    // フィードバックエリアのクリア
+    document.getElementById('resultStatus').innerText = "";
+    document.getElementById('resultStatus').className = "result-status";
+    document.getElementById('explanationText').innerText = "";
+    
+    // ボタン状態のリセット
+    const btnTrue = document.getElementById('btn-true');
+    const btnFalse = document.getElementById('btn-false');
+    
+    btnTrue.disabled = false;
+    btnFalse.disabled = false;
+    btnTrue.classList.remove('highlight-correct');
+    btnFalse.classList.remove('highlight-correct');
+    
+    document.getElementById('nextBtn').disabled = true;
+}
+
+// ユーザーが◯か×を押したときの処理
+function submitAnswer(userChoice) {
+    const qData = currentQuestions[currentIdx];
+    const isCorrect = (userChoice === qData.a);
+    
+    const btnTrue = document.getElementById('btn-true');
+    const btnFalse = document.getElementById('btn-false');
+    
+    // 両方のボタンを無効化
+    btnTrue.disabled = true;
+    btnFalse.disabled = true;
+    
+    // 正解側のボタンを緑色の枠・背景にする
+    if (qData.a === true) {
+        btnTrue.classList.add('highlight-correct');
+    } else {
+        btnFalse.classList.add('highlight-correct');
+    }
+    
+    // 結果ステータスの表示（Correct / Incorrect のみ、記号なし）
+    const statusEl = document.getElementById('resultStatus');
+    if (isCorrect) {
+        statusEl.innerText = "Correct";
+        statusEl.className = "result-status correct";
+        score++;
+    } else {
+        statusEl.innerText = "Incorrect";
+        statusEl.className = "result-status incorrect";
+    }
+    
+    // 解説文の表示（枠の高さが確保されているため画面はがたつきません）
+    document.getElementById('explanationText').innerText = qData.e;
+    
+    // 次へボタンを有効化
+    document.getElementById('nextBtn').disabled = false;
+}
+
+// スペースキーで「解答・解説を表示」→「次の問題へ」を切り替える
+function revealAnswer() {
+    const qData = currentQuestions[currentIdx];
+
+    const btnTrue = document.getElementById('btn-true');
+    const btnFalse = document.getElementById('btn-false');
+
+    // 両方のボタンを無効化
+    btnTrue.disabled = true;
+    btnFalse.disabled = true;
+
+    // 正解側のボタンを緑色の枠・背景にする
+    if (qData.a === true) {
+        btnTrue.classList.add('highlight-correct');
+    } else {
+        btnFalse.classList.add('highlight-correct');
+    }
+
+    // 正解の表示
+    const statusEl = document.getElementById('resultStatus');
+    statusEl.innerText = qData.a ? "正解：〇（正しい文）" : "正解：×（誤りの文）";
+    statusEl.className = "result-status correct";
+
+    // 解説文の表示
+    document.getElementById('explanationText').innerText = qData.e;
+
+    // 次へボタンを有効化
+    document.getElementById('nextBtn').disabled = false;
+}
+
+// スペースキー押下時の処理
+function handleSpaceKey() {
+    // 結果（リザルト）画面ではスペースキーは無視する
+    if (document.getElementById('summary-view').style.display !== 'none') {
+        return;
+    }
+
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn.disabled) {
+        // まだ解答が表示されていなければ解答・解説を表示
+        revealAnswer();
+    } else {
+        // すでに解答が表示されていれば次の問題へ
+        nextQuestion();
+    }
+}
+
+document.addEventListener('keydown', function (e) {
+    if (e.code === 'Space' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault(); // ページのスクロールを防止
+        handleSpaceKey();
+    }
+});
+
+// 次の問題へ進む
+function nextQuestion() {
+    currentIdx++;
+    if (currentIdx < 10) {
+        showQuestion();
+    } else {
+        showSummary();
+    }
+}
+
+// リザルト（終了）画面の表示
+function showSummary() {
+    document.getElementById('game-view').style.display = 'none';
+    document.getElementById('summary-view').style.display = 'block';
+    document.getElementById('finalScore').innerText = `${score} / 10`;
+}
+
+// クイズの最初からのやり直し
+function restartQuiz() {
+    initQuiz();
+}
+
+// 全画面表示の切り替え（トグル）
+function toggleFullscreen() {
+    const container = document.getElementById('quizContainer');
+    const btn = document.getElementById('fullscreenBtn');
+    
+    if (!document.fullscreenElement && 
+        !document.mozFullScreenElement && 
+        !document.webkitFullscreenElement && 
+        !document.msFullscreenElement) {
+        // フルスクリーンにする
+        if (container.requestFullscreen) {
+            container.requestFullscreen();
+        } else if (container.msRequestFullscreen) {
+            container.msRequestFullscreen();
+        } else if (container.mozRequestFullScreen) {
+            container.mozRequestFullScreen();
+        } else if (container.webkitRequestFullscreen) {
+            container.webkitRequestFullscreen();
+        }
+        btn.innerText = "全画面解除";
+    } else {
+        // フルスクリーンを解除する
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+        btn.innerText = "全画面";
+    }
+}
+
+// 起動時にクイズを開始
+window.onload = initQuiz;
+</script>
+
+</body>
+</html>
