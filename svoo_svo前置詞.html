@@ -1,0 +1,147 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:#1a1a1a;}
+body{font-family:var(--font-sans);}
+#app{background:#1a1a1a;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:1.25rem;position:relative;}
+#fs-btn{position:absolute;top:12px;right:12px;padding:6px 14px;font-size:13px;border:0.5px solid #444;border-radius:8px;background:#2a2a2a;color:#aaa;cursor:pointer;z-index:2;}
+#fs-btn:hover{background:#333;}
+#stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;padding-top:2.5rem;}
+.content{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0.5rem;}
+.counter{font-size:clamp(14px,4vw,15px);color:#666;margin-bottom:1.1rem;}
+.progress-bg{width:100%;max-width:500px;height:4px;background:#333;border-radius:99px;overflow:hidden;margin-bottom:1.75rem;}
+.progress-fill{height:4px;background:#5DCAA5;border-radius:99px;transition:width .3s;}
+.lbl{font-size:clamp(13px,3.6vw,13px);color:#555;letter-spacing:.05em;margin-bottom:.4rem;}
+.svoo-sent{font-size:clamp(23px,8vw,26px);font-weight:500;color:#f0f0f0;margin-bottom:1.6rem;line-height:1.5;word-break:break-word;}
+.svo-sent{font-size:clamp(23px,8vw,26px);font-weight:500;color:#f0f0f0;line-height:1.5;min-height:44px;word-break:break-word;}
+.blank{display:inline-block;min-width:clamp(40px,11vw,48px);border-bottom:2.5px solid #555;vertical-align:bottom;margin:0 4px;}
+.revealed{color:#F5C842;font-weight:700;}
+.hint{font-size:clamp(14px,4vw,14px);color:#777;margin-top:1rem;min-height:22px;opacity:0;transition:opacity .25s;}
+.hint.show{opacity:1;}
+#bottom-bar{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;padding:1.25rem 0 0.5rem;}
+#action-btn{padding:13px 32px;font-size:clamp(16px,4.2vw,16px);font-weight:500;border:0.5px solid #555;border-radius:8px;background:#2a2a2a;color:#f0f0f0;cursor:pointer;min-width:160px;}
+#action-btn:hover{background:#333;}
+.key-hint{font-size:clamp(12px,3.2vw,12px);color:#555;}
+.score-big{font-size:clamp(42px,13vw,52px);font-weight:500;color:#f0f0f0;}
+.score-sub{font-size:clamp(15px,4.2vw,16px);color:#888;margin-top:8px;}
+#restart-btn{margin-top:1.75rem;padding:12px 28px;font-size:15px;border:0.5px solid #555;border-radius:8px;background:#2a2a2a;color:#f0f0f0;cursor:pointer;}
+#restart-btn:hover{background:#333;}
+
+:fullscreen #app,:-webkit-full-screen #app{padding:2rem;}
+:fullscreen #stage,:-webkit-full-screen #stage{padding-top:4vh;}
+:fullscreen .svoo-sent,:-webkit-full-screen .svoo-sent{font-size:clamp(32px,5vw,72px);}
+:fullscreen .svo-sent,:-webkit-full-screen .svo-sent{font-size:clamp(32px,5vw,72px);}
+:fullscreen .lbl,:-webkit-full-screen .lbl{font-size:clamp(13px,1.5vw,22px);}
+:fullscreen .hint,:-webkit-full-screen .hint{font-size:clamp(16px,2vw,30px);}
+:fullscreen .counter,:-webkit-full-screen .counter{font-size:clamp(14px,1.5vw,22px);}
+:fullscreen #action-btn,:-webkit-full-screen #action-btn{font-size:clamp(16px,2vw,28px);padding:12px 48px;}
+:fullscreen .key-hint,:-webkit-full-screen .key-hint{font-size:clamp(12px,1.2vw,18px);}
+:fullscreen .score-big,:-webkit-full-screen .score-big{font-size:clamp(60px,10vw,120px);}
+:fullscreen .score-sub,:-webkit-full-screen .score-sub{font-size:clamp(18px,2.5vw,36px);}
+:fullscreen #restart-btn,:-webkit-full-screen #restart-btn{font-size:clamp(16px,2vw,28px);padding:12px 48px;}
+:fullscreen .blank,:-webkit-full-screen .blank{min-width:80px;}
+</style>
+
+<div id="app">
+  <button id="fs-btn" onclick="toggleFS()"><i class="ti ti-arrows-maximize" aria-hidden="true"></i> 全画面</button>
+  <div id="stage"></div>
+</div>
+
+<script>
+const RAW=[
+  {verb:'give',  type:'to',  subj:'He',       o1:'Sally',        o2:'a ring',       hint:'「渡す・届ける」方向 → to'},
+  {verb:'show',  type:'to',  subj:'She',       o1:'me',           o2:'the picture',  hint:'相手に「向けて示す」→ to'},
+  {verb:'tell',  type:'to',  subj:'He',        o1:'us',           o2:'the truth',    hint:'情報を「伝達する」方向 → to'},
+  {verb:'teach', type:'to',  subj:'Ms. Brown', o1:'the students', o2:'English',      hint:'知識を「伝える」→ to'},
+  {verb:'lend',  type:'to',  subj:'Tom',       o1:'me',           o2:'his bike',     hint:'物が「移動していく」イメージ → to'},
+  {verb:'send',  type:'to',  subj:'She',       o1:'him',          o2:'a letter',     hint:'「送り届ける」先 → to'},
+  {verb:'pay',   type:'to',  subj:'They',      o1:'the staff',    o2:'a bonus',      hint:'支払いの「行き先」 → to'},
+  {verb:'hand',  type:'to',  subj:'He',        o1:'her',          o2:'the keys',     hint:'手渡す相手 → to'},
+  {verb:'buy',   type:'for', subj:'Mom',       o1:'me',           o2:'a cake',       hint:'「〜のために買う」→ for'},
+  {verb:'find',  type:'for', subj:'He',        o1:'us',           o2:'a good hotel', hint:'相手の「ために探す」→ for'},
+  {verb:'make',  type:'for', subj:'She',       o1:'him',          o2:'lunch',        hint:'「〜のために作る」→ for'},
+  {verb:'choose',type:'for', subj:'I',         o1:'you',          o2:'a tie',        hint:'相手の「ために選ぶ」→ for'},
+  {verb:'cook',  type:'for', subj:'Dad',       o1:'us',           o2:'dinner',       hint:'「〜のために料理する」→ for'},
+  {verb:'get',   type:'for', subj:'Can you',   o1:'me',           o2:'a coffee',     hint:'「〜のために取ってくる」→ for'},
+  {verb:'call',  type:'for', subj:'She',       o1:'him',          o2:'a taxi',       hint:'相手の「ために呼ぶ」→ for'},
+  {verb:'leave', type:'for', subj:'He',        o1:'her',          o2:'a message',    hint:'「〜のために残す」→ for'},
+];
+
+const NO_S=['I','You','We','They','Can you'];
+const IRREG={teach:'teaches',choose:'chooses',leave:'leaves',give:'gives',show:'shows',tell:'tells',lend:'lends',send:'sends',pay:'pays',hand:'hands',find:'finds',buy:'buys',get:'gets',cook:'cooks',call:'calls',make:'makes'};
+
+function conj(subj,verb){
+  if(NO_S.includes(subj))return verb;
+  if(IRREG[verb])return IRREG[verb];
+  if(/[sxz]$/.test(verb)||/[cs]h$/.test(verb))return verb+'es';
+  if(/[^aeiou]y$/.test(verb))return verb.slice(0,-1)+'ies';
+  return verb+'s';
+}
+
+function endPunct(subj){return subj==='Can you'?'?':'.';}
+
+function svoo(q){return `${q.subj} ${conj(q.subj,q.verb)} ${q.o1} ${q.o2}${endPunct(q.subj)}`;}
+function svo(q,reveal){
+  const prep=reveal?`<span class="revealed">${q.type}</span>`:`<span class="blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>`;
+  return `${q.subj} ${conj(q.subj,q.verb)} ${q.o2} ${prep} ${q.o1}${endPunct(q.subj)}`;
+}
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+let questions,idx,phase;
+
+function start(){questions=shuffle(RAW);idx=0;phase='question';render();}
+
+function advance(){
+  if(phase==='question'){phase='answer';render();}
+  else if(phase==='answer'){idx++;if(idx>=questions.length){phase='score';render();}else{phase='question';render();}}
+}
+
+function render(){
+  const stage=document.getElementById('stage');
+  if(phase==='score'){
+    stage.innerHTML=`
+      <div class="content">
+        <div class="score-big">終了！</div>
+        <div class="score-sub">全 ${questions.length} 問　お疲れさまでした</div>
+        <button id="restart-btn" onclick="start()">もう一度</button>
+      </div>`;
+    return;
+  }
+  const q=questions[idx];
+  const pct=((idx/questions.length)*100).toFixed(0);
+  const isAns=(phase==='answer');
+  stage.innerHTML=`
+    <div class="content">
+      <div class="counter">問題 ${idx+1} / ${questions.length}</div>
+      <div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="lbl">SVOO</div>
+      <div class="svoo-sent">${svoo(q)}</div>
+      <div class="lbl">SVO に書き換え（前置詞は？）</div>
+      <div class="svo-sent">${svo(q,isAns)}</div>
+      <div class="hint${isAns?' show':''}">${isAns?q.hint:''}</div>
+    </div>
+    <div id="bottom-bar">
+      <button id="action-btn" onclick="advance()">${isAns?'次の問題 →':'解答を見る'}</button>
+      <div class="key-hint">Space キーでも操作できます</div>
+    </div>`;
+}
+
+document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();advance();}});
+
+let isFull=false;
+function toggleFS(){
+  const el=document.documentElement;
+  if(!isFull){(el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen).call(el);}
+  else{(document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen).call(document);}
+}
+function onFSChange(){
+  isFull=!!(document.fullscreenElement||document.webkitFullscreenElement);
+  document.getElementById('fs-btn').innerHTML=isFull
+    ?'<i class="ti ti-arrows-minimize" aria-hidden="true"></i> 元に戻す'
+    :'<i class="ti ti-arrows-maximize" aria-hidden="true"></i> 全画面';
+}
+document.addEventListener('fullscreenchange',onFSChange);
+document.addEventListener('webkitfullscreenchange',onFSChange);
+
+start();
+</script>

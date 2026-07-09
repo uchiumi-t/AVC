@@ -1,0 +1,255 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:#1a1a1a;}
+body{font-family:var(--font-sans);}
+#app{background:#1a1a1a;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:1.25rem;position:relative;}
+#fs-btn{position:absolute;top:12px;right:12px;padding:6px 14px;font-size:13px;border:0.5px solid #444;border-radius:8px;background:#2a2a2a;color:#aaa;cursor:pointer;z-index:2;}
+#fs-btn:hover{background:#333;}
+#stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;padding-top:2.5rem;}
+.content{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0.5rem;}
+.counter{font-size:clamp(14px,4vw,15px);color:#666;margin-bottom:1.1rem;}
+.progress-bg{width:100%;max-width:500px;height:4px;background:#333;border-radius:99px;overflow:hidden;margin-bottom:1.75rem;}
+.progress-fill{height:4px;background:#5DCAA5;border-radius:99px;transition:width .3s;}
+.lbl{font-size:clamp(13px,3.6vw,13px);color:#555;letter-spacing:.05em;margin-bottom:.4rem;}
+.active-sent{font-size:clamp(23px,8vw,26px);font-weight:500;color:#f0f0f0;margin-bottom:1.6rem;line-height:1.5;word-break:break-word;}
+.passive-block{margin-bottom:.75rem;}
+.passive-sent{font-size:clamp(19px,6.8vw,22px);font-weight:500;color:#f0f0f0;line-height:1.7;word-break:break-word;}
+.passive-sent .ans{color:#F5C842;font-weight:700;}
+.passive-sent .prep{color:#7EC8E3;font-weight:700;}
+.unnatural-mark{font-size:clamp(12px,3.4vw,13px);color:#E8A838;margin-top:2px;}
+.hint{font-size:clamp(14px,4vw,14px);color:#777;margin-top:1rem;min-height:22px;opacity:0;transition:opacity .25s;}
+.hint.show{opacity:1;}
+#bottom-bar{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;padding:1.25rem 0 0.5rem;}
+#action-btn{padding:13px 32px;font-size:clamp(16px,4.2vw,16px);font-weight:500;border:0.5px solid #555;border-radius:8px;background:#2a2a2a;color:#f0f0f0;cursor:pointer;min-width:160px;}
+#action-btn:hover{background:#333;}
+.key-hint{font-size:clamp(12px,3.2vw,12px);color:#555;}
+.score-big{font-size:clamp(42px,13vw,52px);font-weight:500;color:#f0f0f0;}
+.score-sub{font-size:clamp(15px,4.2vw,16px);color:#888;margin-top:8px;}
+#restart-btn{margin-top:1.75rem;padding:12px 28px;font-size:15px;border:0.5px solid #555;border-radius:8px;background:#2a2a2a;color:#f0f0f0;cursor:pointer;}
+#restart-btn:hover{background:#333;}
+
+:fullscreen #app,:-webkit-full-screen #app{padding:2rem;}
+:fullscreen #stage,:-webkit-full-screen #stage{padding-top:4vh;}
+:fullscreen .active-sent,:-webkit-full-screen .active-sent{font-size:clamp(28px,4.5vw,68px);}
+:fullscreen .passive-sent,:-webkit-full-screen .passive-sent{font-size:clamp(22px,3.5vw,54px);}
+:fullscreen .lbl,:-webkit-full-screen .lbl{font-size:clamp(13px,1.5vw,22px);}
+:fullscreen .hint,:-webkit-full-screen .hint{font-size:clamp(15px,1.8vw,28px);}
+:fullscreen .unnatural-mark,:-webkit-full-screen .unnatural-mark{font-size:clamp(13px,1.5vw,20px);}
+:fullscreen .counter,:-webkit-full-screen .counter{font-size:clamp(14px,1.5vw,22px);}
+:fullscreen #action-btn,:-webkit-full-screen #action-btn{font-size:clamp(16px,2vw,28px);padding:12px 48px;}
+:fullscreen .key-hint,:-webkit-full-screen .key-hint{font-size:clamp(12px,1.2vw,18px);}
+:fullscreen .score-big,:-webkit-full-screen .score-big{font-size:clamp(60px,10vw,120px);}
+:fullscreen .score-sub,:-webkit-full-screen .score-sub{font-size:clamp(18px,2.5vw,36px);}
+:fullscreen #restart-btn,:-webkit-full-screen #restart-btn{font-size:clamp(16px,2vw,28px);padding:12px 48px;}
+</style>
+
+<div id="app">
+  <button id="fs-btn" onclick="toggleFS()"><i class="ti ti-arrows-maximize" aria-hidden="true"></i> 全画面</button>
+  <div id="stage"></div>
+</div>
+
+<script>
+const RAW = [
+  {
+    active: 'He gives Sally a ring.',
+    passives: [
+      {text:'Sally <ans>is given</ans> a ring (by him).', unnatural:false},
+      {text:'A ring <ans>is given</ans> <prep>to</prep> Sally (by him).', unnatural:false},
+    ],
+    note: 'give型：O1・O2どちらも主語にできる'
+  },
+  {
+    active: 'She shows me the picture.',
+    passives: [
+      {text:'I <ans>am shown</ans> the picture (by her).', unnatural:false},
+      {text:'The picture <ans>is shown</ans> <prep>to</prep> me (by her).', unnatural:false},
+    ],
+    note: 'give型：O1・O2どちらも主語にできる'
+  },
+  {
+    active: 'He tells us the truth.',
+    passives: [
+      {text:'We <ans>are told</ans> the truth (by him).', unnatural:false},
+      {text:'The truth <ans>is told</ans> <prep>to</prep> us (by him).', unnatural:false},
+    ],
+    note: 'give型：O1・O2どちらも主語にできる'
+  },
+  {
+    active: 'Ms. Brown teaches the students English.',
+    passives: [
+      {text:'The students <ans>are taught</ans> English (by Ms. Brown).', unnatural:false},
+      {text:'English <ans>is taught</ans> <prep>to</prep> the students (by Ms. Brown).', unnatural:false},
+    ],
+    note: 'give型：O1・O2どちらも主語にできる'
+  },
+  {
+    active: 'Tom lends me his bike.',
+    passives: [
+      {text:'I <ans>am lent</ans> his bike (by Tom).', unnatural:true, unnaturalNote:'文法的には可能だが実際にはほとんど使われない'},
+      {text:'His bike <ans>is lent</ans> <prep>to</prep> me (by Tom).', unnatural:false},
+    ],
+    note: 'give型：O1・O2どちらも主語にできる'
+  },
+  {
+    active: 'She sends him a letter.',
+    passives: [
+      {text:'He <ans>is sent</ans> a letter (by her).', unnatural:false},
+      {text:'A letter <ans>is sent</ans> <prep>to</prep> him (by her).', unnatural:false},
+    ],
+    note: 'give型：O1・O2どちらも主語にできる'
+  },
+  {
+    active: 'They pay the staff a bonus.',
+    passives: [
+      {text:'The staff <ans>are paid</ans> a bonus (by them).', unnatural:false},
+      {text:'A bonus <ans>is paid</ans> <prep>to</prep> the staff (by them).', unnatural:false},
+    ],
+    note: 'give型：O1・O2どちらも主語にできる'
+  },
+  {
+    active: 'He hands her the keys.',
+    passives: [
+      {text:'She <ans>is handed</ans> the keys (by him).', unnatural:false},
+      {text:'The keys <ans>are handed</ans> <prep>to</prep> her (by him).', unnatural:false},
+    ],
+    note: 'give型：O1・O2どちらも主語にできる'
+  },
+  {
+    active: 'Mom buys me a cake.',
+    passives: [
+      {text:'A cake <ans>is bought</ans> <prep>for</prep> me (by Mom).', unnatural:false},
+    ],
+    note: 'buy型：O2のみ主語にできる'
+  },
+  {
+    active: 'He finds us a good hotel.',
+    passives: [
+      {text:'A good hotel <ans>is found</ans> <prep>for</prep> us (by him).', unnatural:false},
+    ],
+    note: 'buy型：O2のみ主語にできる'
+  },
+  {
+    active: 'She makes him lunch.',
+    passives: [
+      {text:'Lunch <ans>is made</ans> <prep>for</prep> him (by her).', unnatural:false},
+    ],
+    note: 'buy型：O2のみ主語にできる'
+  },
+  {
+    active: 'I choose you a tie.',
+    passives: [
+      {text:'A tie <ans>is chosen</ans> <prep>for</prep> you (by me).', unnatural:false},
+    ],
+    note: 'buy型：O2のみ主語にできる'
+  },
+  {
+    active: 'Dad cooks us dinner.',
+    passives: [
+      {text:'Dinner <ans>is cooked</ans> <prep>for</prep> us (by Dad).', unnatural:false},
+    ],
+    note: 'buy型：O2のみ主語にできる'
+  },
+  {
+    active: 'Can you get me a coffee?',
+    passives: [
+      {text:'Can a coffee <ans>be got</ans> <prep>for</prep> me (by you)?', unnatural:true, unnaturalNote:'受動態にすると非常に不自然。能動態のまま使うのが普通'},
+    ],
+    note: 'buy型：O2のみ主語にできる'
+  },
+  {
+    active: 'She calls him a taxi.',
+    passives: [
+      {text:'A taxi <ans>is called</ans> <prep>for</prep> him (by her).', unnatural:false},
+    ],
+    note: 'buy型：O2のみ主語にできる'
+  },
+  {
+    active: 'He leaves her a message.',
+    passives: [
+      {text:'A message <ans>is left</ans> <prep>for</prep> her (by him).', unnatural:false},
+    ],
+    note: 'buy型：O2のみ主語にできる'
+  },
+];
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function renderText(text){
+  return text
+    .replace(/<ans>(.*?)<\/ans>/g,'<span class="ans">$1</span>')
+    .replace(/<prep>(.*?)<\/prep>/g,'<span class="prep">$1</span>');
+}
+
+let questions,idx,phase;
+
+function start(){questions=shuffle(RAW);idx=0;phase='question';render();}
+
+function advance(){
+  if(phase==='question'){phase='answer';render();}
+  else if(phase==='answer'){idx++;if(idx>=questions.length){phase='score';render();}else{phase='question';render();}}
+}
+
+function render(){
+  const stage=document.getElementById('stage');
+  if(phase==='score'){
+    stage.innerHTML=`
+      <div class="content">
+        <div class="score-big">終了！</div>
+        <div class="score-sub">全 ${questions.length} 問　お疲れさまでした</div>
+        <button id="restart-btn" onclick="start()">もう一度</button>
+      </div>`;
+    return;
+  }
+  const q=questions[idx];
+  const pct=((idx/questions.length)*100).toFixed(0);
+  const isAns=(phase==='answer');
+
+  let passiveHTML='';
+  if(isAns){
+    q.passives.forEach(p=>{
+      passiveHTML+=`<div class="passive-block">`;
+      passiveHTML+=`<div class="passive-sent">${renderText(p.text)}</div>`;
+      if(p.unnatural){
+        passiveHTML+=`<div class="unnatural-mark">△ ${p.unnaturalNote}</div>`;
+      }
+      passiveHTML+=`</div>`;
+    });
+  } else {
+    passiveHTML='<div class="passive-sent">&nbsp;</div>';
+  }
+
+  stage.innerHTML=`
+    <div class="content">
+      <div class="counter">問題 ${idx+1} / ${questions.length}</div>
+      <div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="lbl">能動態</div>
+      <div class="active-sent">${q.active}</div>
+      <div class="lbl">受動態に書き換え</div>
+      ${passiveHTML}
+      <div class="hint${isAns?' show':''}">${isAns?q.note:''}</div>
+    </div>
+    <div id="bottom-bar">
+      <button id="action-btn" onclick="advance()">${isAns?'次の問題 →':'解答を見る'}</button>
+      <div class="key-hint">Space キーでも操作できます</div>
+    </div>`;
+}
+
+document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();advance();}});
+
+let isFull=false;
+function toggleFS(){
+  const el=document.documentElement;
+  if(!isFull){(el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen).call(el);}
+  else{(document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen).call(document);}
+}
+function onFSChange(){
+  isFull=!!(document.fullscreenElement||document.webkitFullscreenElement);
+  document.getElementById('fs-btn').innerHTML=isFull
+    ?'<i class="ti ti-arrows-minimize" aria-hidden="true"></i> 元に戻す'
+    :'<i class="ti ti-arrows-maximize" aria-hidden="true"></i> 全画面';
+}
+document.addEventListener('fullscreenchange',onFSChange);
+document.addEventListener('webkitfullscreenchange',onFSChange);
+
+start();
+</script>
