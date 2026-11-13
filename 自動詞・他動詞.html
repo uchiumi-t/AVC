@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大学入試 英語「自動詞・他動詞」全18問ランダム特訓</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --primary: #38bdf8;
+    --secondary: #2dd4bf;
+    --accent: #f472b6;
+    --text: #f8fafc;
+    --correct: #22c55e;
+    --wrong: #ef4444;
+    --muted: #475569;
+  }
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  #app {
+    width: 95%;
+    max-width: 900px;
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  }
+  .menu-screen, .result-screen { text-align: center; }
+  .menu-title { font-size: 2rem; color: var(--primary); margin-bottom: 1rem; }
+  .menu-desc { color: #94a3b8; font-size: 1.1rem; margin-bottom: 2rem; line-height: 1.6; }
+  .start-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #0f172a;
+    font-weight: bold;
+    padding: 1.2rem 3rem;
+    font-size: 1.5rem;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
+  }
+  .start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(56, 189, 248, 0.4);
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #334155;
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+    font-weight: bold;
+  }
+  .progress-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: #334155;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--secondary);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+  .question-text {
+    font-size: 1.6rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    min-height: 3.5em;
+    white-space: pre-wrap;
+  }
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .choice-btn {
+    background: #1e293b;
+    color: white;
+    border: 2px solid #475569;
+    padding: 1.2rem;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: left;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: var(--primary); }
+  .choice-btn.is-correct { background: var(--correct) !important; border-color: #166534 !important; color: white !important; font-weight: bold; transform: scale(1.02); }
+  .choice-btn.is-wrong { background: var(--wrong) !important; border-color: #991b1b !important; color: white !important; opacity: 0.8; }
+  .choice-btn.is-dimmed { opacity: 0.4; border-color: transparent; }
+  #explanation {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #0f172a;
+    border-left: 5px solid var(--primary);
+    border-radius: 4px;
+    display: none;
+  }
+  .ans-title { color: var(--primary); font-weight: bold; font-size: 1.4rem; margin-bottom: 0.5rem; }
+  .nav { display: flex; justify-content: space-between; margin-top: 2rem; gap: 10px; }
+  .nav button { padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; border: none; font-weight: bold; }
+  .btn-home { background: #64748b; color: white; }
+  .btn-prev, .btn-next { background: var(--primary); color: #0f172a; }
+  .btn-ans { background: var(--accent); color: white; }
+  .hidden { display: none; }
+  #fullscreen-btn {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 9999;
+    background: #334155;
+    border: 2px solid #475569;
+    color: var(--primary);
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .score-card {
+    background: #0f172a;
+    padding: 2rem;
+    border-radius: 12px;
+    margin: 2rem 0;
+    border: 1px solid #334155;
+  }
+  .score-number {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: var(--secondary);
+    margin: 0.5rem 0;
+  }
+  :fullscreen body { font-size: 1.4vw; }
+  :fullscreen #app { max-width: 100%; width: 96%; padding: 2.5vw; min-height: 96vh; display: flex; flex-direction: column; justify-content: center; }
+  :fullscreen .question-text { font-size: 2.6vw; }
+  :fullscreen .choice-btn { font-size: 1.8vw; padding: 1.5vw; }
+  :fullscreen .ans-title { font-size: 2.2vw; }
+  :fullscreen .menu-title { font-size: 3vw; }
+</style>
+</head>
+<body>
+
+<button id="fullscreen-btn" onclick="toggleFullscreen()">
+  <span id="fs-icon">⛶</span> <span id="fs-label">全画面</span>
+</button>
+
+<div id="app">
+  <!-- ホーム/スタート画面 -->
+  <div id="menu-screen" class="menu-screen">
+    <h1 class="menu-title">大学入試 英語「自動詞・他動詞」<br>全18問 ランダム特訓</h1>
+    <p class="menu-desc">
+      入試最頻出の「誤りやすい他動詞11語」と「誤りやすい自動詞7語」の全18問。<br>
+      出題順・選択肢ともにランダムで一気に出題されます。
+    </p>
+    <button class="start-btn" onclick="startQuiz()">テスト開始 (全18問)</button>
+  </div>
+
+  <!-- クイズ画面 -->
+  <div id="quiz-screen" class="hidden">
+    <div class="header">
+      <span id="q-num">Question 1 / 18</span>
+      <span>自動詞 vs 他動詞</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div id="progress-bar" class="progress-bar-fill"></div>
+    </div>
+    <div id="q-text" class="question-text"></div>
+    <div id="choice-area" class="choices"></div>
+    <div id="explanation">
+      <div class="ans-title">正解：<span id="correct-ans"></span></div>
+      <div id="expl-detail" style="line-height: 1.7; white-space: pre-wrap;"></div>
+    </div>
+    <div class="nav">
+      <button class="btn-home" onclick="goHome()">TOPへ</button>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-prev" onclick="move(-1)">前へ</button>
+        <button class="btn-ans" onclick="triggerShowAns()">解答表示</button>
+        <button class="btn-next" onclick="move(1)">次へ <span id="space-hint" style="font-size:0.75em;opacity:0.75;"></span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 結果画面 -->
+  <div id="result-screen" class="result-screen hidden">
+    <h1 class="menu-title">テスト終了！</h1>
+    <div class="score-card">
+      <div style="font-size: 1.2rem; color: #94a3b8;">あなたのスコア</div>
+      <div id="score-text" class="score-number">0 / 18</div>
+      <div id="score-comment" style="font-size: 1.1rem; color: var(--primary);"></div>
+    </div>
+    <button class="start-btn" onclick="startQuiz()">もう一度挑戦する</button>
+  </div>
+</div>
+
+<script>
+// 全18問の基本マスターデータ
+const RAW_DATA = [
+  // --- 他動詞 11語 ---
+  {
+    target: "discuss",
+    q: "We need to ______ the new marketing strategy in detail during the upcoming meeting.",
+    correct: "discuss",
+    wrong: "discuss about",
+    e: "【他動詞】discuss（〜について議論する）\n・直後に目的語をとる他動詞のため、about などの前置詞は不要です。\n❌ discuss about the problem → ⭕ discuss the problem\n💡 同義表現：talk about the problem"
+  },
+  {
+    target: "marry",
+    q: "After dating for three years, he finally decided to ______ her next spring.",
+    correct: "marry",
+    wrong: "marry with",
+    e: "【他動詞】marry（〜と結婚する）\n・「〜と」の日本語訳につられて with を付けがちですが、他動詞なので不要です。\n❌ marry with her → ⭕ marry her\n💡 同義熟語：get married to her（※toを用いる点にも注意）"
+  },
+  {
+    target: "reach",
+    q: "The express train is expected to ______ the terminal station in less than twenty minutes.",
+    correct: "reach",
+    wrong: "reach to",
+    e: "【他動詞】reach（〜に到着する）\n・目的語を直接とる他動詞です。前置詞 to はつきません。\n❌ reach to the station → ⭕ reach the station\n💡 同義表現：arrive at / in the station, get to the station"
+  },
+  {
+    target: "approach",
+    q: "As the severe typhoon began to ______ the mainland, heavy rain warnings were issued.",
+    correct: "approach",
+    wrong: "approach to",
+    e: "【他動詞】approach（〜に接近する・近づく）\n・直後に目的語をとる他動詞です。to は不要です。\n❌ approach to the building → ⭕ approach the building"
+  },
+  {
+    target: "mention",
+    q: "Did the manager ______ the proposed budget cuts during the morning conference?",
+    correct: "mention",
+    wrong: "mention about",
+    e: "【他動詞】mention（〜について言及する・述べる）\n・「〜について」に引きずられて about を付けがちですが他動詞です。\n❌ mention about the plan → ⭕ mention the plan\n💡 同義表現：refer to the plan"
+  },
+  {
+    target: "enter",
+    q: "All visitors are required to show their ID card before they ______ the research facility.",
+    correct: "enter",
+    wrong: "enter into",
+    e: "【他動詞】enter（〜に入る）\n・建物や部屋など物理的な場所に入る場合は他動詞です。\n❌ enter into the room → ⭕ enter the room\n⚠️ 注意：enter into は「（契約・事業・会話など）を始める」という抽象的意味でのみ使用されます。"
+  },
+  {
+    target: "attend",
+    q: "All board members are strongly requested to ______ the annual general meeting tomorrow.",
+    correct: "attend",
+    wrong: "attend to",
+    e: "【他動詞】attend（〜に出席する）\n・「〜に出席する」の意味では他動詞です。\n❌ attend to the meeting → ⭕ attend the meeting\n⚠️ 注意：attend to は「〜に注意を払う・世話をする」という自動詞＋前置詞の熟語になります。"
+  },
+  {
+    target: "resemble",
+    q: "With her sharp eyes and bright smile, she closely ______ her grandmother.",
+    correct: "resembles",
+    wrong: "resembles with",
+    e: "【他動詞】resemble（〜に似ている）\n・「〜と似ている」の意味ですが with や to は不要な他動詞です。\n❌ resemble with / to her → ⭕ resemble her\n💡 進行形（is resembling）や受動態（is resembled）にはできません。"
+  },
+  {
+    target: "inhabit",
+    q: "Various rare species of animals are known to ______ the tropical island.",
+    correct: "inhabit",
+    wrong: "inhabit in",
+    e: "【他動詞】inhabit（〜に居住する・生息する）\n・直後に場所をとる他動詞です。in は不要です。\n❌ inhabit in the island → ⭕ inhabit the island\n💡 同義表現：live in the island"
+  },
+  {
+    target: "obey",
+    q: "All drivers must strictly ______ the traffic regulations and speed limits on public roads.",
+    correct: "obey",
+    wrong: "obey to",
+    e: "【他動詞】obey（〜に従う・遵守する）\n・「〜に」につられて to をつけがちですが他動詞です。\n❌ obey to the rules → ⭕ obey the rules"
+  },
+  {
+    target: "answer",
+    q: "Please take a few minutes to ______ the survey questions regarding our service.",
+    correct: "answer",
+    wrong: "answer to",
+    e: "【他動詞】answer（〜に答える）\n・動詞の answer は他動詞です。\n❌ answer to the question → ⭕ answer the question\n⚠️ 注意：名詞の an answer to the question（〜に対する答え）と混同しないようにしましょう。"
+  },
+
+  // --- 自動詞 7語 ---
+  {
+    target: "apologize",
+    q: "He realized his mistake and decided to ______ his boss for the inconvenience caused.",
+    correct: "apologize to",
+    wrong: "apologize",
+    e: "【自動詞】apologize（謝る）\n・自動詞なので「人」を目的語にとるには前置詞 to が絶対に必要です。\n❌ apologize him → ⭕ apologize to him for his mistake\n💡 語法：apologize to [人] for [理由]"
+  },
+  {
+    target: "complain",
+    q: "Many guests began to ______ the poor service they received at the hotel.",
+    correct: "complain about",
+    wrong: "complain",
+    e: "【自動詞】complain（不満を言う・苦情を言った）\n・自動詞なので対象をとるには about または of が不可欠です。\n❌ complain the service → ⭕ complain about [of] the service"
+  },
+  {
+    target: "graduate",
+    q: "Her elder brother is planning to ______ high school and enter university next year.",
+    correct: "graduate from",
+    wrong: "graduate",
+    e: "【自動詞】graduate（卒業する）\n・自動詞のため、学校名を後に置く場合は from が必要です。\n❌ graduate high school → ⭕ graduate from high school"
+  },
+  {
+    target: "object",
+    q: "Many local residents strongly ______ the plan to build a landfill near their neighborhood.",
+    correct: "object to",
+    wrong: "object",
+    e: "【自動詞】object（反対する）\n・自動詞のため、反対対象をとるには前置詞 to（〜に対して）が不可欠です。\n❌ object the plan → ⭕ object to the plan\n💡 他動詞の同義語：oppose the plan（opposeは他動詞）"
+  },
+  {
+    target: "agree",
+    q: "After a long discussion, all committee members managed to ______ the new proposal.",
+    correct: "agree to",
+    wrong: "agree",
+    e: "【自動詞】agree（同意する）\n・自動詞のため前置詞が必要です。提案や計画には to、意見や人には with を使います。\n❌ agree the proposal → ⭕ agree to the proposal / agree with him"
+  },
+  {
+    target: "reply",
+    q: "Please make sure to ______ the client's email before the end of the day.",
+    correct: "reply to",
+    wrong: "reply",
+    e: "【自動詞】reply（返信・返答する）\n・自動詞なので目的語の前に to が不可欠です。\n❌ reply the email → ⭕ reply to the email\n💡 他動詞の同義語：answer the email"
+  },
+  {
+    target: "account",
+    q: "Unexpected system failures often ______ the delay in processing customer requests.",
+    correct: "account for",
+    wrong: "account",
+    e: "【自動詞】account（説明する / 割合を占める）\n・自動詞のため for とセットで用います。\n❌ account the reason → ⭕ account for the reason"
+  }
+];
+
+let qs = [];
+let cur = 0;
+let isAnswered = false;
+let userAnswers = []; // 解答状況を記録
+
+// 配列シャッフル
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// 問題と正解位置（A/B）の構築（ランダム化・A/B連続3回制限）
+function buildQuestions() {
+  const shuffledData = shuffle([...RAW_DATA]);
+
+  let flags;
+  do {
+    flags = Array.from({ length: shuffledData.length }, (_, i) => i < Math.floor(shuffledData.length / 2));
+    shuffle(flags);
+  } while (hasLongRun(flags, 3));
+
+  qs = shuffledData.map((d, i) => {
+    const correctOnA = flags[i];
+    const choices = correctOnA ? [d.correct, d.wrong] : [d.wrong, d.correct];
+    const labels = ["A) ", "B) "];
+    return {
+      n: i + 1,
+      q: d.q.replace("______", "(　　　)"),
+      choices: choices.map((c, k) => labels[k] + c),
+      correctIdx: correctOnA ? 0 : 1,
+      label: (correctOnA ? "A) " : "B) ") + d.correct,
+      e: d.e
+    };
+  });
+  userAnswers = new Array(qs.length).fill(null);
+}
+
+function hasLongRun(arr, max) {
+  let run = 1;
+  for (let i = 1; i < arr.length; i++) {
+    run = arr[i] === arr[i - 1] ? run + 1 : 1;
+    if (run > max) return true;
+  }
+  return false;
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  }
+}
+
+document.addEventListener('fullscreenchange', updateFsBtn);
+document.addEventListener('webkitfullscreenchange', updateFsBtn);
+
+function updateFsBtn() {
+  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  document.getElementById('fs-icon').textContent = isFs ? '✕' : '⛶';
+  document.getElementById('fs-label').textContent = isFs ? '全画面解除' : '全画面';
+}
+
+function startQuiz() {
+  buildQuestions();
+  cur = 0;
+  document.getElementById('menu-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  render();
+}
+
+function goHome() {
+  document.getElementById('menu-screen').classList.remove('hidden');
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+}
+
+function render() {
+  const item = qs[cur];
+  const total = qs.length;
+
+  document.getElementById('q-num').innerText = `Question ${item.n} / ${total}`;
+  document.getElementById('q-text').innerText = item.q;
+  document.getElementById('progress-bar').style.width = `${((cur + 1) / total) * 100}%`;
+  document.getElementById('explanation').style.display = 'none';
+  document.querySelector('.btn-ans').innerHTML = '解答表示 <span style="font-size:0.75em;opacity:0.75;">[Space]</span>';
+  document.getElementById('space-hint').textContent = '';
+
+  const choiceArea = document.getElementById('choice-area');
+  choiceArea.innerHTML = '';
+  
+  item.choices.forEach((txt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.id = 'choice-' + i;
+    btn.innerText = txt;
+    btn.onclick = () => checkAnswer(i);
+    choiceArea.appendChild(btn);
+  });
+
+  // 既に回答済みの場合の復元
+  if (userAnswers[cur] !== null) {
+    applyAnswerState(userAnswers[cur].selected, userAnswers[cur].isCorrect);
+  } else {
+    isAnswered = false;
+  }
+}
+
+function checkAnswer(selectedIdx) {
+  if (isAnswered) return;
+  const item = qs[cur];
+  const isCorrect = selectedIdx === item.correctIdx;
+  
+  userAnswers[cur] = { selected: selectedIdx, isCorrect: isCorrect };
+  applyAnswerState(selectedIdx, isCorrect);
+}
+
+function applyAnswerState(selectedIdx, isCorrect) {
+  isAnswered = true;
+  const item = qs[cur];
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach((btn, i) => {
+    btn.classList.remove('is-correct', 'is-wrong', 'is-dimmed');
+    if (i === item.correctIdx) btn.classList.add('is-correct');
+    else if (i === selectedIdx) btn.classList.add('is-wrong');
+    else btn.classList.add('is-dimmed');
+  });
+  showAns();
+}
+
+function triggerShowAns() {
+  if (isAnswered) return;
+  const item = qs[cur];
+  userAnswers[cur] = { selected: -1, isCorrect: false };
+  applyAnswerState(-1, false);
+}
+
+function showAns() {
+  const item = qs[cur];
+  document.getElementById('correct-ans').innerText = item.label;
+  document.getElementById('expl-detail').innerText = item.e;
+  document.getElementById('explanation').style.display = 'block';
+  document.querySelector('.btn-ans').innerHTML = '解答表示';
+  document.getElementById('space-hint').textContent = '[Space]';
+}
+
+function move(step) {
+  if (step === 1 && cur === qs.length - 1) {
+    showResult();
+    return;
+  }
+  cur = (cur + step + qs.length) % qs.length;
+  render();
+}
+
+function showResult() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+
+  const correctCount = userAnswers.filter(a => a && a.isCorrect).length;
+  const total = qs.length;
+  document.getElementById('score-text').innerText = `${correctCount} / ${total}`;
+
+  let comment = "";
+  const pct = (correctCount / total) * 100;
+  if (pct === 100) comment = "素晴らしい！自動詞・他動詞マスターです！";
+  else if (pct >= 80) comment = "合格圏内です！間違えた問題を復習しましょう。";
+  else if (pct >= 50) comment = "もう少し！前置詞の有無に注意して再挑戦してみましょう。";
+  else comment = "まずはそれぞれの動詞の語法と型をしっかり覚えるところから始めましょう！";
+
+  document.getElementById('score-comment').innerText = comment;
+}
+
+document.addEventListener('keydown', function(e) {
+  const quizScreen = document.getElementById('quiz-screen');
+  if (quizScreen.classList.contains('hidden')) return;
+
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (!isAnswered) {
+      triggerShowAns();
+    } else {
+      move(1);
+    }
+    return;
+  }
+  const k = e.key.toLowerCase();
+  if (k === '1' || k === 'a') checkAnswer(0);
+  else if (k === '2' || k === 'b') checkAnswer(1);
+});
+</script>
+</body>
+</html>

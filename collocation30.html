@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大学入試 英語「名詞×修飾語」コロケーション特訓30</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --primary: #38bdf8;
+    --secondary: #2dd4bf;
+    --accent: #f472b6;
+    --text: #f8fafc;
+    --correct: #22c55e;
+    --wrong: #ef4444;
+    --muted: #475569;
+  }
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  #app {
+    width: 95%;
+    max-width: 900px;
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  }
+  .menu-screen { text-align: center; }
+  .menu-title { font-size: 2rem; color: var(--primary); margin-bottom: 2rem; }
+  .menu-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+  .menu-btn {
+    background: #334155;
+    padding: 1.5rem;
+    font-size: 1.4rem;
+    border-radius: 12px;
+    border: 2px solid #475569;
+    cursor: pointer;
+    transition: 0.2s;
+    color: white;
+  }
+  .menu-btn:hover { border-color: var(--primary); background: #1e293b; }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #334155;
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+    font-weight: bold;
+  }
+  .question-text {
+    font-size: 1.6rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    min-height: 4em;
+    white-space: pre-wrap;
+  }
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .choice-btn {
+    background: #1e293b;
+    color: white;
+    border: 2px solid #475569;
+    padding: 1.2rem;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: left;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: var(--primary); }
+  .choice-btn.is-correct { background: var(--correct) !important; border-color: #166534 !important; color: white !important; font-weight: bold; transform: scale(1.02); }
+  .choice-btn.is-wrong { background: var(--wrong) !important; border-color: #991b1b !important; color: white !important; opacity: 0.8; }
+  .choice-btn.is-dimmed { opacity: 0.4; border-color: transparent; }
+  #explanation {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #0f172a;
+    border-left: 5px solid var(--primary);
+    border-radius: 4px;
+    display: none;
+  }
+  .ans-title { color: var(--primary); font-weight: bold; font-size: 1.4rem; margin-bottom: 0.5rem; }
+  .nav { display: flex; justify-content: space-between; margin-top: 2rem; gap: 10px; }
+  .nav button { padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; border: none; font-weight: bold; }
+  .btn-home { background: #64748b; color: white; }
+  .btn-prev, .btn-next { background: var(--primary); color: #0f172a; }
+  .btn-ans { background: var(--accent); color: white; }
+  .hidden { display: none; }
+  #fullscreen-btn {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 9999;
+    background: #334155;
+    border: 2px solid #475569;
+    color: var(--primary);
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  :fullscreen body { font-size: 1.4vw; }
+  :fullscreen #app { max-width: 100%; width: 96%; padding: 2.5vw; min-height: 96vh; display: flex; flex-direction: column; justify-content: center; }
+  :fullscreen .question-text { font-size: 2.6vw; }
+  :fullscreen .choice-btn { font-size: 1.8vw; padding: 1.5vw; }
+  :fullscreen .ans-title { font-size: 2.2vw; }
+  :fullscreen .menu-title { font-size: 3vw; }
+  :fullscreen .menu-btn { font-size: 2vw; }
+</style>
+</head>
+<body>
+
+<button id="fullscreen-btn" onclick="toggleFullscreen()">
+  <span id="fs-icon">⛶</span> <span id="fs-label">全画面</span>
+</button>
+
+<div id="app">
+  <div id="menu-screen" class="menu-screen">
+    <h1 class="menu-title">名詞×修飾語 コロケーション特訓30<br>分野選択</h1>
+    <div class="menu-grid">
+      <button class="menu-btn" onclick="startQuiz(0)">１．可算・不可算名詞と修飾語 (1-10)</button>
+      <button class="menu-btn" onclick="startQuiz(10)">２．熟語・コロケーションの相性 (11-20)</button>
+      <button class="menu-btn" onclick="startQuiz(20)">３．類似修飾語の識別 (21-30)</button>
+    </div>
+  </div>
+
+  <div id="quiz-screen" class="hidden">
+    <div class="header">
+      <span id="q-num"></span>
+      <span id="section-title"></span>
+    </div>
+    <div id="q-text" class="question-text"></div>
+    <div id="choice-area" class="choices"></div>
+    <div id="explanation">
+      <div class="ans-title">正解：<span id="correct-ans"></span></div>
+      <div id="expl-detail" style="line-height: 1.6;"></div>
+    </div>
+    <div class="nav">
+      <button class="btn-home" onclick="goHome()">一覧へ</button>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-prev" onclick="move(-1)">前へ</button>
+        <button class="btn-ans" onclick="triggerShowAns()">解答表示</button>
+        <button class="btn-next" onclick="move(1)">次へ <span id="space-hint" style="font-size:0.75em;opacity:0.75;"></span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 問題データ：a = 正解の語句、b = 誤答の語句（表示位置は起動時にランダム化）
+const DATA = [
+ {
+  "p": 1,
+  "pn": "可算・不可算名詞と修飾語",
+  "q": "There is only a ______ hope left that the trapped miners will be rescued alive.",
+  "a": "slight",
+  "b": "few",
+  "e": "hope（希望）は原則として不可算（抽象）名詞です。「かすかな希望」は slight hope または little hope を用います。few は可算名詞の複数を修飾するため不可算の hope には使えません。"
+ },
+ {
+  "p": 1,
+  "pn": "可算・不可算名詞と修飾語",
+  "q": "A large ______ of damage was caused by the severe typhoon last night.",
+  "a": "amount",
+  "b": "number",
+  "e": "damage（被害・損害）は不可算名詞です。不可算名詞の「量」を表すには amount を使用します（a large amount of damage）。可算名詞には number を用います。"
+ },
+ {
+  "p": 1,
+  "pn": "可算・不可算名詞と修飾語",
+  "q": "She gave me a great deal of valuable ______ regarding study abroad programs.",
+  "a": "information",
+  "b": "informations",
+  "e": "information（情報）は代表的な不可算名詞であり、複数形の -s は付きません。a great deal of（たくさんの）は不可算名詞を修飾します。"
+ },
+ {
+  "p": 1,
+  "pn": "可算・不可算名詞と修飾語",
+  "q": "Surprisingly, ______ students attended the optional Saturday lecture.",
+  "a": "quite a few",
+  "b": "quite a little",
+  "e": "students は可算名詞の複数形です。「かなり多数の」を意味する quite a few は可算名詞を修飾します。quite a little は不可算名詞を修飾します。"
+ },
+ {
+  "p": 1,
+  "pn": "可算・不可算名詞と修飾語",
+  "q": "We need to buy new ______ for our newly renovated dining room.",
+  "a": "furniture",
+  "b": "furnitures",
+  "e": "furniture（家具）は集合的不可算名詞です。個々の家具を数える場合は a piece of furniture と表し、単体で複数形 furnitures とすることはできません。"
+ },
+ {
+  "p": 1,
+  "pn": "可算・不可算名詞と修飾語",
+  "q": "There were ______ people in the hall than we had originally expected.",
+  "a": "fewer",
+  "b": "less",
+  "e": "people は複数扱い（可算名詞の集合）です。「より少ない」という比較級には fewer を用います。less は不可算名詞に接続します。"
+ },
+ {
+  "p": 1,
+  "pn": "可算・不可算名詞と修飾語",
+  "q": "The professor offered some useful ______ on how to write an academic paper.",
+  "a": "advice",
+  "b": "advices",
+  "e": "advice（助言・アドバイス）は不可算名詞です。数えたい場合は a piece of advice のように助数詞を用い、advices とはしません。"
+ },
+ {
+  "p": 1,
+  "pn": "可算・不可算名詞と修飾語",
+  "q": "Because of the heavy snow, there was very ______ traffic on the highway.",
+  "a": "little",
+  "b": "few",
+  "e": "traffic（交通量・車通り）は不可算名詞です。「ほとんど〜ない」という意味で不可算名詞を修飾するのは little（very little traffic）です。"
+ },
+ {
+  "p": 1,
+  "pn": "可算・不可算名詞と修飾語",
+  "q": "The country lacks natural ______, forcing it to import raw materials.",
+  "a": "resources",
+  "b": "resource",
+  "e": "「（天然・鉱物などの）資源」の意味では、通常複数形の resources（natural resources）として用いられます。"
+ },
+ {
+  "p": 1,
+  "pn": "可算・不可算名詞と修飾語",
+  "q": "He made a great ______ of progress in his oral communication skills.",
+  "a": "deal",
+  "b": "number",
+  "e": "progress（進歩・上達）は不可算名詞です。a great deal of（多大な〜）は不可算名詞を修飾する定番熟語表現です。"
+ },
+ {
+  "p": 2,
+  "pn": "熟語・コロケーションの相性",
+  "q": "The scientist paid close ______ to the sudden change in temperature.",
+  "a": "attention",
+  "b": "regard",
+  "e": "「〜に注意を払う」は pay attention to です。pay close attention to で「〜に細心の注意を払う」という強力なコロケーションを作ります。"
+ },
+ {
+  "p": 2,
+  "pn": "熟語・コロケーションの相性",
+  "q": "Please take into ______ the fact that he has only been learning English for three months.",
+  "a": "account",
+  "b": "consider",
+  "e": "「〜を考慮に入れる」は take ... into account（または take ... into consideration）です。consider は動詞なので into の後ろにそのまま置くことはできません。"
+ },
+ {
+  "p": 2,
+  "pn": "熟語・コロケーションの相性",
+  "q": "It is of great ______ that all team members agree on the new schedule.",
+  "a": "importance",
+  "b": "important",
+  "e": "「of + 抽象名詞」＝ 形容詞 の文法規則です。of importance ＝ important（重要である）を意味します。"
+ },
+ {
+  "p": 2,
+  "pn": "熟語・コロケーションの相性",
+  "q": "The new tax policy will have a strong ______ on small businesses.",
+  "a": "effect",
+  "b": "affect",
+  "e": "have an effect on ... で「〜に影響を与える」という表現です。affect は動詞「〜に影響を与える」なので、冠詞/形容詞の後ろの目的語（名詞）には effect を使います。"
+ },
+ {
+  "p": 2,
+  "pn": "熟語・コロケーションの相性",
+  "q": "He committed a serious ______ in his calculation, ruining the experiment.",
+  "a": "error",
+  "b": "wrong",
+  "e": "「誤りを犯す」は commit an error / make a mistake です。wrong は形容詞または副詞・不可算概念であり、a serious などの直接の修飾対象可算名詞としては error が適切です。"
+ },
+ {
+  "p": 2,
+  "pn": "熟語・コロケーションの相性",
+  "q": "The mayor took active ______ to reduce plastic waste in the city.",
+  "a": "measures",
+  "b": "actions",
+  "e": "「（目的達成のための具体的）措置・対策を講じる」は take measures (to do) と言います。take action も使えますが、複数形加算名詞の特定パターンとして take measures が選ばれます。"
+ },
+ {
+  "p": 2,
+  "pn": "熟語・コロケーションの相性",
+  "q": "I have no ______ in introducing you to our company director.",
+  "a": "hesitation",
+  "b": "hesitate",
+  "e": "have no hesitation in -ing で「ためらうことなく〜する」という決まり文句です。no の修飾を受ける名詞形 hesitation が正解です。"
+ },
+ {
+  "p": 2,
+  "pn": "熟語・コロケーションの相性",
+  "q": "The company makes it a ______ to reply to customer inquiries within 24 hours.",
+  "a": "rule",
+  "b": "habit",
+  "e": "make it a rule to do で「〜することにしている（方針・ルールとしている）」という意味です。個人癖は habit ですが組織的ルールは rule を選択します。"
+ },
+ {
+  "p": 2,
+  "pn": "熟語・コロケーションの相性",
+  "q": "The police are looking into the ______ of the mysterious package.",
+  "a": "origin",
+  "b": "reason",
+  "e": "the origin of ... で「〜の出所・起源」。reason の場合は reason for ... （〜の理由）の形をとるため、前置詞 of との親和性から origin が適合します。"
+ },
+ {
+  "p": 2,
+  "pn": "熟語・コロケーションの相性",
+  "q": "She took ______ of the sunny weather to dry all the heavy blankets.",
+  "a": "advantage",
+  "b": "benefit",
+  "e": "take advantage of ... で「（好機や利用可能なもの）を利用する・生かす」という頻出熟語です。"
+ },
+ {
+  "p": 3,
+  "pn": "類似修飾語の識別",
+  "q": "______ student in the class was given a copy of the new textbook.",
+  "a": "Every",
+  "b": "All",
+  "e": "student（単数形）＋ was（単数動詞）に注目します。every は単数名詞を修飾し単数扱いになります。all は複数名詞（All students were）を受けます。"
+ },
+ {
+  "p": 3,
+  "pn": "類似修飾語の識別",
+  "q": "The company operates offices on ______ side of the Atlantic Ocean.",
+  "a": "either",
+  "b": "both",
+  "e": "side が単数形である点に着目します。either side は「（両側のうちの）どちらの側にも＝両側に」を意味し単数名詞を修飾します。both は複数名詞（both sides）を取ります。"
+ },
+ {
+  "p": 3,
+  "pn": "類似修飾語の識別",
+  "q": "He lives in a peaceful town located in ______ France.",
+  "a": "southern",
+  "b": "south",
+  "e": "「フランス南部」は southern France のように形容詞 southern を用います。south France とは言いません（South Koreaのような固有国名を除く）。"
+ },
+ {
+  "p": 3,
+  "pn": "類似修飾語の識別",
+  "q": "The manager was highly ______ with the thorough quarterly report.",
+  "a": "pleased",
+  "b": "pleasing",
+  "e": "人が主語で「（報告書に）満足して／喜んで」いる感情状態を表すため、過去分詞由来の形容詞 pleased（be pleased with）が適切です。pleasing は「（人を）喜ばせるような」の意味。"
+ },
+ {
+  "p": 3,
+  "pn": "類似修飾語の識別",
+  "q": "An ______ amount of money was spent on the construction of the stadium.",
+  "a": "enormous",
+  "b": "enormously",
+  "e": "名詞 amount を修飾するため、形容詞 enormous（莫大な）が入ります。enormously は副詞です。"
+ },
+ {
+  "p": 3,
+  "pn": "類似修飾語の識別",
+  "q": "The two brothers look similar, but they have completely ______ personalities.",
+  "a": "different",
+  "b": "differ",
+  "e": "名詞 personalities を修飾する位置なので、形容詞 different が正解です。differ は動詞「異なる」です。"
+ },
+ {
+  "p": 3,
+  "pn": "類似修飾語の識別",
+  "q": "There is ______ difference between the two proposed solutions.",
+  "a": "little",
+  "b": "few",
+  "e": "difference（違い・差）はこの文脈で抽象・不可算扱い（there is little difference＝ほとんど違いがない）です。したがって little が入ります。"
+ },
+ {
+  "p": 3,
+  "pn": "類似修飾語の識別",
+  "q": "The stadium was filled with thousands of ______ fans.",
+  "a": "enthusiastic",
+  "b": "enthusiasm",
+  "e": "名詞 fans（ファン）を前置修飾するためには形容詞 enthusiastic（熱狂的な）が必要です。enthusiasm は名詞（熱意）です。"
+ },
+ {
+  "p": 3,
+  "pn": "類似修飾語の識別",
+  "q": "The presentation provided us with ______ economic data for analysis.",
+  "a": "valuable",
+  "b": "value",
+  "e": "economic data（経済データ）という名詞句を直接修飾する形容詞 valuable（価値のある・貴重な）が適合します。"
+ },
+ {
+  "p": 3,
+  "pn": "類似修飾語の識別",
+  "q": "______ member of the committee signed the official resolution.",
+  "a": "Each",
+  "b": "All",
+  "e": "member（単数形名詞）を修飾し、個々人を意識する Each（Each member...）が正解です。All の場合は All members になります。"
+ }
+];
+
+const SEC_TITLES = {
+  1: "１．可算・不可算名詞と修飾語",
+  2: "２．熟語・コロケーションの相性",
+  3: "３．類似修飾語の識別"
+};
+
+// 表示用の問題リスト（正解位置を割り当てたもの）
+let qs = [];
+let cur = 0;
+let isAnswered = false;
+
+// 正解の位置（A / B）をセクションごとに半々（5問ずつ）にしてシャッフル。
+// 同じ位置が4問以上連続しないよう、条件を満たすまで引き直す。
+function buildQuestions() {
+  let flags;
+  do {
+    flags = [];
+    for (let s = 0; s < DATA.length; s += 10) {
+      const n = Math.min(10, DATA.length - s);
+      const half = Math.floor(n / 2);
+      const sec = Array.from({ length: n }, (_, i) => i < half);   // true = 正解がA
+      for (let i = sec.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [sec[i], sec[j]] = [sec[j], sec[i]];
+      }
+      flags = flags.concat(sec);
+    }
+  } while (hasLongRun(flags, 3));
+
+  qs = DATA.map((d, i) => {
+    const correctOnA = flags[i];
+    const texts = correctOnA ? [d.a, d.b] : [d.b, d.a];
+    const labels = ["A) ", "B) "];
+    return {
+      n: String(i + 1),
+      sec: SEC_TITLES[d.p],
+      q: d.q.replace("______", "(　　　)"),
+      s: texts.map((t, k) => labels[k] + " " + t),
+      a: correctOnA ? 0 : 1,
+      label: (correctOnA ? "A) " : "B) ") + " " + d.a,
+      e: d.e
+    };
+  });
+}
+
+function hasLongRun(arr, max) {
+  let run = 1;
+  for (let i = 1; i < arr.length; i++) {
+    run = arr[i] === arr[i - 1] ? run + 1 : 1;
+    if (run > max) return true;
+  }
+  return false;
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  }
+}
+
+document.addEventListener('fullscreenchange', updateFsBtn);
+document.addEventListener('webkitfullscreenchange', updateFsBtn);
+
+function updateFsBtn() {
+  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  document.getElementById('fs-icon').textContent = isFs ? '✕' : '⛶';
+  document.getElementById('fs-label').textContent = isFs ? '全画面解除' : '全画面';
+}
+
+function startQuiz(index) {
+  buildQuestions();   // 開始のたびに正解位置を引き直す
+  cur = index;
+  document.getElementById('menu-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  render();
+}
+
+function goHome() {
+  document.getElementById('menu-screen').classList.remove('hidden');
+  document.getElementById('quiz-screen').classList.add('hidden');
+}
+
+function render() {
+  const item = qs[cur];
+  isAnswered = false;
+  document.getElementById('q-num').innerText = "Question " + item.n;
+  document.getElementById('section-title').innerText = item.sec;
+  document.getElementById('q-text').innerText = item.q;
+  document.getElementById('explanation').style.display = 'none';
+  document.querySelector('.btn-ans').innerHTML = '解答表示 <span style="font-size:0.75em;opacity:0.75;">[Space]</span>';
+  document.getElementById('space-hint').textContent = '';
+
+  const choiceArea = document.getElementById('choice-area');
+  choiceArea.innerHTML = '';
+  item.s.forEach((txt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.id = 'choice-' + i;
+    btn.innerText = txt;
+    btn.onclick = () => checkAnswer(i);
+    choiceArea.appendChild(btn);
+  });
+}
+
+function checkAnswer(selectedIdx) {
+  if (isAnswered) return;
+  isAnswered = true;
+  const item = qs[cur];
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach((btn, i) => {
+    btn.classList.remove('is-correct', 'is-wrong', 'is-dimmed');
+    if (i === item.a) btn.classList.add('is-correct');
+    else if (i === selectedIdx) btn.classList.add('is-wrong');
+    else btn.classList.add('is-dimmed');
+  });
+  showAns();
+}
+
+function triggerShowAns() {
+  const item = qs[cur];
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach((btn, i) => {
+    if (i === item.a) btn.classList.add('is-correct');
+    else btn.classList.add('is-dimmed');
+  });
+  isAnswered = true;
+  showAns();
+}
+
+function showAns() {
+  const item = qs[cur];
+  document.getElementById('correct-ans').innerText = item.label;
+  document.getElementById('expl-detail').innerText = item.e;
+  document.getElementById('explanation').style.display = 'block';
+  document.querySelector('.btn-ans').innerHTML = '解答表示';
+  document.getElementById('space-hint').textContent = '[Space]';
+}
+
+function move(step) {
+  cur = (cur + step + qs.length) % qs.length;
+  render();
+}
+
+document.addEventListener('keydown', function(e) {
+  const quizScreen = document.getElementById('quiz-screen');
+  if (quizScreen.classList.contains('hidden')) return;
+
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (!isAnswered) {
+      triggerShowAns();
+    } else {
+      move(1);
+    }
+    return;
+  }
+  // 1/2・A/B キーで、画面に表示されている位置の選択肢を選ぶ
+  const k = e.key.toLowerCase();
+  if (k === '1' || k === 'a') checkAnswer(0);
+  else if (k === '2' || k === 'b') checkAnswer(1);
+});
+
+buildQuestions();
+</script>
+</body>
+</html>
